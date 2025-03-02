@@ -6,7 +6,7 @@ from ultralytics import YOLO
 
 if __name__ == '__main__':
     model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcecity7/weights/best.pt')
-    model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/privatepower_to_publicpower.yaml',
+    model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
               split='val',
               imgsz=800,
               batch=8,
