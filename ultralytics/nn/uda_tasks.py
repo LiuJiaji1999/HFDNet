@@ -1265,6 +1265,9 @@ def parse_model(d, ch, verbose=True, warehouse_manager=None):  # model_dict, inp
         elif m in {FuseBlockMulti}:
             c2 = ch[f[0]]
             args = [c2]
+        elif m in {DynamicAlignFusion}:
+            c2 = args[0]
+            args = [[ch[x] for x in f], c2]
         elif m in {ConvEdgeFusion}:
             c2 = make_divisible(min(args[0], max_channels) * width, 8)
             args = [[ch[x] for x in f], c2]
