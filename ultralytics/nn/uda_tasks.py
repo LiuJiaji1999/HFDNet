@@ -1275,6 +1275,10 @@ def parse_model(d, ch, verbose=True, warehouse_manager=None):  # model_dict, inp
             c1 = ch[f]
             c2 = [make_divisible(min(i, max_channels) * width, 8) for i in args[0]]
             args = [c1, c2]
+        elif m in {MultiScaleGatedAttn}:
+            c1 = [ch[x] for x in f]
+            c2 = min(c1)
+            args = [c1]
         elif m in {GetIndexOutput}:
             c2 = ch[f][args[0]]
         else:
