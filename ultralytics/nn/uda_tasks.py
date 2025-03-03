@@ -1045,7 +1045,7 @@ def parse_model(d, ch, verbose=True, warehouse_manager=None):  # model_dict, inp
             C3_RetBlock, C2f_RetBlock, C3_PKIModule, C2f_PKIModule, RepNCSPELAN4_CAA, C3_FADC, C2f_FADC, C3_PPA, C2f_PPA, SRFD, DRFD, RGCSPELAN,
             C3_Faster_CGLU, C2f_Faster_CGLU, C3_Star, C2f_Star, C3_Star_CAA, C2f_Star_CAA, C3_KAN, C2f_KAN, C3_EIEM, C2f_EIEM, C3_DEConv, C2f_DEConv,
             C3_SMPCGLU, C2f_SMPCGLU, C3_Heat, C2f_Heat, CSP_PTB, SimpleStem, VisionClueMerge, VSSBlock_YOLO, XSSBlock, GLSA, C2f_WTConv, WTConv2d, FeaturePyramidSharedConv,
-            C2f_FMB, LDConv, C2f_gConv, C2f_WDBB, C2f_DeepDBB,C2f_DCMB,CSP_PMSFA,CSP_FreqSpatial
+            C2f_FMB, LDConv, C2f_gConv, C2f_WDBB, C2f_DeepDBB,C2f_DCMB,CSP_PMSFA,CSP_FreqSpatial, CSP_MutilScaleEdgeInformationEnhance,CSP_MutilScaleEdgeInformationSelect 
         }:
             if args[0] == 'head_channel':
                 args[0] = d[args[0]]
@@ -1083,7 +1083,7 @@ def parse_model(d, ch, verbose=True, warehouse_manager=None):  # model_dict, inp
                      C3_RVB, C2f_RVB, C3_RVB_SE, C2f_RVB_SE, C3_RVB_EMA, C2f_RVB_EMA, C3_RetBlock, C2f_RetBlock, C3_PKIModule, C2f_PKIModule,
                      C3_FADC, C2f_FADC, C3_PPA, C2f_PPA, RGCSPELAN, C3_Faster_CGLU, C2f_Faster_CGLU, C3_Star, C2f_Star, C3_Star_CAA, C2f_Star_CAA,
                      C3_KAN, C2f_KAN, C3_EIEM, C2f_EIEM, C3_DEConv, C2f_DEConv, C3_SMPCGLU, C2f_SMPCGLU, C3_Heat, C2f_Heat, CSP_PTB, XSSBlock, C2f_WTConv,
-                     C2f_FMB, C2f_gConv, C2f_WDBB, C2f_DeepDBB,C2f_DCMB,CSP_PMSFA,CSP_FreqSpatial
+                     C2f_FMB, C2f_gConv, C2f_WDBB, C2f_DeepDBB,C2f_DCMB,CSP_PMSFA,CSP_FreqSpatial, CSP_MutilScaleEdgeInformationEnhance,CSP_MutilScaleEdgeInformationSelect 
                      }:
                 args.insert(2, n)  # number of repeats
                 n = 1
