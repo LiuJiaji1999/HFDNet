@@ -136,15 +136,13 @@ class BaseModel(nn.Module):
                 #     if i is not None:
                 #         print(i.size())
                 x = x[-1]
-            else:
-                x = m(x)  # run
-                y.append(x if m.i in self.save else None)  # save output
-        
             # if m.__class__.__name__ in ['Detect']:
             #     # Only pass pseudo and delta to the detection head as opposed to the other layers
             #     x = m(x, pseudo, delta)
-            # else:
-            #     x = m(x)  # run    
+            else:
+                x = m(x)  # run
+                y.append(x if m.i in self.save else None)  # save output
+
             if visualize:     
                 feature_visualization(x, m.type, m.i, save_dir=visualize)
 

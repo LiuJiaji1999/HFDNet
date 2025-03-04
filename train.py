@@ -5,7 +5,7 @@ from ultralytics import YOLO
 # 训练参数官方详解链接：https://docs.ultralytics.com/modes/train/#resuming-interrupted-trainings:~:text=a%20training%20run.-,Train%20Settings,-The%20training%20settings
 
 if __name__ == '__main__':
-    model = YOLO('ultralytics/cfg/models/v8/yolov8m-CSP-FreqSpatial.yaml')
+    model = YOLO('ultralytics/cfg/models/v8/yolov8m-C2f-MutilScaleEdgeInformationSelect.yaml')
     # model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main/runs/train/exp2/weights/last.pt') # 断点续训
     model.load('yolov8m.pt') # loading pretrain weights
     model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
