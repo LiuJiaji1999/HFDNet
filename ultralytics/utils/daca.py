@@ -209,7 +209,7 @@ def transform_img_bboxes(out, best_side, region_t, transform_):
     '''
     out 原始的检测框(bounding boxes) 形状为 (N, 7)，其中 N 是目标的数量。
     best_side:选定的最佳区域（'topleft', 'bottomleft', 'bottomright', 'topright'）。
-    region_t:从原始图像裁剪出的最佳区域图像。
+    region_t:从原始图像裁剪出的最佳区域图像。 region_t.shape = torch.Size([4, 3, 320, 320])
     transform_:一个用于数据增强的变换函数。
     '''
     out_ = copy.deepcopy(out) # 作用是创建 out 的深拷贝，确保不会修改原始数据
@@ -254,18 +254,35 @@ def transform_img_bboxes(out, best_side, region_t, transform_):
     #  移除宽度或高度小于等于 0 的目标框，防止后续计算出错
     bboxes_ = bboxes_[bboxes_[:, 4] > 0]
     bboxes_ = bboxes_[bboxes_[:, 5] > 0]
+    # bboxes_.shape = torch.Size([263, 7])
 
-    if bboxes_.shape[0]:
-        category_ids = [0]*bboxes_.shape[0] # 创建类别 ID（这里默认都为 0）
+    if bboxes_.shape[0]: # 如果有目标框
+        category_ids = [0] * bboxes_.shape[0] # 创建类别 ID（这里默认都为 0）
         transformed = transform_(image=region_t_np, bboxes= bboxes_[:, 2:6], category_ids=category_ids)
         transformed_img =  np.transpose(transformed['image'], (2,0,1)) # 变回 PyTorch 的格式 (C, H, W)，以便继续训练
-        bboxes_transformed = transformed['bboxes'] # 增强后的坐标
+        bboxes_transformed = transformed['bboxes'] # 增强后的坐标 len():263
+        
+        # 检查增强后的目标框数量
+        if len(bboxes_transformed) != bboxes_.shape[0]:
+            print(f"Warning: Number of transformed bboxes ({len(bboxes_transformed)}) does not match original bboxes ({bboxes_.shape[0]}).")
+            # 过滤掉无效的目标框
+            valid_indices = [i for i, bb in enumerate(bboxes_transformed) if bb is not None]
+            bboxes_ = bboxes_[valid_indices]  # 更新 bboxes_
+
         bboxes_t = [list(bb) for bb in bboxes_transformed] 
-        bboxes_t = torch.FloatTensor(bboxes_t)    #  把 list 转换回 PyTorch Tensor
-        bboxes_t[:, [0, 2]] *= transformed_img.shape[2] # x, w 乘回图片的 宽度，还原真实坐标
-        bboxes_t[:, [1, 3]] *= transformed_img.shape[1] # y, h 乘回图片的 高度，还原真实坐标
-        bboxes_[:, 2:6] = bboxes_t
+        bboxes_t = torch.FloatTensor(bboxes_t)    #  把 list 转换回 PyTorch Tensor [263,4]
+        # 确保形状匹配
+        if bboxes_t.shape[0] == bboxes_.shape[0]:
+            bboxes_t[:, [0, 2]] *= transformed_img.shape[2] # x, w 乘回图片的 宽度，还原真实坐标
+            bboxes_t[:, [1, 3]] *= transformed_img.shape[1] # y, h 乘回图片的 高度，还原真实坐标
+            bboxes_[:, 2:6] = bboxes_t
+        else:
+            raise ValueError(f"Shape mismatch: bboxes_t.shape={bboxes_t.shape}, bboxes_.shape={bboxes_.shape}")
+        
+        # print("bboxes_.shape:", bboxes_.shape) # (,7)
+        # print("bboxes_t.shape:", bboxes_t.shape)  # Debugging (,4)
+        
         return transformed_img, bboxes_
     else: 
-        return region_t.squeeze(0).cpu().numpy(), np.ones((1, 7))
+        return region_t.squeeze(0).cpu().numpy(), np.ones((1, 7)) # 如果没有目标框，返回默认值
     

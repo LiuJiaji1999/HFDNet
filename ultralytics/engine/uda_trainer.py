@@ -512,7 +512,8 @@ class UDABaseTrainer:
                     imgs_concat = torch.ones_like(batch_s['img']) * torch.mean(batch_s['img']) #  初始化合成图像，进行再次训练
                     if out.shape[0] > 0: #（16，4） 如果 out 的行数大于 0，说明有目标框需要处理。
                         # get best region from target 从目标域中选 最好的区域
-                        region_t1_original, out1_original, best_side = get_best_region(out, batch_t['img']) # torch.Size([4, 3, 320, 320]),(16,7),''topleft''  
+                        region_t1_original, out1_original, best_side = get_best_region(out, batch_t['img']) 
+                        # torch.Size([4, 3, 320, 320]),(16,7),''topleft''  
 
                         transform = A.Compose([
                                             A.BBoxSafeRandomCrop(erosion_rate=0.1, always_apply=False, p=0.2),
@@ -891,17 +892,17 @@ class UDABaseTrainer:
         """Plots training samples during YOLO training."""
         pass
 
-    # TODO: may need to put these following functions into callback
-    def plot_uda_samples(self, batch, ni):
-        """Plots uda_training samples during YOLO training."""
-        plot_images(
-            images=batch["img"],
-            batch_idx=batch["batch_idx"],
-            cls=batch["cls"].squeeze(-1),
-            bboxes=batch["bboxes"],
-            fname=self.save_dir / f"uda_train_batch{ni}.jpg",
-            on_plot=self.on_plot,
-        )
+    # # TODO: may need to put these following functions into callback
+    # def plot_uda_samples(self, batch, ni):
+    #     """Plots uda_training samples during YOLO training."""
+    #     plot_images(
+    #         images=batch["img"],
+    #         batch_idx=batch["batch_idx"],
+    #         cls=batch["cls"].squeeze(-1),
+    #         bboxes=batch["bboxes"],
+    #         fname=self.save_dir / f"uda_train_batch{ni}.jpg",
+    #         on_plot=self.on_plot,
+    #     )
 
     def plot_training_labels(self):
         """Plots training labels for YOLO model."""
