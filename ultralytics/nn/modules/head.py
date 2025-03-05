@@ -48,17 +48,29 @@ class Detect(nn.Module):
             self.one2one_cv2 = copy.deepcopy(self.cv2)
             self.one2one_cv3 = copy.deepcopy(self.cv3)
 
-    def forward(self, x):
+    def forward(self, x, pseudo=False,delta=0.5):
         """Concatenates and returns predicted bounding boxes and class probabilities."""
         if self.end2end:
             return self.forward_end2end(x)
 
         for i in range(self.nl):
             x[i] = torch.cat((self.cv2[i](x[i]), self.cv3[i](x[i])), 1)
-        if self.training:  # Training path
+
+        if self.training and not pseudo:  # Training path
             return x
+
         y = self._inference(x)
+
+        if pseudo:
+            print('**************** head/forward/pseudo')
+            cls_conf = y[:,1].sigmoid().detach() # Class confidence (probability)
+            box_conf = torch.mean(cls_conf, dim=1, keepdim=True).detach()  # Bounding box confidence (average class confidence)
+            cls_conf = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
+            y = torch.cat((y[:,0], cls_conf), 1)
+
         return y if self.export else (y, x)
+    
+
 
     def forward_end2end(self, x):
         """

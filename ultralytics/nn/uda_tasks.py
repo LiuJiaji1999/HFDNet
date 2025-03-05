@@ -80,7 +80,7 @@ class BaseModel(nn.Module):
             return self.loss(x, *args, **kwargs)
         return self.predict(x, *args, **kwargs)
 
-    def predict(self, x, profile=False, visualize=False, augment=False, embed=None, layers=False):
+    def predict(self, x, profile=False, visualize=False, augment=False, embed=None, layers=False,pseudo=False,delta=1.):
         """
         Perform a forward pass through the network.
 
@@ -96,9 +96,9 @@ class BaseModel(nn.Module):
         """
         if augment:
             return self._predict_augment(x)
-        return self.uda_predict_once(x, profile, visualize, embed,layers)
+        return self.uda_predict_once(x, profile, visualize, embed,layers,pseudo,delta)
     
-    def uda_predict_once(self, x, profile=False, visualize=False, embed=None,layers=False):
+    def uda_predict_once(self, x, profile=False, visualize=False, embed=None,layers=False,pseudo=False,delta=1.):
         """
         :param bool pseudo: Whether to perform progressive pseudo labelling
         :param float delta: The shifting weight to assign progressively more importance to C_comb
@@ -136,9 +136,11 @@ class BaseModel(nn.Module):
                 #     if i is not None:
                 #         print(i.size())
                 x = x[-1]
-            # if m.__class__.__name__ in ['Detect']:
-            #     # Only pass pseudo and delta to the detection head as opposed to the other layers
-            #     x = m(x, pseudo, delta)
+
+            if m.__class__.__name__ in ['Detect']:
+                # Only pass pseudo and delta to the detection head as opposed to the other layers
+                x = m(x, pseudo, delta)
+
             else:
                 x = m(x)  # run
                 y.append(x if m.i in self.save else None)  # save output
@@ -401,13 +403,12 @@ class DetectionModel(BaseModel):
 
         # Build strides
         m = self.model[-1]  # Detect()
-        print('******************* uda_task/_forward')
+        print('******************* uda_task/Detectmodel/_forward')
         if isinstance(m, (DETECT_CLASS + SEGMENT_CLASS + POSE_CLASS + OBB_CLASS + V10_DETECT_CLASS)):  # includes all Detect subclasses like Segment, Pose, OBB, WorldDetect
             s = 640  # 2x min stride
             m.inplace = self.inplace
             
             def _forward(x):
-                
                 """Performs a forward pass through the model, handling different Detect subclass types accordingly."""
                 if isinstance(m, (DetectAux,)):
                     return self.forward(x)[:3]

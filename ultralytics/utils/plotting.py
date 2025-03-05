@@ -1246,7 +1246,8 @@ def output_to_target(output, max_det=300):
         j = torch.full((conf.shape[0], 1), i)
         targets.append(torch.cat((j, cls, ops.xyxy2xywh(box), conf), 1))
     targets = torch.cat(targets, 0).numpy()
-    return targets[:, 0], targets[:, 1], targets[:, 2:-1], targets[:, -1]
+    return targets
+    # return targets[:, 0], targets[:, 1], targets[:, 2:-1], targets[:, -1]
 
 
 def output_to_rotated_target(output, max_det=300):
