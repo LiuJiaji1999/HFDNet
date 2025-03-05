@@ -29,7 +29,7 @@ class Detect(nn.Module):
     anchors = torch.empty(0)  # init
     strides = torch.empty(0)  # init
 
-    printed_pseudo = False  # 只在初始化时声明
+   
 
     def __init__(self, nc=80, ch=()):
         """Initializes the YOLOv8 detection layer with specified number of classes and channels."""
@@ -45,6 +45,8 @@ class Detect(nn.Module):
         )
         self.cv3 = nn.ModuleList(nn.Sequential(Conv(x, c3, 3), Conv(c3, c3, 3), nn.Conv2d(c3, self.nc, 1)) for x in ch)
         self.dfl = DFL(self.reg_max) if self.reg_max > 1 else nn.Identity()
+
+        # self.printed_pseudo = False  # 只在初始化时声明
 
         if self.end2end:
             self.one2one_cv2 = copy.deepcopy(self.cv2)
@@ -65,9 +67,9 @@ class Detect(nn.Module):
         
         
         if pseudo:
-            if not printed_pseudo:
+            if not hasattr(self, "printed_pseudo"): # self中没有该变量，就执行；有就不执行
                 print('**************** head/forward/pseudo')
-                printed_pseudo = True  # 记录已打印
+                self.printed_pseudo = True  # 记录已打印
             cls_conf = y[:,4].sigmoid().detach() # Class confidence (probability) y[:,1].shape[4,8400]
             box_conf = torch.mean(cls_conf, dim=1, keepdim=True).detach()  # Bounding box confidence (average class confidence)
             y[:, 4] = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
