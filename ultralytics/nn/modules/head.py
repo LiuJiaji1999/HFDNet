@@ -59,14 +59,13 @@ class Detect(nn.Module):
         if self.training and not pseudo:  # Training path
             return x
 
-        y = self._inference(x)
+        y = self._inference(x) # torch.Size([4, 12, 8400])
 
         if pseudo:
             print('**************** head/forward/pseudo')
-            cls_conf = y[:,1].sigmoid().detach() # Class confidence (probability)
+            cls_conf = y[:,4].sigmoid().detach() # Class confidence (probability) y[:,1].shape[4,8400]
             box_conf = torch.mean(cls_conf, dim=1, keepdim=True).detach()  # Bounding box confidence (average class confidence)
-            cls_conf = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
-            y = torch.cat((y[:,0], cls_conf), 1)
+            y[:, 4] = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
 
         return y if self.export else (y, x)
     
