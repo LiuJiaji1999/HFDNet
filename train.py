@@ -23,7 +23,7 @@ if __name__ == '__main__':
                 # half=False,
                 # fraction=0.2,
                 cos_lr = True,
-                project='runs/improve/train',
+                project='runs/train/improve',
                 name='sourcecity',
                 )
 
