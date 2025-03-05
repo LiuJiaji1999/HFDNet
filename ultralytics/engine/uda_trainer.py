@@ -642,7 +642,7 @@ class UDABaseTrainer:
                     if self.args.plots and ni in self.plot_idx:
                         # self.plot_training_samples(batch_s, ni)
                         self.plot_training_samples(batch_t, ni)
-                        self.plot_uda_samples(batch_daca,ni)
+                        # self.plot_uda_samples(batch_daca,ni)
 
                 self.run_callbacks("on_train_batch_end")
 
