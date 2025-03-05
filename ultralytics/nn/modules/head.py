@@ -29,6 +29,8 @@ class Detect(nn.Module):
     anchors = torch.empty(0)  # init
     strides = torch.empty(0)  # init
 
+    printed_pseudo = False  # 只在初始化时声明
+
     def __init__(self, nc=80, ch=()):
         """Initializes the YOLOv8 detection layer with specified number of classes and channels."""
         super().__init__()
@@ -60,9 +62,12 @@ class Detect(nn.Module):
             return x
 
         y = self._inference(x) # torch.Size([4, 12, 8400])
-
+        
+        
         if pseudo:
-            print('**************** head/forward/pseudo')
+            if not printed_pseudo:
+                print('**************** head/forward/pseudo')
+                printed_pseudo = True  # 记录已打印
             cls_conf = y[:,4].sigmoid().detach() # Class confidence (probability) y[:,1].shape[4,8400]
             box_conf = torch.mean(cls_conf, dim=1, keepdim=True).detach()  # Bounding box confidence (average class confidence)
             y[:, 4] = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
