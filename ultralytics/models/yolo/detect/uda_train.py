@@ -154,6 +154,18 @@ class UDADetectionTrainer(UDABaseTrainer):
             on_plot=self.on_plot,
         )
 
+    def plot_uda_samples(self, batch, ni):
+        """Plots uda_training samples during YOLO training."""
+        plot_images(
+            images=batch["img"],
+            batch_idx=batch["batch_idx"],
+            cls=batch["cls"].squeeze(-1),
+            bboxes=batch["bboxes"],
+            fname=self.save_dir / f"uda_train_batch{ni}.jpg",
+            on_plot=self.on_plot,
+        )
+
+
     def plot_metrics(self):
         """Plots metrics from a CSV file."""
         plot_results(file=self.csv, on_plot=self.on_plot)  # save results.png
