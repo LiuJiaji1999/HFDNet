@@ -288,6 +288,7 @@ class Annotator:
         txt_color = self.get_txt_color(color, txt_color)
         if isinstance(box, torch.Tensor):
             box = box.tolist()
+
         if self.pil or not is_ascii(label):
             if rotated:
                 p1 = box[0]
@@ -295,17 +296,24 @@ class Annotator:
             else:
                 p1 = (box[0], box[1])
                 self.draw.rectangle(box, width=self.lw, outline=color)  # box
+            
             if label:
                 w, h = self.font.getsize(label)  # text width, height
                 outside = p1[1] >= h  # label fits outside box
                 if p1[0] > self.im.size[1] - w:  # check if label extend beyond right side of image
                     p1 = self.im.size[1] - w, p1[1]
+                
+                # # 调整标签位置，避免堆叠
+                # offset = 10  # 偏移量
+                # p1 = (p1[0] + offset, p1[1] + offset)
+                
                 self.draw.rectangle(
                     (p1[0], p1[1] - h if outside else p1[1], p1[0] + w + 1, p1[1] + 1 if outside else p1[1] + h + 1),
                     fill=color,
                 )
                 # self.draw.text((box[0], box[1]), label, fill=txt_color, font=self.font, anchor='ls')  # for PIL>8.0
                 self.draw.text((p1[0], p1[1] - h if outside else p1[1]), label, fill=txt_color, font=self.font)
+        
         else:  # cv2
             if rotated:
                 p1 = [int(b) for b in box[0]]
@@ -313,12 +321,18 @@ class Annotator:
             else:
                 p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
                 cv2.rectangle(self.im, p1, p2, color, thickness=self.lw, lineType=cv2.LINE_AA)
+            
             if label:
                 w, h = cv2.getTextSize(label, 0, fontScale=self.sf, thickness=self.tf)[0]  # text width, height
                 h += 3  # add pixels to pad text
                 outside = p1[1] >= h  # label fits outside box
                 if p1[0] > self.im.shape[1] - w:  # check if label extend beyond right side of image
                     p1 = self.im.shape[1] - w, p1[1]
+                
+                # # 调整标签位置，避免堆叠
+                # offset = 10  # 偏移量
+                # p1 = (p1[0] + offset, p1[1] + offset)
+                
                 p2 = p1[0] + w, p1[1] - h if outside else p1[1] + h
                 cv2.rectangle(self.im, p1, p2, color, -1, cv2.LINE_AA)  # filled
                 cv2.putText(
