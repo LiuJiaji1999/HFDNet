@@ -999,7 +999,7 @@ def plot_images(
     fs = int((h + w) * ns * 0.01)  # font size
     annotator = Annotator(mosaic, line_width=round(fs / 10), font_size=fs, pil=True, example=names)
     
-    print(f"Received arguments: paths={paths}")
+    # print(f"Received arguments: paths={paths}")
 
     for i in range(bs):
         x, y = int(w * (i // ns)), int(h * (i % ns))  # block origin
