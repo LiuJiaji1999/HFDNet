@@ -962,6 +962,7 @@ def plot_images(
         This function supports both tensor and numpy array inputs. It will automatically
         convert tensor inputs to numpy arrays for processing.
     """
+    # 转换输入为numpy数组
     if isinstance(images, torch.Tensor):
         images = images.cpu().float().numpy()
     if isinstance(cls, torch.Tensor):
@@ -976,32 +977,37 @@ def plot_images(
         batch_idx = batch_idx.cpu().numpy()
 
     bs, _, h, w = images.shape  # batch size, _, height, width
-    bs = min(bs, max_subplots)  # limit plot images
+    bs = min(bs, max_subplots)  # limit plot images 批次大小个图
     ns = np.ceil(bs**0.5)  # number of subplots (square)
     if np.max(images[0]) <= 1:
         images *= 255  # de-normalise (optional)
 
-    # Build Image
+    # Build Image 创建图像风格
     mosaic = np.full((int(ns * h), int(ns * w), 3), 255, dtype=np.uint8)  # init
     for i in range(bs):
         x, y = int(w * (i // ns)), int(h * (i % ns))  # block origin
         mosaic[y : y + h, x : x + w, :] = images[i].transpose(1, 2, 0)
 
-    # Resize (optional)
+    # Resize (optional) 调整大小
     scale = max_size / ns / max(h, w)
     if scale < 1:
         h = math.ceil(scale * h)
         w = math.ceil(scale * w)
         mosaic = cv2.resize(mosaic, tuple(int(x * ns) for x in (w, h)))
 
-    # Annotate
+    # Annotate 绘制标签和边界框
     fs = int((h + w) * ns * 0.01)  # font size
     annotator = Annotator(mosaic, line_width=round(fs / 10), font_size=fs, pil=True, example=names)
+    
+    print(f"Received arguments: paths={paths}")
+
     for i in range(bs):
         x, y = int(w * (i // ns)), int(h * (i % ns))  # block origin
         annotator.rectangle([x, y, x + w, y + h], None, (255, 255, 255), width=2)  # borders
+        
         if paths:
             annotator.text((x + 5, y + 5), text=Path(paths[i]).name[:40], txt_color=(220, 220, 220))  # filenames
+        
         if len(cls) > 0:
             idx = batch_idx == i
             classes = cls[idx].astype("int")
@@ -1020,6 +1026,7 @@ def plot_images(
                 boxes[..., 1] += y
                 is_obb = boxes.shape[-1] == 5  # xywhr
                 boxes = ops.xywhr2xyxyxyxy(boxes) if is_obb else ops.xywh2xyxy(boxes)
+                
                 for j, box in enumerate(boxes.astype(np.int64).tolist()):
                     c = classes[j]
                     color = colors(c)
@@ -1034,7 +1041,7 @@ def plot_images(
                     c = names.get(c, c) if names else c
                     annotator.text((x, y), f"{c}", txt_color=color, box_style=True)
 
-            # Plot keypoints
+            # Plot keypoints 绘制关键点
             if len(kpts):
                 kpts_ = kpts[idx].copy()
                 if len(kpts_):
@@ -1049,7 +1056,7 @@ def plot_images(
                     if labels or conf[j] > conf_thres:
                         annotator.kpts(kpts_[j], conf_thres=conf_thres)
 
-            # Plot masks
+            # Plot masks 绘制掩码
             if len(masks):
                 if idx.shape[0] == masks.shape[0]:  # overlap_masks=False
                     image_masks = masks[idx]
