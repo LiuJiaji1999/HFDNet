@@ -596,12 +596,15 @@ class UDABaseTrainer:
                     batch_daca['cls'] = targets_daca[:,1].unsqueeze(-1) # [32] -> [32,1]
                     batch_daca['bboxes'] = targets_daca[:,2:] # [32,4]
                     batch_daca['batch_idx'] = targets_daca[:,0] # [32]
-                    self.loss_daca, self.loss_items_daca = self.model(batch_daca)
+                    self.daca_loss, self.daca_loss_items = self.model(batch_daca)
 
                     # 计算最终损失
                     lambda_weight = 0.5  # 超参数，用于平衡
-                    self.loss = self.source_loss + lambda_weight * self.loss_daca
-                    self.loss_items = self.source_loss_items + self.loss_items_daca # 可选：是否将MSE损失也加入loss_items
+                    self.loss = self.source_loss + lambda_weight * self.daca_loss
+                    self.loss_items = torch.cat([
+                        self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
+                        self.daca_loss_items
+                    ])
 
                     # print('最终实际的loss_items',self.loss_items)
                     # 多GPU训练时的损失调整
