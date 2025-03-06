@@ -599,7 +599,7 @@ class UDABaseTrainer:
                     self.daca_loss, self.daca_loss_items = self.model(batch_daca)
 
                     # 计算最终损失
-                    lambda_weight = 0.1  # 超参数，用于平衡 ❌[1, 0.5, 0.3]，过大过小会inf和nan
+                    lambda_weight = 0.05  # 超参数，用于平衡 ❌[1, 0.5, 0.3, 0.1]，过大过小会inf和nan
                     self.loss = self.source_loss + lambda_weight * self.daca_loss
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
