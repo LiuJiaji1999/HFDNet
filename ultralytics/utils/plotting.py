@@ -1118,9 +1118,15 @@ def plot_results(file="path/to/results.csv", dir="", segment=False, pose=False, 
     elif pose:
         fig, ax = plt.subplots(2, 9, figsize=(21, 6), tight_layout=True)
         index = [1, 2, 3, 4, 5, 6, 7, 10, 11, 14, 15, 16, 17, 18, 8, 9, 12, 13]
-    else:
-        fig, ax = plt.subplots(2, 6, figsize=(12, 6), tight_layout=True)
-        index = [1, 2, 3, 4, 5, 8, 9, 10, 6, 7,11]
+    # else: # pseudo+mse
+    #     fig, ax = plt.subplots(2, 7, figsize=(12, 6), tight_layout=True)
+    #     index = [1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 9, 10, 13, 14]
+    else: # pseudo
+        fig, ax = plt.subplots(2, 7, figsize=(12, 6), tight_layout=True)
+        index = [1, 2, 3, 4, 5, 6, 7, 10, 11, 8, 9, 12, 13]
+    # else: # mse
+    #     fig, ax = plt.subplots(2, 6, figsize=(12, 6), tight_layout=True)
+    #     index = [1, 2, 3, 4, 5, 8, 9, 10, 6, 7,11]
     # else:
     #     fig, ax = plt.subplots(2, 5, figsize=(12, 6), tight_layout=True)
     #     index = [1, 2, 3, 4, 5, 8, 9, 10, 6, 7]
