@@ -569,8 +569,9 @@ class UDABaseTrainer:
                     # targets_daca_s = out_s
                     targets_daca_t = out # (32,7) 合成域的 GT
                     targets_daca =  targets_daca_t # (32,7)
-                    pred_daca = self.model(imgs_daca, pseudo=True)  # forward
-                    _ , pred_daca  = pred_daca # 检测结果 和 特征图
+                    
+                    # pred_daca = self.model(imgs_daca, pseudo=True)  # forward
+                    # _ , pred_daca  = pred_daca # 检测结果 和 特征图
 
                     targets_daca = targets_daca[:,:6] # remove confidence values [32,6]
                     # normalize
@@ -598,7 +599,7 @@ class UDABaseTrainer:
                     self.loss_daca, self.loss_items_daca = self.model(batch_daca)
 
                     # 计算最终损失
-                    lambda_weight = 1  # 超参数，用于平衡
+                    lambda_weight = 0.5  # 超参数，用于平衡
                     self.loss = self.source_loss + lambda_weight * self.loss_daca
                     self.loss_items = self.source_loss_items + self.loss_items_daca # 可选：是否将MSE损失也加入loss_items
 
