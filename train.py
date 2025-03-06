@@ -19,7 +19,7 @@ if __name__ == '__main__':
                 optimizer='SGD', # using SGD
                 patience=0, # set 0 to close earlystop.
                 resume=True, # 断点续训,YOLO初始化时选择last.pt
-                # amp=False, # close amp
+                amp=False, # close amp
                 # half=False,
                 # fraction=0.2,
                 cos_lr = True,
