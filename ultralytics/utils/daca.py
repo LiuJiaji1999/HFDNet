@@ -21,35 +21,77 @@ from tqdm import tqdm
 import albumentations as A
 
 
+import torch
+import numpy as np
+
+def cutmix_detection(batch_s, batch_t, alpha):
+    # 解包源域和目标域的数据
+    source_img = batch_s['img']  # 源域图像 [4, 3, 640, 640]
+    source_cls = batch_s['cls']  # 源域分类标签 [203, 1]
+    source_bbox = batch_s['bboxes']  # 源域边界框坐标 [203, 4]
+    source_batchidx = batch_s['batch_idx'] # 源域的类别/边界框 索引 [203]
+
+    target_img = batch_t['img']  # 目标域图像 [4, 3, 640, 640]
+    target_batchidx = batch_t['batch_idx'] # 目标域的类别/边界框 索引 203]
+
+    # 生成相同的随机排列索引
+    indices = torch.randperm(source_img.size(0)) # tensor [2,1,0,3]
+    shuffled_source_img = source_img[indices] # [4, 3, 640, 640]
+    shuffled_target_img = target_img[indices] # [4, 3, 640, 640]
+
+    # 生成相同的混合比例 lam
+    lam = np.random.beta(alpha, alpha) # float值 0.44999
+
+    # 生成相同的裁剪区域
+    image_h, image_w = source_img.shape[2:] #[640,640]
+    cx = np.random.uniform(0, image_w) # 随机生成的  12.93977436
+    cy = np.random.uniform(0, image_h) # 随机生成的 532.8767
+    w = image_w * np.sqrt(1 - lam) # 475.01XXXXXX
+    h = image_h * np.sqrt(1 - lam) # 475.01XXXXXX
+    x0, x1 = int(np.round(max(cx - w / 2, 0))), int(np.round(min(cx + w / 2, image_w)))  # 0 ,250
+    y0, y1 = int(np.round(max(cy - h / 2, 0))), int(np.round(min(cy + h / 2, image_h))) # # 295 640 
+
+    # 对源域和目标域进行相同的混合 进行CutMix
+    source_img[:, :, y0:y1, x0:x1] = shuffled_source_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
+    target_img[:, :, y0:y1, x0:x1] = shuffled_target_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
+
+
+    # 遍历每张图像，调整其边界框
+    mixed_source_bbox = source_bbox.clone()  # 克隆以避免修改原始数据 [203,4]
+    for idx in torch.unique(source_batchidx):  # 遍历每张图像
+        # 获取当前图像的边界框索引
+        mask = source_batchidx == idx
+        if not mask.any():
+            continue  # 如果没有边界框，跳过
+        # 调整当前图像的边界框坐标
+        mixed_source_bbox[mask, 0] = torch.clamp(mixed_source_bbox[mask, 0], x0, x1)  # xmin
+        mixed_source_bbox[mask, 1] = torch.clamp(mixed_source_bbox[mask, 1], y0, y1)  # ymin
+        mixed_source_bbox[mask, 2] = torch.clamp(mixed_source_bbox[mask, 2], x0, x1)  # xmax
+        mixed_source_bbox[mask, 3] = torch.clamp(mixed_source_bbox[mask, 3], y0, y1)  # ymax
+
+    # # 混合后的源域标签
+    # # 由于 source_cls 和 source_bbox 是扁平化的，直接复制并添加 lam
+    # mixed_source_cls = torch.cat([source_cls, source_cls, torch.full_like(source_cls, lam)], dim=1)  # [203, 3]   3 表示原始标签、打乱标签和 lam
+    # mixed_source_bbox = torch.cat([source_bbox, source_bbox, torch.full_like(source_bbox, lam)], dim=1)  # [203, 9] # 9 表示原始边界框、打乱边界框和 lam
+    
+
+    # 保持其他键值不变
+    mixed_batch_s = batch_s.copy() # mixed_batch_s['batch_idx'].shape [203]
+    mixed_batch_s['img'] = source_img # [4,3,640,640]
+    # mixed_batch_s['cls'] = mixed_source_cls # [203,3]
+    mixed_batch_s['bboxes'] = mixed_source_bbox # [203,12]
+
+
+    mixed_batch_t = batch_t.copy()
+    mixed_batch_t['img'] = target_img
+
+    return mixed_batch_s, mixed_batch_t
+
 def gram_matrix(x):
     b, c, h, w = x.shape
     features = x.view(b, c, h*w)  # shape: (b, c, N)
     gram = torch.bmm(features, features.transpose(1, 2)) / (c * h * w)
     return gram
-
-
-import argparse
-import math
-import os
-import random
-import sys
-import time
-from copy import deepcopy
-from datetime import datetime
-from pathlib import Path
-import copy
-import numpy as np
-import torch
-import torch.distributed as dist
-import torch.nn as nn
-import yaml
-from torch.cuda import amp
-from torch.nn.parallel import DistributedDataParallel as DDP
-from torch.optim import SGD, Adam, AdamW, lr_scheduler
-from tqdm import tqdm
-import albumentations as A
-
-
 
 def get_features(x, module_type, stage):
     """

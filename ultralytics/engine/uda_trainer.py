@@ -54,7 +54,7 @@ from ultralytics.nn.extra_modules.kernel_warehouse import get_temperature
 ##########################################################
 from ultralytics.nn.uda_tasks import attempt_load_one_weight, attempt_load_weights
 import torch.nn.functional as F
-from ultralytics.utils.daca import  get_best_region, transform_img_bboxes
+from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cutmix_detection
 from ultralytics.utils.ops import  non_max_suppression
 from ultralytics.utils.plotting import output_to_target, plot_images
 import copy
@@ -493,6 +493,7 @@ class UDABaseTrainer:
 
                     # ----------------------------------------------------- 
                     # 基于伪标签的合成域，二次训练
+                    '''    
                     r = ni / max_iterations
                     delta = 2 / (1 + math.exp(-5. * r)) - 1
                     # pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
@@ -581,12 +582,12 @@ class UDABaseTrainer:
                     # supervised detector loss term on the labelled source samples
                     # 源域的检测损失
                     self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
-                    '''
-                    batch_s['img'].shape [4,3,640,640]
-                    batch_s['cls'].shape [109,1]
-                    batch_s['bboxes'].shape [109,4]
-                    batch_s['batch_idx'].shape [109]
-                    '''
+                    
+                    # batch_s['img'].shape [4,3,640,640]
+                    # batch_s['cls'].shape [109,1]
+                    # batch_s['bboxes'].shape [109,4]
+                    # batch_s['batch_idx'].shape [109]
+
                     # self-supervised consistency loss term on the mixed samples
                     # 合成域的 二次检测
                     batch_daca = {}
@@ -614,7 +615,43 @@ class UDABaseTrainer:
                     self.tloss = (
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     )
+                    '''
+                    # ----------------------------------------------------- 
     
+                    # ----------------------------------------------------- 
+                    # 对源域和目标域的合成增强
+                    alpha = 1.0
+                    mixed_batch_s, mixed_batch_t = cutmix_detection(batch_s, batch_t, alpha)
+                    self.source_loss, self.source_loss_items = self.model(mixed_batch_s)
+
+                    # 计算目标域的一致性损失
+                    self.target_loss = F.mse_loss(self.model(batch_t['img']), self.model(mixed_batch_t['img']))
+                    self.target_loss = torch.mean((self.model(batch_t['img']) - self.model(mixed_batch_t['img'])) ** 2)
+
+                    log_pred_s = torch.log(self.model(batch_t['img']))
+                    log_pred_t = torch.log(self.model(mixed_batch_t['img']))
+                    self.target_loss_1 = torch.mean(self.model(batch_t['img']) * (log_pred_s - log_pred_t))
+
+                    # 计算最终损失
+                    lambda_weight = 0.1  # 超参数
+                    self.loss = self.source_loss + lambda_weight * self.target_loss
+                    self.loss_items = torch.cat([
+                        self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
+                        self.target_loss.detach().unsqueeze(0)
+                    ])
+
+                    # print('最终实际的loss_items',self.loss_items)
+                    # 多GPU训练时的损失调整
+                    if RANK != -1:
+                        self.loss *= world_size
+                    # 更新平均损失
+                    self.tloss = (
+                        (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
+                    )
+                    # ----------------------------------------------------- 
+
+
+
                 # Backward
                 self.scaler.scale(self.loss).backward()
 
@@ -647,7 +684,7 @@ class UDABaseTrainer:
                     if self.args.plots and ni in self.plot_idx:
                         # self.plot_training_samples(batch_s, ni)
                         self.plot_training_samples(batch_t, ni)
-                        self.plot_uda_samples(batch_daca,ni)
+                        # self.plot_uda_samples(batch_daca,ni)
 
                 self.run_callbacks("on_train_batch_end")
 

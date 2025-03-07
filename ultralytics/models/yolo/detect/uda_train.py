@@ -114,7 +114,9 @@ class UDADetectionTrainer(UDABaseTrainer):
 
     def get_validator(self):
         """Returns a DetectionValidator for YOLO model validation."""
-        self.loss_names = "box_loss", "cls_loss", "dfl_loss","ps_bboxl","ps_clsl","ps_dfll"
+        self.loss_names = "box_loss", "cls_loss", "dfl_loss","t_mse_loss"
+        # self.loss_names = "box_loss", "cls_loss", "dfl_loss","ps_bboxl","ps_clsl","ps_dfll"
+        # self.loss_names = "box_loss", "cls_loss", "dfl_loss","mse_loss"
         return yolo.detect.DetectionValidator(
             self.test_loader, save_dir=self.save_dir, args=copy(self.args), _callbacks=self.callbacks
         )
