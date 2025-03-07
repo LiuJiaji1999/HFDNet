@@ -459,10 +459,10 @@ class UDABaseTrainer:
                                 gram_losses.append(gram_loss)
                             mean_gram_loss = sum(gram_losses) / 3 
 
-                            if layer in [2,4,6,8, 9]:
+                            if layer in [8, 9]: # [2,4,6,8,9]
                                 mse_loss = F.mse_loss(source_fea, target_fea)
                                 mse_losses.append(mse_loss)
-                            mean_mse_loss = sum(mse_losses) / 5
+                            mean_mse_loss = sum(mse_losses) / 2
     
                             # else:# 如果源域或目标域特征为空，跳过计算
                             #     # print('WARNING  source target features is None!!!')
