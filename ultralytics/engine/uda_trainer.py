@@ -54,7 +54,7 @@ from ultralytics.nn.extra_modules.kernel_warehouse import get_temperature
 ##########################################################
 from ultralytics.nn.uda_tasks import attempt_load_one_weight, attempt_load_weights
 import torch.nn.functional as F
-from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cutmix_detection
+from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cutmix_detection, gram_matrix
 from ultralytics.utils.ops import  non_max_suppression
 from ultralytics.utils.plotting import output_to_target, plot_images
 import copy
@@ -420,9 +420,9 @@ class UDABaseTrainer:
                     batch_s = self.preprocess_batch(batch_S)
                     batch_t = self.preprocess_batch(batch_T)
                     
-                    # ----------------------------------------------------- 
-                    # 源域 目标域的特征图 差异，作为第二个损失 最终优化目标为 与源域的检测损失 ，权重相加
-                    '''    
+                    # -------- 方法一 --------------------------------------------- 
+                    #  源域 目标域的特征图 差异，作为第二个损失 最终优化目标为 与源域的检测损失 ，权重相加
+                        
                     # self.model(batch) 其中，batch是字典就计算loss,不是字典就计算 预测值
                     # 源域的检测损失
                     self.source_loss, self.source_loss_items = self.model(batch_s) # loss*batch,[cls,bbox,dfl]
@@ -452,12 +452,12 @@ class UDABaseTrainer:
                                     align_corners=False
                                 )
                             # 计算 特征 损失
-                            # if layer in [2, 4, 6]:
-                            #     gram_s = gram_matrix(source_fea)
-                            #     gram_t = gram_matrix(target_fea)
-                            #     gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
-                            #     gram_losses.append(gram_loss)
-                            # mean_gram_loss = sum(gram_losses) / 3 
+                            if layer in [2, 4, 6]:
+                                gram_s = gram_matrix(source_fea)
+                                gram_t = gram_matrix(target_fea)
+                                gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
+                                gram_losses.append(gram_loss)
+                            mean_gram_loss = sum(gram_losses) / 3 
 
                             if layer in [2,4,6,8, 9]:
                                 mse_loss = F.mse_loss(source_fea, target_fea)
@@ -471,14 +471,14 @@ class UDABaseTrainer:
 
                     # 计算最终损失
 
-                    # alpha_weight = 0.1 # 超参数，用于平衡 gram
+                    alpha_weight = 0.05 # 超参数，用于平衡 gram
                     lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
-                    self.loss = self.source_loss + lambda_weight * mean_mse_loss
+                    self.loss = self.source_loss + lambda_weight * mean_mse_loss + alpha_weight * mean_gram_loss
                     # 将 mean_mse_loss 和 mean_gram_loss 加入 loss_items
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
-                        # mean_gram_loss.detach().unsqueeze(0),  # 加入 gram 损失
-                        mean_mse_loss.detach().unsqueeze(0)   # 加入 mse 损失
+                        mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
+                        mean_gram_loss.detach().unsqueeze(0),  # 加入 gram 损失
                     ])
 
                     # 多GPU训练时的损失调整
@@ -488,10 +488,10 @@ class UDABaseTrainer:
                     self.tloss = (
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     ) # i 是batch索引
-                    '''
+                    
                     # ----------------------------------------------------- 
 
-                    # ----------------------------------------------------- 
+                    # ----------方法二 ------------------------------------------- 
                     # 基于伪标签的合成域，二次训练
                     '''    
                     r = ni / max_iterations
@@ -618,9 +618,9 @@ class UDABaseTrainer:
                     '''
                     # ----------------------------------------------------- 
     
-                    # ----------------------------------------------------- 
+                    # -----------方法三---------------------------------------- 
                     # 对源域和目标域的合成增强
-
+                    '''
                     # 1.原始源域的监督损失
                     self.source_loss, self.source_loss_items = self.model(batch_s)
                     
@@ -697,8 +697,11 @@ class UDABaseTrainer:
                     self.tloss = (
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     )
+                    '''
                     # ----------------------------------------------------- 
-
+                   
+                    
+                    
 
                 # Backward
                 self.scaler.scale(self.loss).backward()
