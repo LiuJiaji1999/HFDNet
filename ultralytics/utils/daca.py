@@ -51,10 +51,17 @@ def cutmix_detection(batch_s, batch_t, alpha):
     x0, x1 = int(np.round(max(cx - w / 2, 0))), int(np.round(min(cx + w / 2, image_w)))  # 0 ,250
     y0, y1 = int(np.round(max(cy - h / 2, 0))), int(np.round(min(cy + h / 2, image_h))) # # 295 640 
 
-    # 对源域和目标域进行相同的混合 进行CutMix
-    source_img[:, :, y0:y1, x0:x1] = shuffled_source_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
-    target_img[:, :, y0:y1, x0:x1] = shuffled_target_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
+    # # 对源域和目标域进行相同的混合 进行CutMix
+    # source_img[:, :, y0:y1, x0:x1] = shuffled_source_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
+    # target_img[:, :, y0:y1, x0:x1] = shuffled_target_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
+    
+    # 创建掩码，用于混合区域
+    mask = torch.zeros_like(source_img, dtype=torch.bool)
+    mask[:, :, y0:y1, x0:x1] = True
 
+    # 对源域和目标域进行相同的混合（避免原地操作）
+    mixed_source_img = torch.where(mask, shuffled_source_img, source_img)
+    mixed_target_img = torch.where(mask, shuffled_target_img, target_img)
 
     # 遍历每张图像，调整其边界框
     mixed_source_bbox = source_bbox.clone()  # 克隆以避免修改原始数据 [203,4]
@@ -77,13 +84,13 @@ def cutmix_detection(batch_s, batch_t, alpha):
 
     # 保持其他键值不变
     mixed_batch_s = batch_s.copy() # mixed_batch_s['batch_idx'].shape [203]
-    mixed_batch_s['img'] = source_img # [4,3,640,640]
+    mixed_batch_s['img'] = mixed_source_img # [4,3,640,640]
     # mixed_batch_s['cls'] = mixed_source_cls # [203,3]
     mixed_batch_s['bboxes'] = mixed_source_bbox # [203,12]
 
 
     mixed_batch_t = batch_t.copy()
-    mixed_batch_t['img'] = target_img
+    mixed_batch_t['img'] = mixed_target_img
 
     return mixed_batch_s, mixed_batch_t
 

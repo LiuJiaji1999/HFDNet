@@ -620,24 +620,73 @@ class UDABaseTrainer:
     
                     # ----------------------------------------------------- 
                     # 对源域和目标域的合成增强
+
+                    # 1.原始源域的监督损失
+                    self.source_loss, self.source_loss_items = self.model(batch_s)
+                    
+                    # 2.合成源域的监督损失
                     alpha = 1.0
                     mixed_batch_s, mixed_batch_t = cutmix_detection(batch_s, batch_t, alpha)
-                    self.source_loss, self.source_loss_items = self.model(mixed_batch_s)
+                    self.mix_source_loss, self.mix_source_loss_items = self.model(mixed_batch_s)
 
-                    # 计算目标域的一致性损失
-                    self.target_loss = F.mse_loss(self.model(batch_t['img']), self.model(mixed_batch_t['img']))
-                    self.target_loss = torch.mean((self.model(batch_t['img']) - self.model(mixed_batch_t['img'])) ** 2)
+                    
+                    # 仅 源域和目标域图像 的前向传播，返回特征图值
+                    self.source_feature_dict = self.model(batch_s['img'],layers=True)  
+                    self.target_feature_dict = self.model(batch_t['img'],layers=True)  
+                    
+                    # self.mixed_target_feature_dict= self.model(mixed_batch_t['img'],layers=True)
+                    
+                    gap_losses = []
+                    consistency_losses = []
 
-                    log_pred_s = torch.log(self.model(batch_t['img']))
-                    log_pred_t = torch.log(self.model(mixed_batch_t['img']))
-                    self.target_loss_1 = torch.mean(self.model(batch_t['img']) * (log_pred_s - log_pred_t))
+                    for layer in [2, 4, 6, 8, 9]:
+                        source_feas = self.source_feature_dict[layer]
+                        target_feas = self.target_feature_dict[layer]
+                        # mix_target_feas = self.mixed_target_feature_dict[layer]
+                        # # 检查批次大小
+                        min_batch_size = min(source_feas.size(0), target_feas.size(0))
+                        source_fea = source_feas[:min_batch_size]
+                        target_fea = target_feas[:min_batch_size]
+                        # mix_target_fea = mix_target_feas[:min_batch_size]
+                        if source_fea is not None and target_fea is not None:
+                            # 检查源域和目标域特征的形状是否一致
+                            if source_fea.shape != target_fea.shape: 
+                                # 调整 target_feature 的尺寸，使其匹配 source_feature
+                                target_fea = F.interpolate(
+                                    target_fea, 
+                                    size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
+                                    mode="bilinear", 
+                                    align_corners=False
+                                )
+                             # 3.计算源域和目标域的 特定层特征的  MMD ，缩小域间差异
+                            if layer in [2,4,6,8, 9]:
+                                gap_loss = F.mse_loss(source_fea, target_fea)
+                                gap_losses.append(gap_loss)
+                            mean_gap_loss = sum(gap_losses) / 5
+
+                            # # 4.计算目标域的一致性损失
+                            # if layer in [2,4,6,8, 9]:
+                            #     consistency_loss = F.mse_loss(target_fea,mix_target_fea)
+                            #     consistency_losses.append(consistency_loss)
+                            # mean_consis_loss = sum(consistency_losses) / 5
+                                 
 
                     # 计算最终损失
                     lambda_weight = 0.1  # 超参数
-                    self.loss = self.source_loss + lambda_weight * self.target_loss
+                    alpha_weight = 0.1
+
+                    # 4.计算源域 和 合成域 的一致性损失,肯定很大啊，标签都复制了，又不是直接改变风格
+                    # loss_cons = torch.abs(self.source_loss - self.mix_source_loss) * alpha_weight  # L1 loss
+                    # loss_cons = torch.abs(self.source_loss - self.mix_source_loss)**2 * alpha_weight  # L2 loss
+                    
+                    # 最终损失
+                                       
+                    self.loss = self.source_loss + self.mix_source_loss + lambda_weight * mean_gap_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
-                        self.target_loss.detach().unsqueeze(0)
+                        self.mix_source_loss_items,
+                        mean_gap_loss.detach().unsqueeze(0),
+                        # loss_cons.detach().unsqueeze(0),
                     ])
 
                     # print('最终实际的loss_items',self.loss_items)
@@ -649,7 +698,6 @@ class UDABaseTrainer:
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     )
                     # ----------------------------------------------------- 
-
 
 
                 # Backward

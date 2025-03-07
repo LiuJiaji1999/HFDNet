@@ -214,6 +214,7 @@ def compute_linearmmd_loss(source_feat, target_feat, kernel_mul=2.0, kernel_num=
     # 取所有通道均值
     return (mmd_val / n_channels).item()
 
+
 def compute_mmd_loss_allmean(source_feat, target_feat, kernel_mul=2.0, kernel_num=5, fix_sigma=None):
     """
     方式1: 将所有通道展平为一维，得到 shape: (batch, channels*height*width)
