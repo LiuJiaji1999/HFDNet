@@ -991,9 +991,9 @@ class UDABaseTrainer:
         """Plots training samples during YOLO training."""
         pass
 
-    def plot_uda_samples(self, batch, ni):
-        """Plots uda_training samples during YOLO training."""
-        pass
+    # def plot_uda_samples(self, batch, ni):
+    #     """Plots uda_training samples during YOLO training."""
+    #     pass
 
     def plot_training_labels(self):
         """Plots training labels for YOLO model."""
