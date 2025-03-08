@@ -100,6 +100,55 @@ def gram_matrix(x):
     gram = torch.bmm(features, features.transpose(1, 2)) / (c * h * w)
     return gram
 
+
+import torch
+
+def compute_linearmmd_loss(source_feat, target_feat, kernel_mul=2.0, kernel_num=5, fix_sigma=None):
+    """
+    对每个通道分别计算 MMD，然后取所有通道的均值作为最终结果。
+    
+    输入特征的 shape 为 (batch, channels, height, width)。先对空间维度展平（或取均值），
+    然后对每个通道分别计算 MMD。
+    
+    Returns:
+        float: 每个通道 MMD 值的均值。
+    """
+    # 确保输入张量在 GPU 上
+    if not source_feat.is_cuda or not target_feat.is_cuda:
+        raise ValueError("Input tensors must be on GPU (cuda).")
+    
+    n = source_feat.size(0)
+    m = target_feat.size(0)
+    batch_size, n_channels, height, width = source_feat.shape
+    
+    # 将空间维度展平，保留通道信息： (batch, channels, height*width)
+    feas_s = source_feat.view(n, n_channels, -1)
+    feas_t = target_feat.view(m, n_channels, -1)
+    
+    mmd_val = torch.tensor(0.0, device=source_feat.device)  # 初始化 mmd_val 在 GPU 上
+    for i in range(n_channels):
+        # 对第 i 个通道：先对空间维度取均值，得到 (n, 1) 和 (m, 1)
+        channel_s = feas_s[:, i, :].mean(dim=1, keepdim=True)  # (n, 1)
+        channel_t = feas_t[:, i, :].mean(dim=1, keepdim=True)  # (m, 1)
+        
+        # 使用线性核，即内积。计算核矩阵：
+        K_xx = channel_s @ channel_s.t()  # (n, n)
+        K_yy = channel_t @ channel_t.t()  # (m, m)
+        K_xy = channel_s @ channel_t.t()  # (n, m)
+        
+        # 检查是否存在 nan
+        if torch.isnan(K_xx).any() or torch.isnan(K_yy).any() or torch.isnan(K_xy).any():
+            print(f"Warning: nan encountered in channel {i}")
+            continue
+        
+        mmd_channel = K_xx.mean() + K_yy.mean() - 2 * K_xy.mean()
+        mmd_val += mmd_channel
+    
+    # 取所有通道均值
+    return mmd_val / n_channels
+
+
+
 def get_features(x, module_type, stage):
     """
     获取特定层的输出特征。

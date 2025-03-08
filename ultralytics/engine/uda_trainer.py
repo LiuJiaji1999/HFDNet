@@ -54,7 +54,7 @@ from ultralytics.nn.extra_modules.kernel_warehouse import get_temperature
 ##########################################################
 from ultralytics.nn.uda_tasks import attempt_load_one_weight, attempt_load_weights
 import torch.nn.functional as F
-from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cutmix_detection, gram_matrix
+from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cutmix_detection, gram_matrix,compute_linearmmd_loss
 from ultralytics.utils.ops import  non_max_suppression
 from ultralytics.utils.plotting import output_to_target, plot_images
 import copy
@@ -432,7 +432,9 @@ class UDABaseTrainer:
                     self.target_feature_dict = self.model(batch_t['img'],layers=True)
                     
                     gram_losses = [] # Gram
+                    mmd_losses= []
                     mse_losses = [] # l2
+
                     
                     for layer in [2, 4, 6, 8, 9]:
                         source_feas = self.source_feature_dict[layer]
@@ -452,12 +454,17 @@ class UDABaseTrainer:
                                     align_corners=False
                                 )
                             # 计算 特征 损失
-                            if layer in [2, 4, 6]:
-                                gram_s = gram_matrix(source_fea)
-                                gram_t = gram_matrix(target_fea)
-                                gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
-                                gram_losses.append(gram_loss)
-                            mean_gram_loss = sum(gram_losses) / 3 
+                            if layer in [2, 4, 6]: 
+                            # 值太小，对结果影响很小
+                            #     gram_s = gram_matrix(source_fea)
+                            #     gram_t = gram_matrix(target_fea)
+                            #     gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
+                            #     gram_losses.append(gram_loss)
+                            # mean_gram_loss = sum(gram_losses) / 3
+                                
+                                mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
+                                mmd_losses.append(mmd_loss)
+                            mean_mmd_loss = sum(mmd_losses) / 3  
 
                             if layer in [8, 9]: # [2,4,6,8,9]
                                 mse_loss = F.mse_loss(source_fea, target_fea)
@@ -469,16 +476,16 @@ class UDABaseTrainer:
                             #     mse_loss = torch.Tensor(0)
                             #     gram_loss = torch.Tensor(0)  
 
-                    # 计算最终损失
 
+                    # 计算最终损失
                     alpha_weight = 0.05 # 超参数，用于平衡 gram
                     lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
-                    self.loss = self.source_loss + lambda_weight * mean_mse_loss + alpha_weight * mean_gram_loss
+                    self.loss = self.source_loss + lambda_weight * mean_mse_loss + alpha_weight * mean_mmd_loss
                     # 将 mean_mse_loss 和 mean_gram_loss 加入 loss_items
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
                         mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
-                        mean_gram_loss.detach().unsqueeze(0),  # 加入 gram 损失
+                        mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram 损失
                     ])
 
                     # 多GPU训练时的损失调整
