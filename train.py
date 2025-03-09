@@ -9,7 +9,7 @@ if __name__ == '__main__':
     # model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main/runs/train/exp2/weights/last.pt') # 断点续训
     # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/oraclecity/weights/best.pt') # loading pretrain weights
     model.load('yolov8m.pt')
-    model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/sim10k_to_cityscapes.yaml',
+    model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
                 cache=False,
                 imgsz=640,
                 epochs=50,
@@ -26,7 +26,7 @@ if __name__ == '__main__':
                 cos_lr = True,
                 # project='runs/debug',
                 project='runs/train/improve',
-                name='sourcesim10k',
+                name='sourcevoc',
                 )
 
         # city_to_foggycity.yaml sourcecity
