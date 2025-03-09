@@ -19,10 +19,10 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.optim import SGD, Adam, AdamW, lr_scheduler
 from tqdm import tqdm
 import albumentations as A
-
-
 import torch
 import numpy as np
+import ot
+from torch import cdist
 
 def cutmix_detection(batch_s, batch_t, alpha):
     # 解包源域和目标域的数据
@@ -101,8 +101,6 @@ def gram_matrix(x):
     return gram
 
 
-import torch
-
 def compute_linearmmd_loss(source_feat, target_feat, kernel_mul=2.0, kernel_num=5, fix_sigma=None):
     """
     对每个通道分别计算 MMD，然后取所有通道的均值作为最终结果。
@@ -116,38 +114,63 @@ def compute_linearmmd_loss(source_feat, target_feat, kernel_mul=2.0, kernel_num=
     # 确保输入张量在 GPU 上
     if not source_feat.is_cuda or not target_feat.is_cuda:
         raise ValueError("Input tensors must be on GPU (cuda).")
-    
     n = source_feat.size(0)
     m = target_feat.size(0)
     batch_size, n_channels, height, width = source_feat.shape
-    
     # 将空间维度展平，保留通道信息： (batch, channels, height*width)
     feas_s = source_feat.view(n, n_channels, -1)
     feas_t = target_feat.view(m, n_channels, -1)
-    
     mmd_val = torch.tensor(0.0, device=source_feat.device)  # 初始化 mmd_val 在 GPU 上
     for i in range(n_channels):
         # 对第 i 个通道：先对空间维度取均值，得到 (n, 1) 和 (m, 1)
         channel_s = feas_s[:, i, :].mean(dim=1, keepdim=True)  # (n, 1)
         channel_t = feas_t[:, i, :].mean(dim=1, keepdim=True)  # (m, 1)
-        
         # 使用线性核，即内积。计算核矩阵：
         K_xx = channel_s @ channel_s.t()  # (n, n)
         K_yy = channel_t @ channel_t.t()  # (m, m)
         K_xy = channel_s @ channel_t.t()  # (n, m)
-        
         # 检查是否存在 nan
         if torch.isnan(K_xx).any() or torch.isnan(K_yy).any() or torch.isnan(K_xy).any():
             print(f"Warning: nan encountered in channel {i}")
             continue
-        
         mmd_channel = K_xx.mean() + K_yy.mean() - 2 * K_xy.mean()
         mmd_val += mmd_channel
-    
     # 取所有通道均值
     return mmd_val / n_channels
 
+def compute_swd_loss(source_feat, target_feat):
+    batch_size, n_channels, height, width = source_feat.shape  # [1, 96, 96, 160]
+    wasserstein_distance = 0
+    # Flatten height and width dimensions for each channel 每个通道的特征图展平为一维向量，方便后续计算。
+    feas_s_flat = source_feat.view(batch_size, n_channels, -1)  # (batch, channel, height*width)
+    feas_t_flat = target_feat.view(batch_size, n_channels, -1)  # (batch, channel, height*width)
+    for i in range(n_channels):
+        feas_s = feas_s_flat[:, i, :]  # (batch, height*width) 
+        feas_t = feas_t_flat[:, i, :]  # (batch, height*width)
+        # Compute cost matrix on GPU，使用 cdist 函数计算 feas_s 和 feas_t 之间的欧氏距离平方，得到代价矩阵 cost_matrix：
+        cost_matrix = cdist(feas_s, feas_t, p=2)**2  # (batch, height*width, height*width)
+        # Move cost matrix to CPU for OT computation
+        cost_matrix_cpu = cost_matrix.detach().cpu().numpy()
+        # Compute optimal transport
+        '''
+        ot.unif(n) 生成一个均匀分布的概率向量，长度为 n，每个元素的值为 1/n。
+        这里的作用是为 feas_s 和 feas_t 分别生成均匀分布的概率质量函数（PMF），表示每个样本的权重。
+        a=[ 1/n,..,1/n ],n=feas_s.shape[0]
 
+        ot.emd(a, b, cost_matrix, numItermax=1e6):是 POT 库中用于计算 Earth Mover's Distance (EMD) 的函数。
+        a: 第一个分布的权重向量（均匀分布）。
+        b: 第二个分布的权重向量（均匀分布）。
+        cost_matrix: 代价矩阵，表示从 a 的每个点到 b 的每个点的传输成本。
+        numItermax: 最大迭代次数，用于控制算法的收敛性。
+        返回值 gamma 是一个最优传输矩阵，表示从分布 a 到分布 b 的最优传输计划。
+        '''
+        gamma = ot.emd(ot.unif(feas_s.shape[0]), ot.unif(feas_t.shape[0]), cost_matrix_cpu, numItermax=1e6)
+        # Compute Wasserstein distance
+        # np.multiply(gamma, cost_matrix_cpu): 计算传输矩阵 gamma 和代价矩阵 cost_matrix_cpu 的逐元素乘积。
+        # torch.sum(torch.tensor(...)): 将结果转换为 PyTorch 张量并求和，得到当前通道的 Wasserstein 距离。
+        wasserstein_distance += torch.sum(torch.tensor(np.multiply(gamma, cost_matrix_cpu), device=source_feat.device))
+        del cost_matrix_cpu
+    return wasserstein_distance / n_channels
 
 def get_features(x, module_type, stage):
     """
