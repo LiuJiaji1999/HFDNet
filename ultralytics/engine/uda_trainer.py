@@ -464,14 +464,14 @@ class UDABaseTrainer:
                             # mean_gram_loss = sum(gram_losses) / 3
                                 
                                 # mmd_linear 在50epoch还行，100epoch就变很小值了！
-                                # mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
-                                # mmd_losses.append(mmd_loss)
-                            # mean_mmd_loss = sum(mmd_losses) / 3  
+                                mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
+                                mmd_losses.append(mmd_loss)
+                            mean_mmd_loss = sum(mmd_losses) / 3  
 
-                                # swd
-                                swd_loss = torch.tensor(compute_swd_loss(source_fea,target_fea))
-                                swd_losses.append(swd_loss)
-                            mean_swd_loss = sum(swd_losses) / 3  
+                            #     # swd 不是很好，但比gram好一些
+                            #     swd_loss = torch.tensor(compute_swd_loss(source_fea,target_fea))
+                            #     swd_losses.append(swd_loss)
+                            # mean_swd_loss = sum(swd_losses) / 3  
 
 
                             if layer in [8, 9]: # [2,4,6,8,9]
@@ -488,12 +488,12 @@ class UDABaseTrainer:
                     # 计算最终损失
                     alpha_weight = 0.05 # 超参数，用于平衡 gram
                     lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
-                    self.loss = self.source_loss + lambda_weight * mean_mse_loss + alpha_weight * mean_swd_loss
+                    self.loss = self.source_loss + lambda_weight * mean_mse_loss + alpha_weight * mean_mmd_loss
                     # 将 mean_mse_loss 和 mean_gram_loss 加入 loss_items
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
                         mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
-                        mean_swd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
+                        mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
                     ])
 
                     # 多GPU训练时的损失调整
