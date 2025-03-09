@@ -12,7 +12,7 @@ if __name__ == '__main__':
     model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
                 cache=False,
                 imgsz=640,
-                epochs=50,
+                epochs=100,
                 batch=8, # 32
                 close_mosaic=10, 
                 workers=8,# 4
