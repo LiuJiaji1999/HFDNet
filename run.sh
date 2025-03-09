@@ -2,7 +2,7 @@
 
 # 定义训练命令列表（按顺序执行）
 commands=(
-    "python feature_gap.py"
+    "python train.py"
     "python feature_gap_1.py"
     "python feature_gap_2.py"
 )

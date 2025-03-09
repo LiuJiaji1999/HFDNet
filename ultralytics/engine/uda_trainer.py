@@ -486,7 +486,7 @@ class UDABaseTrainer:
 
 
                     # 计算最终损失
-                    alpha_weight = 0.05 # 超参数，用于平衡 gram
+                    alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
                     lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
                     self.loss = self.source_loss + lambda_weight * mean_mse_loss + alpha_weight * mean_mmd_loss
                     # 将 mean_mse_loss 和 mean_gram_loss 加入 loss_items
