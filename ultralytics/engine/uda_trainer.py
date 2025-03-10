@@ -422,7 +422,8 @@ class UDABaseTrainer:
                     
                     # -------- 方法一 --------------------------------------------- 
                     #  源域 目标域的特征图 差异，作为第二个损失 最终优化目标为 与源域的检测损失 ，权重相加
-                    '''   
+                    '''
+                    
                     # self.model(batch) 其中，batch是字典就计算loss,不是字典就计算 预测值
                     # 源域的检测损失
                     self.source_loss, self.source_loss_items = self.model(batch_s) # loss*batch,[cls,bbox,dfl]
@@ -503,7 +504,7 @@ class UDABaseTrainer:
                     self.tloss = (
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     ) # i 是batch索引
-                    ''' 
+                    '''
                     # ----------------------------------------------------- 
 
                     # ----------方法二 ------------------------------------------- 
@@ -632,7 +633,7 @@ class UDABaseTrainer:
                     )
                     '''
                     
-                    
+                   
                     r = ni / max_iterations
                     delta = 2 / (1 + math.exp(-5. * r)) - 1
                     
@@ -803,10 +804,7 @@ class UDABaseTrainer:
                     )
                     
                     # ----------------------------------------------------- 
-    
-
-
-
+                    
                     # -----------方法三---------------------------------------- 
                     # 对源域和目标域的合成增强
                     '''
@@ -890,8 +888,7 @@ class UDABaseTrainer:
                     # ----------------------------------------------------- 
                    
                     
-                    
-
+            
                 # Backward
                 self.scaler.scale(self.loss).backward()
 

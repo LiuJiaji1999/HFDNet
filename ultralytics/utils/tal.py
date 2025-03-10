@@ -113,12 +113,12 @@ class TaskAlignedAssigner(nn.Module):
         ind[0] = torch.arange(end=self.bs).view(-1, 1).expand(-1, self.n_max_boxes)  # b, max_num_obj
         ind[1] = gt_labels.squeeze(-1)  # b, max_num_obj
         # Get the scores of each grid for each gt cls
-        bbox_scores[mask_gt] = pd_scores[ind[0], :, ind[1]][mask_gt]  # b, max_num_obj, h*w
+        bbox_scores[mask_gt] = pd_scores[ind[0], :, ind[1]][mask_gt]  # b, max_num_obj, h*w 分类分支的输出
 
         # (b, max_num_obj, 1, 4), (b, 1, h*w, 4)
         pd_boxes = pd_bboxes.unsqueeze(1).expand(-1, self.n_max_boxes, -1, -1)[mask_gt]
         gt_boxes = gt_bboxes.unsqueeze(2).expand(-1, -1, na, -1)[mask_gt]
-        overlaps[mask_gt] = self.iou_calculation(gt_boxes, pd_boxes)
+        overlaps[mask_gt] = self.iou_calculation(gt_boxes, pd_boxes) # iou的计算
         if power:
             overlaps[mask_gt] = self.power_transform(overlaps[mask_gt].to(dtype=torch.float)).to(overlaps.dtype)
 
@@ -127,7 +127,7 @@ class TaskAlignedAssigner(nn.Module):
 
     def iou_calculation(self, gt_bboxes, pd_bboxes):
         """Iou calculation for horizontal bounding boxes."""
-        return bbox_iou(gt_bboxes, pd_bboxes, xywh=False, CIoU=True).squeeze(-1).clamp_(0)
+        return bbox_iou(gt_bboxes, pd_bboxes, xywh=False, CIoU=True).squeeze(-1).clamp_(0) # 对小于0值的截断
         # return wasserstein_loss(gt_bboxes, pd_bboxes).squeeze(-1).clamp_(0)
 
     def select_topk_candidates(self, metrics, largest=True, topk_mask=None):
