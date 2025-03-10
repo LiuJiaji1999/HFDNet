@@ -12,7 +12,7 @@ if __name__ == '__main__':
     model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
                 cache=False,
                 imgsz=640,
-                epochs=50,
+                epochs=90,
                 batch=8, # 32
                 close_mosaic=10, 
                 workers=8,# 4
@@ -27,6 +27,7 @@ if __name__ == '__main__':
                 # project='runs/debug',
                 project='runs/train/improve',
                 name='sourcevoc',
+                mixup=0.5
                 )
 
         # city_to_foggycity.yaml sourcecity

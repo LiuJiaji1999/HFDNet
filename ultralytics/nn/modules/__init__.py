@@ -59,6 +59,7 @@ from .conv import (
     ChannelAttention,
     Concat,
     Conv,
+    ConvIn, #
     Conv2,
     ConvTranspose,
     DWConv,
@@ -86,6 +87,7 @@ from .transformer import (
 
 __all__ = (
     "Conv",
+    "ConvIn", #
     "Conv2",
     "LightConv",
     "RepConv",
@@ -151,4 +153,5 @@ __all__ = (
     "Attention",
     "PSA",
     "SCDown",
+    
 )
