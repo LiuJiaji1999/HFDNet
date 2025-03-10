@@ -667,7 +667,7 @@ class UDABaseTrainer:
                     index = torch.max(mean_confidences, 0)[1]
 
                      # create binary mask for the confmix image and filter the source pseudo detections based on the selected region
-                    mask = torch.zeros((b, c, h, w))
+                    mask = torch.zeros((b, c, h, w)).to(self.device)
                     if index == 0:
                         # tar_lb
                         tar_lb[:,2:6] = clip_coords_target(tar_lb, 0, w//2, h//2, h)
@@ -707,12 +707,14 @@ class UDABaseTrainer:
                     
 
                     # create confmix targets and compute confmix weight
-                    targets_confmix_s = out_s
+                    targets_confmix_s = out_s #  [batch_id, class_id, x, y, w, h, conf]
                     targets_confmix_t = target_regions[index]
 
                     targets_confmix = torch.cat((targets_confmix_s, targets_confmix_t))
                     
                     c_gamma_thres = 0.5
+                    #  .sum() 对布尔张量求和。True=1，False=0。 返回的是满足条件（大于 0.5）的元素个数。
+                    #  .nelement() 返回张量中元素的总数。对于 targets_confmix[:, 6]，它是一个形状为 [N] 的一维张量，因此 返回 N。
                     gamma = (targets_confmix[:,6] > c_gamma_thres).sum() / \
                                     (targets_confmix[:,6]).nelement()
 
@@ -745,12 +747,50 @@ class UDABaseTrainer:
                     batch_confmix['batch_idx'] = targets_confmix[:,0] # [32]
                     self.confmix_loss, self.confmix_loss_items = self.model(batch_confmix)
 
+                    # # 仅 源域和目标域图像 的前向传播，返回特征图值
+                    # self.source_feature_dict = self.model(batch_s['img'],layers=True)  
+                    # self.target_feature_dict = self.model(batch_t['img'],layers=True)
+                    # mmd_losses = []
+                    # mse_losses = [] # l2
+
+                    # for layer in [2, 4, 6, 8, 9]:
+                    #     source_feas = self.source_feature_dict[layer]
+                    #     target_feas = self.target_feature_dict[layer]
+                    #     # # 检查批次大小
+                    #     min_batch_size = min(source_feas.size(0), target_feas.size(0))
+                    #     source_fea = source_feas[:min_batch_size]
+                    #     target_fea = target_feas[:min_batch_size]
+                    #     if source_fea is not None and target_fea is not None:
+                    #         # 检查源域和目标域特征的形状是否一致
+                    #         if source_fea.shape != target_fea.shape: 
+                    #             # 调整 target_feature 的尺寸，使其匹配 source_feature
+                    #             target_fea = F.interpolate(
+                    #                 target_fea, 
+                    #                 size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
+                    #                 mode="bilinear", 
+                    #                 align_corners=False
+                    #             )
+                    #         # 计算 特征 损失
+                    #         if layer in [2, 4, 6]: 
+                    #             mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
+                    #             mmd_losses.append(mmd_loss)
+                    #         mean_mmd_loss = sum(mmd_losses) / 3  
+
+                    #         if layer in [8, 9]: # [2,4,6,8,9]
+                    #             mse_loss = F.mse_loss(source_fea, target_fea)
+                    #             mse_losses.append(mse_loss)
+                    #         mean_mse_loss = sum(mse_losses) / 2
+
                     # 计算最终损失
-                    # lambda_weight = 0.1  # 超参数，用于平衡 ❌[1, 0.5, 0.3, 0.1]，过大过小会inf和nan
-                    self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma) 
+                    alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
+                    lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
+                    self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma)
+                    # self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma) + lambda_weight * mean_mse_loss + alpha_weight * mean_mmd_loss
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
-                        self.confmix_loss_items
+                        self.confmix_loss_items,
+                        # mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
+                        # mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
                     ])
 
                     # print('最终实际的loss_items',self.loss_items)
@@ -764,6 +804,9 @@ class UDABaseTrainer:
                     
                     # ----------------------------------------------------- 
     
+
+
+
                     # -----------方法三---------------------------------------- 
                     # 对源域和目标域的合成增强
                     '''
