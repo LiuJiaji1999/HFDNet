@@ -54,7 +54,7 @@ from ultralytics.nn.extra_modules.kernel_warehouse import get_temperature
 ##########################################################
 from ultralytics.nn.uda_tasks import attempt_load_one_weight, attempt_load_weights
 import torch.nn.functional as F
-from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cutmix_detection, gram_matrix,compute_linearmmd_loss, compute_swd_loss
+from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cutmix_detection, gram_matrix,compute_linearmmd_loss, compute_swd_loss,clip_coords_target
 from ultralytics.utils.ops import  non_max_suppression
 from ultralytics.utils.plotting import output_to_target, plot_images
 import copy
@@ -422,7 +422,7 @@ class UDABaseTrainer:
                     
                     # -------- 方法一 --------------------------------------------- 
                     #  源域 目标域的特征图 差异，作为第二个损失 最终优化目标为 与源域的检测损失 ，权重相加
-                        
+                    '''   
                     # self.model(batch) 其中，batch是字典就计算loss,不是字典就计算 预测值
                     # 源域的检测损失
                     self.source_loss, self.source_loss_items = self.model(batch_s) # loss*batch,[cls,bbox,dfl]
@@ -503,12 +503,12 @@ class UDABaseTrainer:
                     self.tloss = (
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     ) # i 是batch索引
-                    
+                    ''' 
                     # ----------------------------------------------------- 
 
                     # ----------方法二 ------------------------------------------- 
                     # 基于伪标签的合成域，二次训练
-                    '''    
+                    '''
                     r = ni / max_iterations
                     delta = 2 / (1 + math.exp(-5. * r)) - 1
                     # pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
@@ -631,6 +631,137 @@ class UDABaseTrainer:
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     )
                     '''
+                    
+                    
+                    r = ni / max_iterations
+                    delta = 2 / (1 + math.exp(-5. * r)) - 1
+                    
+                    pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
+                    pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
+                
+                    pred_t = self.model(batch_t['img'], pseudo=True, delta=delta)  # forward
+                    pseudo_t, _ = pred_t # 目标域的 伪标签 和 特征图 pseudo_t.shape(4,5,8400)
+                    
+                    # filter pseudo detections on source images applying NMS
+                    out_s = non_max_suppression(pseudo_s.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
+                    out_s = output_to_target(out_s)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+
+                    # filter pseudo detections on target images applying NMS
+                    out_t = non_max_suppression(pseudo_t.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
+                    out_t = output_to_target(out_t)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+
+                    # confmix
+                    b, c, h, w = batch_s['img'].shape
+                    out_s = torch.from_numpy(out_s) if out_s.size else torch.empty([0,7])
+                    out_t = torch.from_numpy(out_t) if out_t.size else torch.empty([0,7]) 
+
+                    # divide the pseudo detections on the target into 4 regions ([0,0] is top-left)
+                    tar_lb = out_t[(out_t[:,2] < w//2) & (out_t[:,3] >= h//2), :]
+                    tar_lt = out_t[(out_t[:,2] < w//2) & (out_t[:,3] < h//2), :]
+                    tar_rb = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] >= h//2), :]
+                    tar_rt = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] < h//2), :]
+
+                    target_regions = [tar_lb, tar_lt, tar_rb, tar_rt] 
+                    # select the most confident region
+                    mean_confidences = torch.nan_to_num(torch.as_tensor([torch.mean(i[:,6]) for i in target_regions]))  # Column 6 includes the confidence of the predictions
+                    index = torch.max(mean_confidences, 0)[1]
+
+                     # create binary mask for the confmix image and filter the source pseudo detections based on the selected region
+                    mask = torch.zeros((b, c, h, w))
+                    if index == 0:
+                        # tar_lb
+                        tar_lb[:,2:6] = clip_coords_target(tar_lb, 0, w//2, h//2, h)
+                        out_s = out_s[(out_s[:,2] >= w//2) | (out_s[:,3] < h//2), :]
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] < w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] < w//2, :], 0, w, 0, h//2)
+
+                        mask[:, :, h//2:h+1, 0:w//2] = 1.
+                    elif index == 1:
+                        # tar_lt
+                        tar_lt[:,2:6] = clip_coords_target(tar_lt, 0, w//2, 0, h//2)
+                        out_s = out_s[(out_s[:,2] >= w//2) | (out_s[:,3] >= h//2), :]
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] < w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] < w//2, :], 0, w, h//2, h)
+
+                        mask[:, :, 0:h//2, 0:w//2] = 1.
+                    elif index == 2:
+                        # tar_rb
+                        tar_rb[:,2:6] = clip_coords_target(tar_rb, w//2, w, h//2, h)
+                        out_s = out_s[(out_s[:,2] < w//2) | (out_s[:,3] < h//2), :]
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] >= w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] >= w//2, :], 0, w, 0, h//2)
+
+                        mask[:, :, h//2:h+1, w//2:w+1] = 1.
+                    elif index == 3:
+                        # tar_rt
+                        tar_rt[:,2:6] = clip_coords_target(tar_rt, w//2, w, 0, h//2)
+                        out_s = out_s[(out_s[:,2] < w//2) | (out_s[:,3] >= h//2), :]
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] >= w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] >= w//2, :], 0, w, h//2, h)
+
+                        mask[:, :, 0:h//2, w//2:w+1] = 1.
+                    
+
+                    # create confmix targets and compute confmix weight
+                    targets_confmix_s = out_s
+                    targets_confmix_t = target_regions[index]
+
+                    targets_confmix = torch.cat((targets_confmix_s, targets_confmix_t))
+                    
+                    c_gamma_thres = 0.5
+                    gamma = (targets_confmix[:,6] > c_gamma_thres).sum() / \
+                                    (targets_confmix[:,6]).nelement()
+
+                    targets_confmix = targets_confmix[:,:6] # remove confidence values
+                    # normalize
+                    targets_confmix[:, [2, 4]] /= w
+                    targets_confmix[:, [3, 5]] /= h
+
+                    # create confmix image
+                    imgs_confmix = batch_s['img'] * (1-mask) + batch_t['img'] * mask
+                    imgs_confmix = imgs_confmix.to(self.device, non_blocking=True).float() / 255.0
+                    
+                    # supervised detector loss term on the labelled source samples
+                    # 源域的检测损失
+                    self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
+                    
+                    # batch_s['img'].shape [4,3,640,640]
+                    # batch_s['cls'].shape [109,1]
+                    # batch_s['bboxes'].shape [109,4]
+                    # batch_s['batch_idx'].shape [109]
+
+                    # self-supervised consistency loss term on the mixed samples
+                    # 合成域的 二次检测
+                    batch_confmix = {}
+                    batch_confmix['ori_shape'] = batch_s['ori_shape']
+                    batch_confmix['resized_shape'] = [[640,640],[640,640],[640,640],[640,640]]
+                    batch_confmix['img'] = imgs_confmix #[4,3,640,640]
+                    batch_confmix['cls'] = targets_confmix[:,1].unsqueeze(-1) # [32] -> [32,1]
+                    batch_confmix['bboxes'] = targets_confmix[:,2:] # [32,4]
+                    batch_confmix['batch_idx'] = targets_confmix[:,0] # [32]
+                    self.confmix_loss, self.confmix_loss_items = self.model(batch_confmix)
+
+                    # 计算最终损失
+                    # lambda_weight = 0.1  # 超参数，用于平衡 ❌[1, 0.5, 0.3, 0.1]，过大过小会inf和nan
+                    self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma) 
+                    self.loss_items = torch.cat([
+                        self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
+                        self.confmix_loss_items
+                    ])
+
+                    # print('最终实际的loss_items',self.loss_items)
+                    # 多GPU训练时的损失调整
+                    if RANK != -1:
+                        self.loss *= world_size
+                    # 更新平均损失
+                    self.tloss = (
+                        (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
+                    )
+                    
                     # ----------------------------------------------------- 
     
                     # -----------方法三---------------------------------------- 

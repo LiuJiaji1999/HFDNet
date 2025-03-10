@@ -1,28 +1,9 @@
-
-import argparse
-import math
-import os
-import random
-import sys
-import time
-from copy import deepcopy
-from datetime import datetime
-from pathlib import Path
 import copy
-import numpy as np
-import torch
-import torch.distributed as dist
-import torch.nn as nn
-import yaml
-from torch.cuda import amp
-from torch.nn.parallel import DistributedDataParallel as DDP
-from torch.optim import SGD, Adam, AdamW, lr_scheduler
-from tqdm import tqdm
-import albumentations as A
 import torch
 import numpy as np
 import ot
 from torch import cdist
+from ultralytics.utils.ops import  xywh2xyxy,xyxy2xywh
 
 def cutmix_detection(batch_s, batch_t, alpha):
     # 解包源域和目标域的数据
@@ -406,4 +387,13 @@ def transform_img_bboxes(out, best_side, region_t, transform_):
         return transformed_img, bboxes_
     else: 
         return region_t.squeeze(0).cpu().numpy(), np.ones((1, 7)) # 如果没有目标框，返回默认值
-    
+
+
+def clip_coords_target(target, w0, w1, h0, h1):
+    # Clip bounding xywh bounding boxes to image shape (height, width)
+    temp_coords = xywh2xyxy(target[:,2:6])
+    temp_coords[:, 0].clamp_(w0, w1)  # x1
+    temp_coords[:, 1].clamp_(h0, h1)  # y1
+    temp_coords[:, 2].clamp_(w0, w1)  # x2
+    temp_coords[:, 3].clamp_(h0, h1)  # y2
+    return xyxy2xywh(temp_coords)
