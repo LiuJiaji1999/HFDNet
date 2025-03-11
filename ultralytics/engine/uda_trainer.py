@@ -870,10 +870,10 @@ class UDABaseTrainer:
                     
                     # 最终损失
                     # 计算最终损失
-                    gamma_weight = 0.05 # 不行，[1,]
-                    alpha_weight = 0.1 # 超参数，用于平衡 gram、mmd、swd
+                    gamma_weight = 0.5 # 不行，[1,]
+                    alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
                     lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
-                    self.loss = self.source_loss + gamma_weight * self.mix_loss + lambda_weight * mean_mse_loss + alpha_weight * mean_mmd_loss
+                    self.loss = self.source_loss + gamma_weight * self.mix_loss + alpha_weight * mean_mmd_loss + lambda_weight * mean_mse_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
                         self.mix_loss_items, # 合成域的
