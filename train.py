@@ -29,7 +29,7 @@ if __name__ == '__main__':
                 # project='runs/debug',
                 project='runs/train/improve',
                 name='sourcecity',
-                # mixup=0.5
+                mixup=0.5
                 )
 
         # city_to_foggycity.yaml sourcecity
