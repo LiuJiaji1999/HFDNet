@@ -5,75 +5,165 @@ import ot
 from torch import cdist
 from ultralytics.utils.ops import  xywh2xyxy,xyxy2xywh
 
-def cutmix_detection(batch_s, batch_t, alpha):
-    # 解包源域和目标域的数据
-    source_img = batch_s['img']  # 源域图像 [4, 3, 640, 640]
-    source_cls = batch_s['cls']  # 源域分类标签 [203, 1]
-    source_bbox = batch_s['bboxes']  # 源域边界框坐标 [203, 4]
-    source_batchidx = batch_s['batch_idx'] # 源域的类别/边界框 索引 [203]
+import numpy as np
+import torch
+import torch.nn.functional as F
 
-    target_img = batch_t['img']  # 目标域图像 [4, 3, 640, 640]
-    target_batchidx = batch_t['batch_idx'] # 目标域的类别/边界框 索引 203]
+import torch
+import numpy as np
 
-    # 生成相同的随机排列索引
-    indices = torch.randperm(source_img.size(0)) # tensor [2,1,0,3]
-    shuffled_source_img = source_img[indices] # [4, 3, 640, 640]
-    shuffled_target_img = target_img[indices] # [4, 3, 640, 640]
-
-    # 生成相同的混合比例 lam
-    lam = np.random.beta(alpha, alpha) # float值 0.44999
-
-    # 生成相同的裁剪区域
-    image_h, image_w = source_img.shape[2:] #[640,640]
-    cx = np.random.uniform(0, image_w) # 随机生成的  12.93977436
-    cy = np.random.uniform(0, image_h) # 随机生成的 532.8767
-    w = image_w * np.sqrt(1 - lam) # 475.01XXXXXX
-    h = image_h * np.sqrt(1 - lam) # 475.01XXXXXX
-    x0, x1 = int(np.round(max(cx - w / 2, 0))), int(np.round(min(cx + w / 2, image_w)))  # 0 ,250
-    y0, y1 = int(np.round(max(cy - h / 2, 0))), int(np.round(min(cy + h / 2, image_h))) # # 295 640 
-
-    # # 对源域和目标域进行相同的混合 进行CutMix
-    # source_img[:, :, y0:y1, x0:x1] = shuffled_source_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
-    # target_img[:, :, y0:y1, x0:x1] = shuffled_target_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
+def cross_set_cutmix(source_img, target_img, source_cls, source_bbox, alpha=1.0):
+    """
+    Cross-set CutMix for object detection tasks.
     
-    # 创建掩码，用于混合区域
-    mask = torch.zeros_like(source_img, dtype=torch.bool)
-    mask[:, :, y0:y1, x0:x1] = True
+    Args:
+        source_img (torch.Tensor): Source domain images [B, C, H, W].
+        target_img (torch.Tensor): Target domain images [B, C, H, W].
+        source_cls (torch.Tensor): Source domain class labels [N, 1].
+        source_bbox (torch.Tensor): Source domain bounding boxes [N, 4] (normalized xyxy format).
+        alpha (float): Beta distribution parameter for CutMix.
+    
+    Returns:
+        mixed_img (torch.Tensor): Mixed image [B, C, H, W].
+        mixed_cls (torch.Tensor): Mixed class labels [N, 1].
+        mixed_bbox (torch.Tensor): Mixed bounding boxes [N, 4].
+    """
+    B, C, H, W = source_img.shape
+    mixed_img = target_img.clone()
+    mixed_cls = torch.full_like(source_cls, -1)  # 初始化为 -1，表示无效标签
+    mixed_bbox = torch.zeros_like(source_bbox)   # 初始化为0
+    
+    # Generate random bounding box for CutMix
+    lam = np.random.beta(alpha, alpha)
+    cut_ratio = np.sqrt(1 - lam)
+    cut_w = int(W * cut_ratio)
+    cut_h = int(H * cut_ratio)
+    cx = np.random.randint(0, W)
+    cy = np.random.randint(0, H)
+    x1 = max(0, cx - cut_w // 2)
+    y1 = max(0, cy - cut_h // 2)
+    x2 = min(W, cx + cut_w // 2)
+    y2 = min(H, cy + cut_h // 2)
+    
+    # Copy the region from source image to target image
+    mixed_img[:, :, y1:y2, x1:x2] = source_img[:, :, y1:y2, x1:x2]
 
-    # 对源域和目标域进行相同的混合（避免原地操作）
-    mixed_source_img = torch.where(mask, shuffled_source_img, source_img)
-    mixed_target_img = torch.where(mask, shuffled_target_img, target_img)
+    # Adjust bounding boxes and labels for the mixed region
+    for idx, (bbox, cls) in enumerate(zip(source_bbox, source_cls)):
+        bbox_abs = bbox.clone()
+        # Convert to absolute coordinates
+        bbox_abs[0] *= W
+        bbox_abs[1] *= H
+        bbox_abs[2] *= W
+        bbox_abs[3] *= H
+        
+        # Check if bbox intersects with CutMix region
+        if (bbox_abs[0] < x2 and bbox_abs[2] > x1 and bbox_abs[1] < y2 and bbox_abs[3] > y1):
+            # Clip bbox to CutMix region
+            bbox_abs[0] = max(bbox_abs[0], x1)
+            bbox_abs[1] = max(bbox_abs[1], y1)
+            bbox_abs[2] = min(bbox_abs[2], x2)
+            bbox_abs[3] = min(bbox_abs[3], y2)
+            
+            # Normalize back
+            bbox_abs[0] /= W
+            bbox_abs[1] /= H
+            bbox_abs[2] /= W
+            bbox_abs[3] /= H
+            
+            mixed_bbox[idx] = bbox_abs
+            mixed_cls[idx] = cls
 
-    # 遍历每张图像，调整其边界框
-    mixed_source_bbox = source_bbox.clone()  # 克隆以避免修改原始数据 [203,4]
-    for idx in torch.unique(source_batchidx):  # 遍历每张图像
-        # 获取当前图像的边界框索引
-        mask = source_batchidx == idx
-        if not mask.any():
-            continue  # 如果没有边界框，跳过
-        # 调整当前图像的边界框坐标
-        mixed_source_bbox[mask, 0] = torch.clamp(mixed_source_bbox[mask, 0], x0, x1)  # xmin
-        mixed_source_bbox[mask, 1] = torch.clamp(mixed_source_bbox[mask, 1], y0, y1)  # ymin
-        mixed_source_bbox[mask, 2] = torch.clamp(mixed_source_bbox[mask, 2], x0, x1)  # xmax
-        mixed_source_bbox[mask, 3] = torch.clamp(mixed_source_bbox[mask, 3], y0, y1)  # ymax
+    return mixed_img, mixed_cls, mixed_bbox
 
-    # # 混合后的源域标签
-    # # 由于 source_cls 和 source_bbox 是扁平化的，直接复制并添加 lam
-    # mixed_source_cls = torch.cat([source_cls, source_cls, torch.full_like(source_cls, lam)], dim=1)  # [203, 3]   3 表示原始标签、打乱标签和 lam
-    # mixed_source_bbox = torch.cat([source_bbox, source_bbox, torch.full_like(source_bbox, lam)], dim=1)  # [203, 9] # 9 表示原始边界框、打乱边界框和 lam
+
+def adjust_alpha(epoch, max_epoch, initial_alpha=1.0, final_alpha=0.0):
+    """
+    Dynamically adjust alpha based on training progress.
+    
+    Args:
+        epoch (int): Current epoch.
+        max_epoch (int): Maximum number of epochs.
+        initial_alpha (float): Initial value of alpha.
+        final_alpha (float): Final value of alpha.
+    
+    Returns:
+        alpha (float): Adjusted alpha value.
+    """
+    alpha = initial_alpha - (initial_alpha - final_alpha) * (epoch / max_epoch)
+    return alpha
+
+
+
+
+# def cutmix_detection(batch_s, batch_t, alpha):
+#     # 解包源域和目标域的数据
+#     source_img = batch_s['img']  # 源域图像 [4, 3, 640, 640]
+#     source_cls = batch_s['cls']  # 源域分类标签 [203, 1]
+#     source_bbox = batch_s['bboxes']  # 源域边界框坐标 [203, 4]
+#     source_batchidx = batch_s['batch_idx'] # 源域的类别/边界框 索引 [203]
+
+#     target_img = batch_t['img']  # 目标域图像 [4, 3, 640, 640]
+#     target_batchidx = batch_t['batch_idx'] # 目标域的类别/边界框 索引 203]
+
+#     # 生成相同的随机排列索引
+#     indices = torch.randperm(source_img.size(0)) # tensor [2,1,0,3]
+#     shuffled_source_img = source_img[indices] # [4, 3, 640, 640]
+#     shuffled_target_img = target_img[indices] # [4, 3, 640, 640]
+
+#     # 生成相同的混合比例 lam
+#     lam = np.random.beta(alpha, alpha) # float值 0.44999
+
+#     # 生成相同的裁剪区域
+#     image_h, image_w = source_img.shape[2:] #[640,640]
+#     cx = np.random.uniform(0, image_w) # 随机生成的  12.93977436
+#     cy = np.random.uniform(0, image_h) # 随机生成的 532.8767
+#     w = image_w * np.sqrt(1 - lam) # 475.01XXXXXX
+#     h = image_h * np.sqrt(1 - lam) # 475.01XXXXXX
+#     x0, x1 = int(np.round(max(cx - w / 2, 0))), int(np.round(min(cx + w / 2, image_w)))  # 0 ,250
+#     y0, y1 = int(np.round(max(cy - h / 2, 0))), int(np.round(min(cy + h / 2, image_h))) # # 295 640 
+
+#     # # 对源域和目标域进行相同的混合 进行CutMix
+#     # source_img[:, :, y0:y1, x0:x1] = shuffled_source_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
+#     # target_img[:, :, y0:y1, x0:x1] = shuffled_target_img[:, :, y0:y1, x0:x1] # [4, 3, 640, 640]
+    
+#     # 创建掩码，用于混合区域
+#     mask = torch.zeros_like(source_img, dtype=torch.bool)
+#     mask[:, :, y0:y1, x0:x1] = True
+
+#     # 对源域和目标域进行相同的混合（避免原地操作）
+#     mixed_source_img = torch.where(mask, shuffled_source_img, source_img)
+#     mixed_target_img = torch.where(mask, shuffled_target_img, target_img)
+
+#     # 遍历每张图像，调整其边界框
+#     mixed_source_bbox = source_bbox.clone()  # 克隆以避免修改原始数据 [203,4]
+#     for idx in torch.unique(source_batchidx):  # 遍历每张图像
+#         # 获取当前图像的边界框索引
+#         mask = source_batchidx == idx
+#         if not mask.any():
+#             continue  # 如果没有边界框，跳过
+#         # 调整当前图像的边界框坐标
+#         mixed_source_bbox[mask, 0] = torch.clamp(mixed_source_bbox[mask, 0], x0, x1)  # xmin
+#         mixed_source_bbox[mask, 1] = torch.clamp(mixed_source_bbox[mask, 1], y0, y1)  # ymin
+#         mixed_source_bbox[mask, 2] = torch.clamp(mixed_source_bbox[mask, 2], x0, x1)  # xmax
+#         mixed_source_bbox[mask, 3] = torch.clamp(mixed_source_bbox[mask, 3], y0, y1)  # ymax
+
+#     # # 混合后的源域标签
+#     # # 由于 source_cls 和 source_bbox 是扁平化的，直接复制并添加 lam
+#     # mixed_source_cls = torch.cat([source_cls, source_cls, torch.full_like(source_cls, lam)], dim=1)  # [203, 3]   3 表示原始标签、打乱标签和 lam
+#     # mixed_source_bbox = torch.cat([source_bbox, source_bbox, torch.full_like(source_bbox, lam)], dim=1)  # [203, 9] # 9 表示原始边界框、打乱边界框和 lam
     
 
-    # 保持其他键值不变
-    mixed_batch_s = batch_s.copy() # mixed_batch_s['batch_idx'].shape [203]
-    mixed_batch_s['img'] = mixed_source_img # [4,3,640,640]
-    # mixed_batch_s['cls'] = mixed_source_cls # [203,3]
-    mixed_batch_s['bboxes'] = mixed_source_bbox # [203,12]
+#     # 保持其他键值不变
+#     mixed_batch_s = batch_s.copy() # mixed_batch_s['batch_idx'].shape [203]
+#     mixed_batch_s['img'] = mixed_source_img # [4,3,640,640]
+#     # mixed_batch_s['cls'] = mixed_source_cls # [203,3]
+#     mixed_batch_s['bboxes'] = mixed_source_bbox # [203,12]
 
+#     mixed_batch_t = batch_t.copy()
+#     mixed_batch_t['img'] = mixed_target_img
 
-    mixed_batch_t = batch_t.copy()
-    mixed_batch_t['img'] = mixed_target_img
-
-    return mixed_batch_s, mixed_batch_t
+#     return mixed_batch_s, mixed_batch_t
 
 def gram_matrix(x):
     b, c, h, w = x.shape

@@ -114,10 +114,10 @@ class UDADetectionTrainer(UDABaseTrainer):
 
     def get_validator(self):
         """Returns a DetectionValidator for YOLO model validation."""
-        # self.loss_names = "box_loss", "cls_loss", "dfl_loss","mbox_l", "mcls_l", "mdfl_l","st_mse_l" # 合成域
+        self.loss_names = "box_loss", "cls_loss", "dfl_loss", "mbox_l", "mcls_l", "mdfl_l", "mse_loss", "mmd_loss" # 合成域
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss","psc_box","psc_cls","psc_dfl"  # 伪标签
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss","mse_loss","mmd_loss" # gram_loss 值太小 \ mmd_loss 100epoch的倒数几个值太小
-        self.loss_names = "box_loss", "cls_loss", "dfl_loss","psc_box","psc_cls","psc_dfl","mse_loss","mmd_loss"  # 伪标签 + 域差异
+        # self.loss_names = "box_loss", "cls_loss", "dfl_loss","psc_box","psc_cls","psc_dfl","mse_loss","mmd_loss"  # 伪标签 + 域差异
         return yolo.detect.DetectionValidator(
             self.test_loader, save_dir=self.save_dir, args=copy(self.args), _callbacks=self.callbacks
         )
