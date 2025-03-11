@@ -29,8 +29,8 @@ if __name__ == '__main__':
                 # project='runs/debug',
                 project='runs/train/improve',
                 name='sourcecity',
-                mixup = 1.0,
-                mosaic = 0.0
+                # mixup = 1.0,
+                # mosaic = 0.0
                 )
 
         # city_to_foggycity.yaml sourcecity

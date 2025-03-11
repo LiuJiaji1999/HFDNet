@@ -877,8 +877,8 @@ class UDABaseTrainer:
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
                         self.mix_loss_items, # 合成域的
-                        mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
                         mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
+                        mean_mse_loss.detach().unsqueeze(0)   # 加入 mse 损失
                     ])
 
                     # 多GPU训练时的损失调整
