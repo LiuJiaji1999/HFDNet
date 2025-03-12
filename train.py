@@ -114,11 +114,11 @@ if __name__ == '__main__':
                 # half=False,
                 # fraction=0.2,
                 cos_lr = True,
-                project='runs/debug',
-                # project='runs/train/improve',
+                # project='runs/debug',
+                project='runs/train/improve',
                 name='sourcecity',
-                mixup = 1.0,
-                mosaic = 0.0
+                # mixup = 1.0,
+                # mosaic = 0.0
 
                 # # 设置自定义损失权重
                 # gamma_weight = gamma_weight,
