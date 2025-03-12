@@ -816,15 +816,19 @@ class UDABaseTrainer:
                     # 2.合成源域的监督损失 (源域+目标域的 cutmix)
                     alpha = adjust_alpha(epoch, self.epochs, initial_alpha=1.0, final_alpha=0.0)
                     mixed_img, mixed_cls, mixed_bbox = cross_set_cutmix(batch_s['img'], batch_t['img'], batch_s['cls'],batch_s['bboxes'], alpha)
-                    if torch.all(mixed_cls == -1) : 
-                        self.mix_loss = torch.tensor(1, dtype=torch.float32).to(self.device)
-                        self.mix_loss_items = torch.tensor([1,1,1],dtype=torch.float32).to(self.device)
-                    else:
-                        mixed_batch_st = batch_s.copy() # mixed_batch_s['batch_idx'].shape [203]
-                        mixed_batch_st['img'] = mixed_img # [4,3,640,640]
-                        mixed_batch_st['cls'] = mixed_cls # [203,3]
-                        mixed_batch_st['bboxes'] = mixed_bbox # [203,12]
-                        self.mix_loss, self.mix_loss_items = self.model(mixed_batch_st)
+                    if torch.all(mixed_cls == -1):
+                        if epoch < self.epochs // 2:  # 训练前半段
+                            self.mix_loss = torch.tensor(1, dtype=torch.float32).to(self.device)
+                            self.mix_loss_items = torch.tensor([1, 1, 1], dtype=torch.float32).to(self.device)
+                        else:  # 训练后半段
+                            self.mix_loss = torch.tensor(0, dtype=torch.float32).to(self.device)
+                            self.mix_loss_items = torch.tensor([0, 0, 0], dtype=torch.float32).to(self.device)
+                   
+                    mixed_batch_st = batch_s.copy() # mixed_batch_s['batch_idx'].shape [203]
+                    mixed_batch_st['img'] = mixed_img # [4,3,640,640]
+                    mixed_batch_st['cls'] = mixed_cls # [203,3]
+                    mixed_batch_st['bboxes'] = mixed_bbox # [203,12]
+                    self.mix_loss, self.mix_loss_items = self.model(mixed_batch_st)
 
                     # 仅 源域和目标域图像 的前向传播，返回特征图值
                     self.source_feature_dict = self.model(batch_s['img'],layers=True)  

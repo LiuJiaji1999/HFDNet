@@ -95,10 +95,10 @@ from ultralytics import YOLO
 if __name__ == '__main__':
     model = YOLO('ultralytics/cfg/models/v8/yolov8m.yaml')
     # model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main/runs/train/exp2/weights/last.pt') # 断点续训
-    # 伪标签使用的 源域 pre-trained weight
-    # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity/weights/best.pt') # loading pretrain weights
+    # 域适应会使用 源域 pre-trained weight
+    model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity/weights/best.pt') # loading pretrain weights
     # COCO pre-trained weight
-    model.load('yolov8m.pt')
+    # model.load('yolov8m.pt')
     result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
                 cache=False,
                 imgsz=640,
