@@ -358,649 +358,633 @@ class UDABaseTrainer:
         self.optimizer.zero_grad()  # zero any resumed gradients to ensure stability on train start
         
         max_iterations = nb * ( self.epochs - epoch)
-        import itertools 
-        # 定义搜索空间
-        gamma_weights = [0.05, 0.1, 0.5, 1.0, 1.5 ]  # gamma_weight 的候选值
-        alpha_weights = [0.05, 0.1, 0.5, 1.0, 1.5]  # alpha_weight 的候选值
-        lambda_weights = [0.05, 0.1, 0.5, 1.0, 1.5]  # lambda_weight 的候选值
-        # 要保证 alpha_weights < lambda_weights
-        # 生成所有可能的组合
-        param_grid = list(itertools.product(gamma_weights, alpha_weights, lambda_weights ))
-        # # 生成所有可能的组合，并过滤掉不满足 alpha_weight < lambda_weight 的组合
-        # param_grid = [
-        #     (gamma, alpha, lambda_ )
-        #     for gamma, alpha, lambda_ in itertools.product(gamma_weights, alpha_weights, lambda_weights)
-        #     if alpha < lambda_  # 确保 alpha_weight < lambda_weight
-        # ]
-        best_mAP = 0  # 记录最佳验证集性能
-        best_params = None  # 记录最佳参数组合
-        for params in param_grid:
-            gamma_weight, alpha_weight ,lambda_weight = params
-            
-            while True:
-                self.epoch = epoch
-                self.run_callbacks("on_train_epoch_start")
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")  # suppress 'Detected lr_scheduler.step() before optimizer.step()'
-                    self.scheduler.step()
 
-                self.model.train()
-                if RANK != -1:
-                    self.train_loader.sampler.set_epoch(epoch)
-                    self.target_loader.sampler.set_epoch(epoch)
+        while True:
+        # for epoch in range(self.epochs):
+            self.epoch = epoch
+            self.run_callbacks("on_train_epoch_start")
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")  # suppress 'Detected lr_scheduler.step() before optimizer.step()'
+                self.scheduler.step()
 
-                # pbar = enumerate(self.train_loader)
-                pbar = enumerate(zip(self.train_loader,self.target_loader))
+            self.model.train()
+            if RANK != -1:
+                self.train_loader.sampler.set_epoch(epoch)
+                self.target_loader.sampler.set_epoch(epoch)
 
-                # Update dataloader attributes (optional)
-                if epoch == (self.epochs - self.args.close_mosaic):
-                    self._close_dataloader_mosaic()
-                    self.train_loader.reset()
+            # pbar = enumerate(self.train_loader)
+            pbar = enumerate(zip(self.train_loader,self.target_loader))
 
-                if RANK in {-1, 0}:
-                    LOGGER.info(self.progress_string())
-                    # pbar = TQDM(enumerate(self.train_loader), total=nb)
-                    pbar = TQDM(pbar, total=nb)
+            # Update dataloader attributes (optional)
+            if epoch == (self.epochs - self.args.close_mosaic):
+                self._close_dataloader_mosaic()
+                self.train_loader.reset()
 
-                self.tloss = None
+            if RANK in {-1, 0}:
+                LOGGER.info(self.progress_string())
+                # pbar = TQDM(enumerate(self.train_loader), total=nb)
+                pbar = TQDM(pbar, total=nb)
 
-                for i, (batch_S,batch_T) in pbar:
-                    self.run_callbacks("on_train_batch_start")
-                    # Warmup
-                    ni = i + nb * epoch
-                    if ni <= nw:
-                        xi = [0, nw]  # x interp
-                        self.accumulate = max(1, int(np.interp(ni, xi, [1, self.args.nbs / self.batch_size]).round()))
-                        for j, x in enumerate(self.optimizer.param_groups):
-                            # Bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
-                            x["lr"] = np.interp(
-                                ni, xi, [self.args.warmup_bias_lr if j == 0 else 0.0, x["initial_lr"] * self.lf(epoch)]
-                            )
-                            if "momentum" in x:
-                                x["momentum"] = np.interp(ni, xi, [self.args.warmup_momentum, self.args.momentum])
+            self.tloss = None
 
-                    if hasattr(self.model, 'net_update_temperature'):
-                        temp = get_temperature(i + 1, epoch, len(self.train_loader), temp_epoch=20, temp_init_value=1.0)
-                        self.model.net_update_temperature(temp)
+            for i, (batch_S,batch_T) in pbar:
+                self.run_callbacks("on_train_batch_start")
+                # Warmup
+                ni = i + nb * epoch
+                if ni <= nw:
+                    xi = [0, nw]  # x interp
+                    self.accumulate = max(1, int(np.interp(ni, xi, [1, self.args.nbs / self.batch_size]).round()))
+                    for j, x in enumerate(self.optimizer.param_groups):
+                        # Bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
+                        x["lr"] = np.interp(
+                            ni, xi, [self.args.warmup_bias_lr if j == 0 else 0.0, x["initial_lr"] * self.lf(epoch)]
+                        )
+                        if "momentum" in x:
+                            x["momentum"] = np.interp(ni, xi, [self.args.warmup_momentum, self.args.momentum])
 
-                    # Forward
-                    with torch.cuda.amp.autocast(self.amp):
-                        # ----------------------------------------------------- 
-                        # 原来的 仅源域的检测损失 Source-only / 仅目标域的 Oracle
-                        # batch = self.preprocess_batch(batch)
-                        # self.loss, self.loss_items = self.model(batch)
-                        # if RANK != -1:
-                        #     self.loss *= world_size
-                        # self.tloss = (
-                        #     (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
-                        # )
-                        # ----------------------------------------------------- 
+                if hasattr(self.model, 'net_update_temperature'):
+                    temp = get_temperature(i + 1, epoch, len(self.train_loader), temp_epoch=20, temp_init_value=1.0)
+                    self.model.net_update_temperature(temp)
 
-                        batch_s = self.preprocess_batch(batch_S)
-                        batch_t = self.preprocess_batch(batch_T)
-                        
-                        # -------- 方法一 --------------------------------------------- 
-                        #  源域 目标域的特征图 差异，作为第二个损失 最终优化目标为 与源域的检测损失 ，权重相加
-                        '''
-                        
-                        # self.model(batch) 其中，batch是字典就计算loss,不是字典就计算 预测值
-                        # 源域的检测损失
-                        self.source_loss, self.source_loss_items = self.model(batch_s) # loss*batch,[cls,bbox,dfl]
+                # Forward
+                with torch.cuda.amp.autocast(self.amp):
+                    # ----------------------------------------------------- 
+                    # 原来的 仅源域的检测损失 Source-only / 仅目标域的 Oracle
+                    # batch = self.preprocess_batch(batch)
+                    # self.loss, self.loss_items = self.model(batch)
+                    # if RANK != -1:
+                    #     self.loss *= world_size
+                    # self.tloss = (
+                    #     (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
+                    # )
+                    # ----------------------------------------------------- 
 
-                        # 仅 源域和目标域图像 的前向传播，返回特征图值
-                        self.source_feature_dict = self.model(batch_s['img'],layers=True)  
-                        self.target_feature_dict = self.model(batch_t['img'],layers=True)
-                        
-                        gram_losses = [] # Gram
-                        mmd_losses = []
-                        swd_losses = []
-                        mse_losses = [] # l2
-
-                        
-                        for layer in [2, 4, 6, 8, 9]:
-                            source_feas = self.source_feature_dict[layer]
-                            target_feas = self.target_feature_dict[layer]
-                            # # 检查批次大小
-                            min_batch_size = min(source_feas.size(0), target_feas.size(0))
-                            source_fea = source_feas[:min_batch_size]
-                            target_fea = target_feas[:min_batch_size]
-                            if source_fea is not None and target_fea is not None:
-                                # 检查源域和目标域特征的形状是否一致
-                                if source_fea.shape != target_fea.shape: 
-                                    # 调整 target_feature 的尺寸，使其匹配 source_feature
-                                    target_fea = F.interpolate(
-                                        target_fea, 
-                                        size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
-                                        mode="bilinear", 
-                                        align_corners=False
-                                    )
-                                # 计算 特征 损失
-                                if layer in [2, 4, 6]: 
-                                    # gram值太小，对结果影响很小
-                                    # gram_s = gram_matrix(source_fea)
-                                    # gram_t = gram_matrix(target_fea)
-                                    # gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
-                                    # gram_losses.append(gram_loss)
-                                # mean_gram_loss = sum(gram_losses) / 3
-                                    
-                                    # mmd_linear 在50epoch还行，100epoch就变很小值了！
-                                    mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
-                                    mmd_losses.append(mmd_loss)
-                                mean_mmd_loss = sum(mmd_losses) / 3  
-
-                                #     # swd 不是很好，但比gram好一些
-                                #     swd_loss = torch.tensor(compute_swd_loss(source_fea,target_fea))
-                                #     swd_losses.append(swd_loss)
-                                # mean_swd_loss = sum(swd_losses) / 3  
-
-
-                                if layer in [8, 9]: # [2,4,6,8,9]
-                                    mse_loss = F.mse_loss(source_fea, target_fea)
-                                    mse_losses.append(mse_loss)
-                                mean_mse_loss = sum(mse_losses) / 2
-        
-                                # else:# 如果源域或目标域特征为空，跳过计算
-                                #     # print('WARNING  source target features is None!!!')
-                                #     mse_loss = torch.Tensor(0)
-                                #     gram_loss = torch.Tensor(0)  
-
-
-                        # 计算最终损失
-                        alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
-                        lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
-                        self.loss = self.source_loss + lambda_weight * mean_mse_loss + alpha_weight * mean_mmd_loss
-                        # 将 mean_mse_loss 和 mean_gram_loss 加入 loss_items
-                        self.loss_items = torch.cat([
-                            self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
-                            mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
-                            mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
-                        ])
-
-                        # 多GPU训练时的损失调整
-                        if RANK != -1:
-                            self.loss *= world_size
-                        # 更新平均损失
-                        self.tloss = (
-                            (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
-                        ) # i 是batch索引
-                        '''
-                        # ----------------------------------------------------- 
-
-                        # ----------方法二 ------------------------------------------- 
-                        # 基于伪标签的合成域，二次训练
-                        '''
-                        r = ni / max_iterations
-                        delta = 2 / (1 + math.exp(-5. * r)) - 1
-                        # pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
-                        # pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
+                    batch_s = self.preprocess_batch(batch_S)
+                    batch_t = self.preprocess_batch(batch_T)
                     
-                        pred_t = self.model(batch_t['img'], pseudo=True, delta=delta)  # forward
-                        pseudo_t, _ = pred_t # 目标域的 伪标签 和 特征图 pseudo_t.shape(4,5,8400)
+                    # -------- 方法一 --------------------------------------------- 
+                    #  源域 目标域的特征图 差异，作为第二个损失 最终优化目标为 与源域的检测损失 ，权重相加
+                    '''
+                    
+                    # self.model(batch) 其中，batch是字典就计算loss,不是字典就计算 预测值
+                    # 源域的检测损失
+                    self.source_loss, self.source_loss_items = self.model(batch_s) # loss*batch,[cls,bbox,dfl]
 
-                        # filter pseudo detections on target images applying NMS
-                        out = non_max_suppression(pseudo_t.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
-                        out = output_to_target(out)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
-                        out_original = copy.deepcopy(out)    
+                    # 仅 源域和目标域图像 的前向传播，返回特征图值
+                    self.source_feature_dict = self.model(batch_s['img'],layers=True)  
+                    self.target_feature_dict = self.model(batch_t['img'],layers=True)
+                    
+                    gram_losses = [] # Gram
+                    mmd_losses = []
+                    swd_losses = []
+                    mse_losses = [] # l2
 
-                        # DACA
-                        # 创建一个与源图像 imgs_s 形状相同的全 1 张量，并将其乘以 imgs_s 的均值。
-                        # 目的是生成一个与 imgs_s 大小相同的空白图像，用于后续拼接增强后的图像。
-                        imgs_concat = torch.ones_like(batch_s['img']) * torch.mean(batch_s['img']) #  初始化合成图像，进行再次训练
-                        if out.shape[0] > 0: #（16，4） 如果 out 的行数大于 0，说明有目标框需要处理。
-                            # get best region from target 从目标域中选 最好的区域
-                            region_t1_original, out1_original, best_side = get_best_region(out, batch_t['img']) 
-                            # torch.Size([4, 3, 320, 320]),(16,7),''topleft''  
+                    
+                    for layer in [2, 4, 6, 8, 9]:
+                        source_feas = self.source_feature_dict[layer]
+                        target_feas = self.target_feature_dict[layer]
+                        # # 检查批次大小
+                        min_batch_size = min(source_feas.size(0), target_feas.size(0))
+                        source_fea = source_feas[:min_batch_size]
+                        target_fea = target_feas[:min_batch_size]
+                        if source_fea is not None and target_fea is not None:
+                            # 检查源域和目标域特征的形状是否一致
+                            if source_fea.shape != target_fea.shape: 
+                                # 调整 target_feature 的尺寸，使其匹配 source_feature
+                                target_fea = F.interpolate(
+                                    target_fea, 
+                                    size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
+                                    mode="bilinear", 
+                                    align_corners=False
+                                )
+                            # 计算 特征 损失
+                            if layer in [2, 4, 6]: 
+                                # gram值太小，对结果影响很小
+                                # gram_s = gram_matrix(source_fea)
+                                # gram_t = gram_matrix(target_fea)
+                                # gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
+                                # gram_losses.append(gram_loss)
+                            # mean_gram_loss = sum(gram_losses) / 3
+                                
+                                # mmd_linear 在50epoch还行，100epoch就变很小值了！
+                                mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
+                                mmd_losses.append(mmd_loss)
+                            mean_mmd_loss = sum(mmd_losses) / 3  
 
-                            transform = A.Compose([
-                                                A.BBoxSafeRandomCrop(erosion_rate=0.1, always_apply=False, p=0.2),
-                                                A.HorizontalFlip(p=0.5),
-                                                A.Blur(blur_limit=1, always_apply=True, p=0.5), 
-                                                A.ColorJitter (brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2, always_apply=False, p=0.5),
-                                                A.Downscale (scale_min=0.5, scale_max=0.99, interpolation=None, always_apply=False, p=0.5),
-                                                A.RandomBrightnessContrast (brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
-                                                ], 
-                                                bbox_params=A.BboxParams(format='yolo', label_fields=['category_ids']),)              
-                            
-                            # 对最佳区域进行增强
-                            region_t1, out1 = transform_img_bboxes(out1_original, best_side, region_t1_original, transform)
-                            region_t2, out2 = transform_img_bboxes(out1_original, best_side, region_t1_original, transform)
-                            region_t3, out3 = transform_img_bboxes(out1_original, best_side, region_t1_original, transform)
-                            region_t4, out4 = transform_img_bboxes(out1_original, best_side, region_t1_original, transform)
+                            #     # swd 不是很好，但比gram好一些
+                            #     swd_loss = torch.tensor(compute_swd_loss(source_fea,target_fea))
+                            #     swd_losses.append(swd_loss)
+                            # mean_swd_loss = sum(swd_losses) / 3  
 
-                            # fill up the concat image
-                            # 将增强后的 4 个区域 region_t1 到 region_t4 拼接到 imgs_concat 的不同位置，形成一张新的拼接图像。
-                            imgs_concat[:, :, 0:int(region_t1.shape[1]), 0:int(region_t1.shape[2])] = torch.from_numpy(region_t1).unsqueeze(0)
-                            imgs_concat[:, :, int(batch_s['img'].shape[3]/2):int(batch_s['img'].shape[3]/2) + int(region_t2.shape[1]), 0:int(region_t2.shape[2])] = torch.from_numpy(region_t2).unsqueeze(0)
-                            imgs_concat[:, :, int(batch_s['img'].shape[3]/2):int(batch_s['img'].shape[3]/2) + int(region_t3.shape[1]),  int(batch_s['img'].shape[3]/2):int(batch_s['img'].shape[3]/2) + int(region_t3.shape[2])] = torch.from_numpy(region_t3).unsqueeze(0)
-                            imgs_concat[:, :, 0:int(region_t4.shape[1]), int(batch_s['img'].shape[3]/2):int(batch_s['img'].shape[3]/2) + int(region_t4.shape[2])] = torch.from_numpy(region_t4).unsqueeze(0)
+
+                            if layer in [8, 9]: # [2,4,6,8,9]
+                                mse_loss = F.mse_loss(source_fea, target_fea)
+                                mse_losses.append(mse_loss)
+                            mean_mse_loss = sum(mse_losses) / 2
     
-                            # Adjust region-level bboxes of the image-level coordinates
-                            # 调整目标框坐标
-                            # convert to bottomleft
-                            out2[:, 3] += batch_t['img'].shape[3]/2
-                            # convert to bottomright
-                            out3[:, 2] += batch_t['img'].shape[2]/2
-                            out3[:, 3] += batch_t['img'].shape[3]/2
-                            # convert to topright
-                            out4[:, 2] += batch_t['img'].shape[2]/2
-                            
-                            # 将目标框转换为张量
-                            if not torch.is_tensor(out1):
-                                out1 = torch.from_numpy(out1)
-                            if not torch.is_tensor(out2):
-                                out2 = torch.from_numpy(out2)
-                            if not torch.is_tensor(out3):
-                                out3 = torch.from_numpy(out3)                                                        
-                            if not torch.is_tensor(out4):
-                                out4 = torch.from_numpy(out4)       
-                            out = torch.cat((out1, out2, out3, out4), dim=0) # shape (32,7)
-                        else:
-                            out = torch.empty([0,7]) 
+                            # else:# 如果源域或目标域特征为空，跳过计算
+                            #     # print('WARNING  source target features is None!!!')
+                            #     mse_loss = torch.Tensor(0)
+                            #     gram_loss = torch.Tensor(0)  
 
-                        imgs_daca = imgs_concat # 合成域的图像
-                        # out_s = torch.from_numpy(out_s) if out_s.size else torch.empty([0,7])
-                        b, c, h, w = imgs_daca.shape # [4,3,640,640]
-                        
-                        # create daca targets 
-                        # targets_daca_s = out_s
-                        targets_daca_t = out # (32,7) 合成域的 GT
-                        targets_daca =  targets_daca_t # (32,7)
-                        
-                        # pred_daca = self.model(imgs_daca, pseudo=True)  # forward
-                        # _ , pred_daca  = pred_daca # 检测结果 和 特征图
 
-                        targets_daca = targets_daca[:,:6] # remove confidence values [32,6]
-                        # normalize
-                        targets_daca[:, [2, 4]] /= w
-                        targets_daca[:, [3, 5]] /= h
-                        
-                        # supervised detector loss term on the labelled source samples
-                        # 源域的检测损失
-                        self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
-                        
-                        # batch_s['img'].shape [4,3,640,640]
-                        # batch_s['cls'].shape [109,1]
-                        # batch_s['bboxes'].shape [109,4]
-                        # batch_s['batch_idx'].shape [109]
+                    # 计算最终损失
+                    alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
+                    lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
+                    self.loss = self.source_loss + lambda_weight * mean_mse_loss + alpha_weight * mean_mmd_loss
+                    # 将 mean_mse_loss 和 mean_gram_loss 加入 loss_items
+                    self.loss_items = torch.cat([
+                        self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
+                        mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
+                        mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
+                    ])
 
-                        # self-supervised consistency loss term on the mixed samples
-                        # 合成域的 二次检测
-                        batch_daca = {}
-                        batch_daca['ori_shape'] = batch_s['ori_shape']
-                        batch_daca['resized_shape'] = [[640,640],[640,640],[640,640],[640,640]]
-                        batch_daca['img'] = imgs_daca #[4,3,640,640]
-                        batch_daca['cls'] = targets_daca[:,1].unsqueeze(-1) # [32] -> [32,1]
-                        batch_daca['bboxes'] = targets_daca[:,2:] # [32,4]
-                        batch_daca['batch_idx'] = targets_daca[:,0] # [32]
-                        self.daca_loss, self.daca_loss_items = self.model(batch_daca)
+                    # 多GPU训练时的损失调整
+                    if RANK != -1:
+                        self.loss *= world_size
+                    # 更新平均损失
+                    self.tloss = (
+                        (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
+                    ) # i 是batch索引
+                    '''
+                    # ----------------------------------------------------- 
 
-                        # 计算最终损失
-                        lambda_weight = 0.1  # 超参数，用于平衡 ❌[1, 0.5, 0.3, 0.1], 过大过小会inf和nan
-                        self.loss = self.source_loss + lambda_weight * self.daca_loss
-                        self.loss_items = torch.cat([
-                            self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
-                            self.daca_loss_items
-                        ])
-
-                        # print('最终实际的loss_items',self.loss_items)
-                        # 多GPU训练时的损失调整
-                        if RANK != -1:
-                            self.loss *= world_size
-                        # 更新平均损失
-                        self.tloss = (
-                            (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
-                        )
-                        '''
-                        
-                        '''
-                        r = ni / max_iterations
-                        delta = 2 / (1 + math.exp(-5. * r)) - 1
-                        
-                        pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
-                        pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
-                    
-                        pred_t = self.model(batch_t['img'], pseudo=True, delta=delta)  # forward
-                        pseudo_t, _ = pred_t # 目标域的 伪标签 和 特征图 pseudo_t.shape(4,5,8400)
-                        
-                        # filter pseudo detections on source images applying NMS
-                        out_s = non_max_suppression(pseudo_s.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
-                        out_s = output_to_target(out_s)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
-
-                        # filter pseudo detections on target images applying NMS
-                        out_t = non_max_suppression(pseudo_t.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
-                        out_t = output_to_target(out_t)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
-
-                        # confmix
-                        b, c, h, w = batch_s['img'].shape
-                        out_s = torch.from_numpy(out_s) if out_s.size else torch.empty([0,7])
-                        out_t = torch.from_numpy(out_t) if out_t.size else torch.empty([0,7]) 
-
-                        # divide the pseudo detections on the target into 4 regions ([0,0] is top-left)
-                        tar_lb = out_t[(out_t[:,2] < w//2) & (out_t[:,3] >= h//2), :]
-                        tar_lt = out_t[(out_t[:,2] < w//2) & (out_t[:,3] < h//2), :]
-                        tar_rb = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] >= h//2), :]
-                        tar_rt = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] < h//2), :]
-
-                        target_regions = [tar_lb, tar_lt, tar_rb, tar_rt] 
-                        # select the most confident region
-                        mean_confidences = torch.nan_to_num(torch.as_tensor([torch.mean(i[:,6]) for i in target_regions]))  # Column 6 includes the confidence of the predictions
-                        index = torch.max(mean_confidences, 0)[1]
-
-                        # create binary mask for the confmix image and filter the source pseudo detections based on the selected region
-                        mask = torch.zeros((b, c, h, w)).to(self.device)
-                        if index == 0:
-                            # tar_lb
-                            tar_lb[:,2:6] = clip_coords_target(tar_lb, 0, w//2, h//2, h)
-                            out_s = out_s[(out_s[:,2] >= w//2) | (out_s[:,3] < h//2), :]
-                            out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), :], w//2, w, 0, h)
-                            out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), :], 0, w, 0, h)
-                            out_s[out_s[:,2] < w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] < w//2, :], 0, w, 0, h//2)
-
-                            mask[:, :, h//2:h+1, 0:w//2] = 1.
-                        elif index == 1:
-                            # tar_lt
-                            tar_lt[:,2:6] = clip_coords_target(tar_lt, 0, w//2, 0, h//2)
-                            out_s = out_s[(out_s[:,2] >= w//2) | (out_s[:,3] >= h//2), :]
-                            out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), :], w//2, w, 0, h)
-                            out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), :], 0, w, 0, h)
-                            out_s[out_s[:,2] < w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] < w//2, :], 0, w, h//2, h)
-
-                            mask[:, :, 0:h//2, 0:w//2] = 1.
-                        elif index == 2:
-                            # tar_rb
-                            tar_rb[:,2:6] = clip_coords_target(tar_rb, w//2, w, h//2, h)
-                            out_s = out_s[(out_s[:,2] < w//2) | (out_s[:,3] < h//2), :]
-                            out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), :], w//2, w, 0, h)
-                            out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), :], 0, w, 0, h)
-                            out_s[out_s[:,2] >= w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] >= w//2, :], 0, w, 0, h//2)
-
-                            mask[:, :, h//2:h+1, w//2:w+1] = 1.
-                        elif index == 3:
-                            # tar_rt
-                            tar_rt[:,2:6] = clip_coords_target(tar_rt, w//2, w, 0, h//2)
-                            out_s = out_s[(out_s[:,2] < w//2) | (out_s[:,3] >= h//2), :]
-                            out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), :], w//2, w, 0, h)
-                            out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), :], 0, w, 0, h)
-                            out_s[out_s[:,2] >= w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] >= w//2, :], 0, w, h//2, h)
-
-                            mask[:, :, 0:h//2, w//2:w+1] = 1.
-                        
-
-                        # create confmix targets and compute confmix weight
-                        targets_confmix_s = out_s #  [batch_id, class_id, x, y, w, h, conf]
-                        targets_confmix_t = target_regions[index]
-
-                        targets_confmix = torch.cat((targets_confmix_s, targets_confmix_t))
-                        
-                        c_gamma_thres = 0.5
-                        #  .sum() 对布尔张量求和。True=1，False=0。 返回的是满足条件（大于 0.5）的元素个数。
-                        #  .nelement() 返回张量中元素的总数。对于 targets_confmix[:, 6]，它是一个形状为 [N] 的一维张量，因此 返回 N。
-                        gamma = (targets_confmix[:,6] > c_gamma_thres).sum() / \
-                                        (targets_confmix[:,6]).nelement()
-
-                        targets_confmix = targets_confmix[:,:6] # remove confidence values
-                        # normalize
-                        targets_confmix[:, [2, 4]] /= w
-                        targets_confmix[:, [3, 5]] /= h
-
-                        # create confmix image
-                        imgs_confmix = batch_s['img'] * (1-mask) + batch_t['img'] * mask
-                        imgs_confmix = imgs_confmix.to(self.device, non_blocking=True).float() / 255.0
-                        
-                        # supervised detector loss term on the labelled source samples
-                        # 源域的检测损失
-                        self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
-                        
-                        # batch_s['img'].shape [4,3,640,640]
-                        # batch_s['cls'].shape [109,1]
-                        # batch_s['bboxes'].shape [109,4]
-                        # batch_s['batch_idx'].shape [109]
-
-                        # self-supervised consistency loss term on the mixed samples
-                        # 合成域的 二次检测
-                        batch_confmix = {}
-                        batch_confmix['ori_shape'] = batch_s['ori_shape']
-                        batch_confmix['resized_shape'] = [[640,640],[640,640],[640,640],[640,640]]
-                        batch_confmix['img'] = imgs_confmix #[4,3,640,640]
-                        batch_confmix['cls'] = targets_confmix[:,1].unsqueeze(-1) # [32] -> [32,1]
-                        batch_confmix['bboxes'] = targets_confmix[:,2:] # [32,4]
-                        batch_confmix['batch_idx'] = targets_confmix[:,0] # [32]
-                        self.confmix_loss, self.confmix_loss_items = self.model(batch_confmix)
-
-                        # 仅 源域和目标域图像 的前向传播，返回特征图值
-                        self.source_feature_dict = self.model(batch_s['img'],layers=True)  
-                        self.target_feature_dict = self.model(batch_t['img'],layers=True)
-                        mmd_losses = []
-                        mse_losses = [] # l2
-
-                        for layer in [2, 4, 6, 8, 9]:
-                            source_feas = self.source_feature_dict[layer]
-                            target_feas = self.target_feature_dict[layer]
-                            # # 检查批次大小
-                            min_batch_size = min(source_feas.size(0), target_feas.size(0))
-                            source_fea = source_feas[:min_batch_size]
-                            target_fea = target_feas[:min_batch_size]
-                            if source_fea is not None and target_fea is not None:
-                                # 检查源域和目标域特征的形状是否一致
-                                if source_fea.shape != target_fea.shape: 
-                                    # 调整 target_feature 的尺寸，使其匹配 source_feature
-                                    target_fea = F.interpolate(
-                                        target_fea, 
-                                        size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
-                                        mode="bilinear", 
-                                        align_corners=False
-                                    )
-                                # 计算 特征 损失
-                                if layer in [2, 4, 6]: 
-                                    mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
-                                    mmd_losses.append(mmd_loss)
-                                mean_mmd_loss = sum(mmd_losses) / 3  
-
-                                if layer in [8, 9]: # [2,4,6,8,9]
-                                    mse_loss = F.mse_loss(source_fea, target_fea)
-                                    mse_losses.append(mse_loss)
-                                mean_mse_loss = sum(mse_losses) / 2
-
-                        # 计算最终损失
-                        alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
-                        lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
-                        # self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma)
-                        self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma) + lambda_weight * mean_mse_loss + alpha_weight * mean_mmd_loss
-                        self.loss_items = torch.cat([
-                            self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
-                            self.confmix_loss_items,
-                            mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
-                            mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
-                        ])
-
-                        # print('最终实际的loss_items',self.loss_items)
-                        # 多GPU训练时的损失调整
-                        if RANK != -1:
-                            self.loss *= world_size
-                        # 更新平均损失
-                        self.tloss = (
-                            (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
-                        )
-                        '''
-                        # ----------------------------------------------------- 
-                        
-                        # -----------方法三---------------------------------------- 
-                        # 对源域和目标域的合成增强
-                        
-                        # 1.原始源域的监督损失
-                        self.source_loss, self.source_loss_items = self.model(batch_s)
-                        
-                        # 2.合成源域的监督损失 (源域+目标域的 cutmix)
-                        alpha = adjust_alpha(epoch, self.epochs, initial_alpha=1.0, final_alpha=0.0)
-                        mixed_img, mixed_cls, mixed_bbox = cross_set_cutmix(batch_s['img'], batch_t['img'], batch_s['cls'],batch_s['bboxes'], alpha)
-                        if torch.all(mixed_cls == -1) : 
-                            self.mix_loss = torch.tensor(0, dtype=torch.float32).to(self.device)
-                            self.mix_loss_items = torch.tensor([0,0,0],dtype=torch.float32).to(self.device)
-                        else:
-                            mixed_batch_st = batch_s.copy() # mixed_batch_s['batch_idx'].shape [203]
-                            mixed_batch_st['img'] = mixed_img # [4,3,640,640]
-                            mixed_batch_st['cls'] = mixed_cls # [203,3]
-                            mixed_batch_st['bboxes'] = mixed_bbox # [203,12]
-                            self.mix_loss, self.mix_loss_items = self.model(mixed_batch_st)
-
-                        # 仅 源域和目标域图像 的前向传播，返回特征图值
-                        self.source_feature_dict = self.model(batch_s['img'],layers=True)  
-                        self.target_feature_dict = self.model(batch_t['img'],layers=True)  
-                        
-                        mmd_losses = []
-                        mse_losses = []
-                        for layer in [2, 4, 6, 8, 9]:
-                            source_feas = self.source_feature_dict[layer]
-                            target_feas = self.target_feature_dict[layer]
-                            # mix_target_feas = self.mixed_target_feature_dict[layer]
-                            # # 检查批次大小
-                            min_batch_size = min(source_feas.size(0), target_feas.size(0))
-                            source_fea = source_feas[:min_batch_size]
-                            target_fea = target_feas[:min_batch_size]
-                            # mix_target_fea = mix_target_feas[:min_batch_size]
-                            if source_fea is not None and target_fea is not None:
-                                # 检查源域和目标域特征的形状是否一致
-                                if source_fea.shape != target_fea.shape: 
-                                    # 调整 target_feature 的尺寸，使其匹配 source_feature
-                                    target_fea = F.interpolate(
-                                        target_fea, 
-                                        size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
-                                        mode="bilinear", 
-                                        align_corners=False
-                                    )
-                                # 3.计算源域和目标域的 特定层特征的  MMD ，缩小域间差异
-                                if layer in [2, 4, 6]: 
-                                    # mmd_linear 在50epoch还行，100epoch就变很小值了！
-                                    mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
-                                    mmd_losses.append(mmd_loss)
-                                mean_mmd_loss = sum(mmd_losses) / 3  
-
-                                if layer in [8, 9]: # [2,4,6,8,9]
-                                    mse_loss = F.mse_loss(source_fea, target_fea)
-                                    mse_losses.append(mse_loss)
-                                mean_mse_loss = sum(mse_losses) / 2
-                                    
-
-                        # 4.计算源域 和 合成域 的一致性损失,肯定很大啊，标签都复制了，又不是直接改变风格
-                        # loss_cons = torch.abs(self.source_loss - self.mix_loss)  # L1 loss
-                        # loss_cons = torch.abs(self.source_loss - self.mix_loss)**2   # L2 loss
-                        
-                        # 最终损失
-                        # 计算最终损失
-                        # gamma_weight = 0.1 # 不行，[1,0.5,0.3]
-                        # alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
-                        # lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
-                        self.loss = self.source_loss + gamma_weight * self.mix_loss + alpha_weight * mean_mmd_loss + lambda_weight * mean_mse_loss 
-                        self.loss_items = torch.cat([
-                            self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
-                            self.mix_loss_items, # 合成域的
-                            mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
-                            mean_mse_loss.detach().unsqueeze(0)   # 加入 mse 损失
-                        ])
-
-                        # 多GPU训练时的损失调整
-                        if RANK != -1:
-                            self.loss *= world_size
-                        # 更新平均损失
-                        self.tloss = (
-                            (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
-                        )
-                        
-                        # ----------------------------------------------------- 
-                    
-                        
+                    # ----------方法二 ------------------------------------------- 
+                    # 基于伪标签的合成域，二次训练
+                    '''
+                    r = ni / max_iterations
+                    delta = 2 / (1 + math.exp(-5. * r)) - 1
+                    # pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
+                    # pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
                 
-                    # Backward
-                    self.scaler.scale(self.loss).backward()
+                    pred_t = self.model(batch_t['img'], pseudo=True, delta=delta)  # forward
+                    pseudo_t, _ = pred_t # 目标域的 伪标签 和 特征图 pseudo_t.shape(4,5,8400)
 
-                    # Optimize - https://pytorch.org/docs/master/notes/amp_examples.html
-                    if ni - last_opt_step >= self.accumulate:
-                        self.optimizer_step()
-                        last_opt_step = ni
+                    # filter pseudo detections on target images applying NMS
+                    out = non_max_suppression(pseudo_t.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
+                    out = output_to_target(out)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+                    out_original = copy.deepcopy(out)    
 
-                        # Timed stopping
-                        if self.args.time:
-                            self.stop = (time.time() - self.train_time_start) > (self.args.time * 3600)
-                            if RANK != -1:  # if DDP training
-                                broadcast_list = [self.stop if RANK == 0 else None]
-                                dist.broadcast_object_list(broadcast_list, 0)  # broadcast 'stop' to all ranks
-                                self.stop = broadcast_list[0]
-                            if self.stop:  # training time exceeded
-                                break
+                    # DACA
+                    # 创建一个与源图像 imgs_s 形状相同的全 1 张量，并将其乘以 imgs_s 的均值。
+                    # 目的是生成一个与 imgs_s 大小相同的空白图像，用于后续拼接增强后的图像。
+                    imgs_concat = torch.ones_like(batch_s['img']) * torch.mean(batch_s['img']) #  初始化合成图像，进行再次训练
+                    if out.shape[0] > 0: #（16，4） 如果 out 的行数大于 0，说明有目标框需要处理。
+                        # get best region from target 从目标域中选 最好的区域
+                        region_t1_original, out1_original, best_side = get_best_region(out, batch_t['img']) 
+                        # torch.Size([4, 3, 320, 320]),(16,7),''topleft''  
 
-                    # Log
-                    mem = f"{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G"  # (GB)
-                    loss_len = self.tloss.shape[0] if len(self.tloss.shape) else 1
-                    # 确保 losses 是一个张量
-                    losses = self.tloss if loss_len > 1 else torch.unsqueeze(self.tloss, 0)
-                    if RANK in {-1, 0}:
-                        pbar.set_description( # 直接显示的值
-                            ("%11s" * 2 + "%11.4g" * (2 + loss_len))
-                            % (f"{epoch + 1}/{self.epochs}", mem, *losses, batch_s["cls"].shape[0], batch_s["img"].shape[-1])
-                        )
-                        self.run_callbacks("on_batch_end")
-                        if self.args.plots and ni in self.plot_idx:
-                            # self.plot_training_samples(batch_s, ni)
-                            self.plot_training_samples(batch_t, ni) # 绘制的就是目标域
-                            # self.plot_uda_samples(batch_daca,ni)
+                        transform = A.Compose([
+                                            A.BBoxSafeRandomCrop(erosion_rate=0.1, always_apply=False, p=0.2),
+                                            A.HorizontalFlip(p=0.5),
+                                            A.Blur(blur_limit=1, always_apply=True, p=0.5), 
+                                            A.ColorJitter (brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2, always_apply=False, p=0.5),
+                                            A.Downscale (scale_min=0.5, scale_max=0.99, interpolation=None, always_apply=False, p=0.5),
+                                            A.RandomBrightnessContrast (brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
+                                            ], 
+                                            bbox_params=A.BboxParams(format='yolo', label_fields=['category_ids']),)              
+                        
+                        # 对最佳区域进行增强
+                        region_t1, out1 = transform_img_bboxes(out1_original, best_side, region_t1_original, transform)
+                        region_t2, out2 = transform_img_bboxes(out1_original, best_side, region_t1_original, transform)
+                        region_t3, out3 = transform_img_bboxes(out1_original, best_side, region_t1_original, transform)
+                        region_t4, out4 = transform_img_bboxes(out1_original, best_side, region_t1_original, transform)
 
-                    self.run_callbacks("on_train_batch_end")
+                        # fill up the concat image
+                        # 将增强后的 4 个区域 region_t1 到 region_t4 拼接到 imgs_concat 的不同位置，形成一张新的拼接图像。
+                        imgs_concat[:, :, 0:int(region_t1.shape[1]), 0:int(region_t1.shape[2])] = torch.from_numpy(region_t1).unsqueeze(0)
+                        imgs_concat[:, :, int(batch_s['img'].shape[3]/2):int(batch_s['img'].shape[3]/2) + int(region_t2.shape[1]), 0:int(region_t2.shape[2])] = torch.from_numpy(region_t2).unsqueeze(0)
+                        imgs_concat[:, :, int(batch_s['img'].shape[3]/2):int(batch_s['img'].shape[3]/2) + int(region_t3.shape[1]),  int(batch_s['img'].shape[3]/2):int(batch_s['img'].shape[3]/2) + int(region_t3.shape[2])] = torch.from_numpy(region_t3).unsqueeze(0)
+                        imgs_concat[:, :, 0:int(region_t4.shape[1]), int(batch_s['img'].shape[3]/2):int(batch_s['img'].shape[3]/2) + int(region_t4.shape[2])] = torch.from_numpy(region_t4).unsqueeze(0)
 
-                self.lr = {f"lr/pg{ir}": x["lr"] for ir, x in enumerate(self.optimizer.param_groups)}  # for loggers
-                self.run_callbacks("on_train_epoch_end")
-                if RANK in {-1, 0}:
-                    final_epoch = epoch + 1 >= self.epochs
-                    self.ema.update_attr(self.model, include=["yaml", "nc", "args", "names", "stride", "class_weights"])
+                        # Adjust region-level bboxes of the image-level coordinates
+                        # 调整目标框坐标
+                        # convert to bottomleft
+                        out2[:, 3] += batch_t['img'].shape[3]/2
+                        # convert to bottomright
+                        out3[:, 2] += batch_t['img'].shape[2]/2
+                        out3[:, 3] += batch_t['img'].shape[3]/2
+                        # convert to topright
+                        out4[:, 2] += batch_t['img'].shape[2]/2
+                        
+                        # 将目标框转换为张量
+                        if not torch.is_tensor(out1):
+                            out1 = torch.from_numpy(out1)
+                        if not torch.is_tensor(out2):
+                            out2 = torch.from_numpy(out2)
+                        if not torch.is_tensor(out3):
+                            out3 = torch.from_numpy(out3)                                                        
+                        if not torch.is_tensor(out4):
+                            out4 = torch.from_numpy(out4)       
+                        out = torch.cat((out1, out2, out3, out4), dim=0) # shape (32,7)
+                    else:
+                        out = torch.empty([0,7]) 
 
-                    # Validation
-                    if self.args.val or final_epoch or self.stopper.possible_stop or self.stop:
-                        self.metrics, self.fitness = self.validate()
+                    imgs_daca = imgs_concat # 合成域的图像
+                    # out_s = torch.from_numpy(out_s) if out_s.size else torch.empty([0,7])
+                    b, c, h, w = imgs_daca.shape # [4,3,640,640]
                     
-                    # 验证集性能
-                    if self.metrics['metrics/mAP50(B)'] > best_mAP :
-                        # 动态调整 lambda_weight
-                        best_mAP = self.metrics['metrics/mAP50(B)']
-                        best_params = (gamma_weight, lambda_weight, alpha_weight)
+                    # create daca targets 
+                    # targets_daca_s = out_s
+                    targets_daca_t = out # (32,7) 合成域的 GT
+                    targets_daca =  targets_daca_t # (32,7)
+                    
+                    # pred_daca = self.model(imgs_daca, pseudo=True)  # forward
+                    # _ , pred_daca  = pred_daca # 检测结果 和 特征图
 
-                    self.save_metrics(metrics={**self.label_loss_items(self.tloss), **self.metrics, **self.lr})
-                    self.stop |= self.stopper(epoch + 1, self.fitness) or final_epoch
+                    targets_daca = targets_daca[:,:6] # remove confidence values [32,6]
+                    # normalize
+                    targets_daca[:, [2, 4]] /= w
+                    targets_daca[:, [3, 5]] /= h
+                    
+                    # supervised detector loss term on the labelled source samples
+                    # 源域的检测损失
+                    self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
+                    
+                    # batch_s['img'].shape [4,3,640,640]
+                    # batch_s['cls'].shape [109,1]
+                    # batch_s['bboxes'].shape [109,4]
+                    # batch_s['batch_idx'].shape [109]
+
+                    # self-supervised consistency loss term on the mixed samples
+                    # 合成域的 二次检测
+                    batch_daca = {}
+                    batch_daca['ori_shape'] = batch_s['ori_shape']
+                    batch_daca['resized_shape'] = [[640,640],[640,640],[640,640],[640,640]]
+                    batch_daca['img'] = imgs_daca #[4,3,640,640]
+                    batch_daca['cls'] = targets_daca[:,1].unsqueeze(-1) # [32] -> [32,1]
+                    batch_daca['bboxes'] = targets_daca[:,2:] # [32,4]
+                    batch_daca['batch_idx'] = targets_daca[:,0] # [32]
+                    self.daca_loss, self.daca_loss_items = self.model(batch_daca)
+
+                    # 计算最终损失
+                    lambda_weight = 0.1  # 超参数，用于平衡 ❌[1, 0.5, 0.3, 0.1], 过大过小会inf和nan
+                    self.loss = self.source_loss + lambda_weight * self.daca_loss
+                    self.loss_items = torch.cat([
+                        self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
+                        self.daca_loss_items
+                    ])
+
+                    # print('最终实际的loss_items',self.loss_items)
+                    # 多GPU训练时的损失调整
+                    if RANK != -1:
+                        self.loss *= world_size
+                    # 更新平均损失
+                    self.tloss = (
+                        (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
+                    )
+                    '''
+                    
+                    '''
+                    r = ni / max_iterations
+                    delta = 2 / (1 + math.exp(-5. * r)) - 1
+                    
+                    pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
+                    pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
+                
+                    pred_t = self.model(batch_t['img'], pseudo=True, delta=delta)  # forward
+                    pseudo_t, _ = pred_t # 目标域的 伪标签 和 特征图 pseudo_t.shape(4,5,8400)
+                    
+                    # filter pseudo detections on source images applying NMS
+                    out_s = non_max_suppression(pseudo_s.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
+                    out_s = output_to_target(out_s)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+
+                    # filter pseudo detections on target images applying NMS
+                    out_t = non_max_suppression(pseudo_t.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
+                    out_t = output_to_target(out_t)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+
+                    # confmix
+                    b, c, h, w = batch_s['img'].shape
+                    out_s = torch.from_numpy(out_s) if out_s.size else torch.empty([0,7])
+                    out_t = torch.from_numpy(out_t) if out_t.size else torch.empty([0,7]) 
+
+                    # divide the pseudo detections on the target into 4 regions ([0,0] is top-left)
+                    tar_lb = out_t[(out_t[:,2] < w//2) & (out_t[:,3] >= h//2), :]
+                    tar_lt = out_t[(out_t[:,2] < w//2) & (out_t[:,3] < h//2), :]
+                    tar_rb = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] >= h//2), :]
+                    tar_rt = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] < h//2), :]
+
+                    target_regions = [tar_lb, tar_lt, tar_rb, tar_rt] 
+                    # select the most confident region
+                    mean_confidences = torch.nan_to_num(torch.as_tensor([torch.mean(i[:,6]) for i in target_regions]))  # Column 6 includes the confidence of the predictions
+                    index = torch.max(mean_confidences, 0)[1]
+
+                    # create binary mask for the confmix image and filter the source pseudo detections based on the selected region
+                    mask = torch.zeros((b, c, h, w)).to(self.device)
+                    if index == 0:
+                        # tar_lb
+                        tar_lb[:,2:6] = clip_coords_target(tar_lb, 0, w//2, h//2, h)
+                        out_s = out_s[(out_s[:,2] >= w//2) | (out_s[:,3] < h//2), :]
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] < w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] < w//2, :], 0, w, 0, h//2)
+
+                        mask[:, :, h//2:h+1, 0:w//2] = 1.
+                    elif index == 1:
+                        # tar_lt
+                        tar_lt[:,2:6] = clip_coords_target(tar_lt, 0, w//2, 0, h//2)
+                        out_s = out_s[(out_s[:,2] >= w//2) | (out_s[:,3] >= h//2), :]
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] < w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] < w//2, :], 0, w, h//2, h)
+
+                        mask[:, :, 0:h//2, 0:w//2] = 1.
+                    elif index == 2:
+                        # tar_rb
+                        tar_rb[:,2:6] = clip_coords_target(tar_rb, w//2, w, h//2, h)
+                        out_s = out_s[(out_s[:,2] < w//2) | (out_s[:,3] < h//2), :]
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] >= w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] >= w//2, :], 0, w, 0, h//2)
+
+                        mask[:, :, h//2:h+1, w//2:w+1] = 1.
+                    elif index == 3:
+                        # tar_rt
+                        tar_rt[:,2:6] = clip_coords_target(tar_rt, w//2, w, 0, h//2)
+                        out_s = out_s[(out_s[:,2] < w//2) | (out_s[:,3] >= h//2), :]
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] >= w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] >= w//2, :], 0, w, h//2, h)
+
+                        mask[:, :, 0:h//2, w//2:w+1] = 1.
+                    
+
+                    # create confmix targets and compute confmix weight
+                    targets_confmix_s = out_s #  [batch_id, class_id, x, y, w, h, conf]
+                    targets_confmix_t = target_regions[index]
+
+                    targets_confmix = torch.cat((targets_confmix_s, targets_confmix_t))
+                    
+                    c_gamma_thres = 0.5
+                    #  .sum() 对布尔张量求和。True=1，False=0。 返回的是满足条件（大于 0.5）的元素个数。
+                    #  .nelement() 返回张量中元素的总数。对于 targets_confmix[:, 6]，它是一个形状为 [N] 的一维张量，因此 返回 N。
+                    gamma = (targets_confmix[:,6] > c_gamma_thres).sum() / \
+                                    (targets_confmix[:,6]).nelement()
+
+                    targets_confmix = targets_confmix[:,:6] # remove confidence values
+                    # normalize
+                    targets_confmix[:, [2, 4]] /= w
+                    targets_confmix[:, [3, 5]] /= h
+
+                    # create confmix image
+                    imgs_confmix = batch_s['img'] * (1-mask) + batch_t['img'] * mask
+                    imgs_confmix = imgs_confmix.to(self.device, non_blocking=True).float() / 255.0
+                    
+                    # supervised detector loss term on the labelled source samples
+                    # 源域的检测损失
+                    self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
+                    
+                    # batch_s['img'].shape [4,3,640,640]
+                    # batch_s['cls'].shape [109,1]
+                    # batch_s['bboxes'].shape [109,4]
+                    # batch_s['batch_idx'].shape [109]
+
+                    # self-supervised consistency loss term on the mixed samples
+                    # 合成域的 二次检测
+                    batch_confmix = {}
+                    batch_confmix['ori_shape'] = batch_s['ori_shape']
+                    batch_confmix['resized_shape'] = [[640,640],[640,640],[640,640],[640,640]]
+                    batch_confmix['img'] = imgs_confmix #[4,3,640,640]
+                    batch_confmix['cls'] = targets_confmix[:,1].unsqueeze(-1) # [32] -> [32,1]
+                    batch_confmix['bboxes'] = targets_confmix[:,2:] # [32,4]
+                    batch_confmix['batch_idx'] = targets_confmix[:,0] # [32]
+                    self.confmix_loss, self.confmix_loss_items = self.model(batch_confmix)
+
+                    # 仅 源域和目标域图像 的前向传播，返回特征图值
+                    self.source_feature_dict = self.model(batch_s['img'],layers=True)  
+                    self.target_feature_dict = self.model(batch_t['img'],layers=True)
+                    mmd_losses = []
+                    mse_losses = [] # l2
+
+                    for layer in [2, 4, 6, 8, 9]:
+                        source_feas = self.source_feature_dict[layer]
+                        target_feas = self.target_feature_dict[layer]
+                        # # 检查批次大小
+                        min_batch_size = min(source_feas.size(0), target_feas.size(0))
+                        source_fea = source_feas[:min_batch_size]
+                        target_fea = target_feas[:min_batch_size]
+                        if source_fea is not None and target_fea is not None:
+                            # 检查源域和目标域特征的形状是否一致
+                            if source_fea.shape != target_fea.shape: 
+                                # 调整 target_feature 的尺寸，使其匹配 source_feature
+                                target_fea = F.interpolate(
+                                    target_fea, 
+                                    size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
+                                    mode="bilinear", 
+                                    align_corners=False
+                                )
+                            # 计算 特征 损失
+                            if layer in [2, 4, 6]: 
+                                mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
+                                mmd_losses.append(mmd_loss)
+                            mean_mmd_loss = sum(mmd_losses) / 3  
+
+                            if layer in [8, 9]: # [2,4,6,8,9]
+                                mse_loss = F.mse_loss(source_fea, target_fea)
+                                mse_losses.append(mse_loss)
+                            mean_mse_loss = sum(mse_losses) / 2
+
+                    # 计算最终损失
+                    alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
+                    lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
+                    # self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma)
+                    self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma) + lambda_weight * mean_mse_loss + alpha_weight * mean_mmd_loss
+                    self.loss_items = torch.cat([
+                        self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
+                        self.confmix_loss_items,
+                        mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
+                        mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
+                    ])
+
+                    # print('最终实际的loss_items',self.loss_items)
+                    # 多GPU训练时的损失调整
+                    if RANK != -1:
+                        self.loss *= world_size
+                    # 更新平均损失
+                    self.tloss = (
+                        (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
+                    )
+                    '''
+                    # ----------------------------------------------------- 
+                    
+                    # -----------方法三---------------------------------------- 
+                    # 对源域和目标域的合成增强
+                    
+                    # 1.原始源域的监督损失
+                    self.source_loss, self.source_loss_items = self.model(batch_s)
+                    
+                    # 2.合成源域的监督损失 (源域+目标域的 cutmix)
+                    alpha = adjust_alpha(epoch, self.epochs, initial_alpha=1.0, final_alpha=0.0)
+                    mixed_img, mixed_cls, mixed_bbox = cross_set_cutmix(batch_s['img'], batch_t['img'], batch_s['cls'],batch_s['bboxes'], alpha)
+                    if torch.all(mixed_cls == -1) : 
+                        self.mix_loss = torch.tensor(1, dtype=torch.float32).to(self.device)
+                        self.mix_loss_items = torch.tensor([1,1,1],dtype=torch.float32).to(self.device)
+                    else:
+                        mixed_batch_st = batch_s.copy() # mixed_batch_s['batch_idx'].shape [203]
+                        mixed_batch_st['img'] = mixed_img # [4,3,640,640]
+                        mixed_batch_st['cls'] = mixed_cls # [203,3]
+                        mixed_batch_st['bboxes'] = mixed_bbox # [203,12]
+                        self.mix_loss, self.mix_loss_items = self.model(mixed_batch_st)
+
+                    # 仅 源域和目标域图像 的前向传播，返回特征图值
+                    self.source_feature_dict = self.model(batch_s['img'],layers=True)  
+                    self.target_feature_dict = self.model(batch_t['img'],layers=True)  
+                    
+                    mmd_losses = []
+                    mse_losses = []
+                    for layer in [2, 4, 6, 8, 9]:
+                        source_feas = self.source_feature_dict[layer]
+                        target_feas = self.target_feature_dict[layer]
+                        # mix_target_feas = self.mixed_target_feature_dict[layer]
+                        # # 检查批次大小
+                        min_batch_size = min(source_feas.size(0), target_feas.size(0))
+                        source_fea = source_feas[:min_batch_size]
+                        target_fea = target_feas[:min_batch_size]
+                        # mix_target_fea = mix_target_feas[:min_batch_size]
+                        if source_fea is not None and target_fea is not None:
+                            # 检查源域和目标域特征的形状是否一致
+                            if source_fea.shape != target_fea.shape: 
+                                # 调整 target_feature 的尺寸，使其匹配 source_feature
+                                target_fea = F.interpolate(
+                                    target_fea, 
+                                    size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
+                                    mode="bilinear", 
+                                    align_corners=False
+                                )
+                            # 3.计算源域和目标域的 特定层特征的  MMD ，缩小域间差异
+                            if layer in [2, 4, 6]: 
+                                # mmd_linear 在50epoch还行，100epoch就变很小值了！
+                                mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
+                                mmd_losses.append(mmd_loss)
+                            mean_mmd_loss = sum(mmd_losses) / 3  
+
+                            if layer in [8, 9]: # [2,4,6,8,9]
+                                mse_loss = F.mse_loss(source_fea, target_fea)
+                                mse_losses.append(mse_loss)
+                            mean_mse_loss = sum(mse_losses) / 2
+                                
+
+                    # 4.计算源域 和 合成域 的一致性损失,肯定很大啊，标签都复制了，又不是直接改变风格
+                    # loss_cons = torch.abs(self.source_loss - self.mix_loss)  # L1 loss
+                    # loss_cons = torch.abs(self.source_loss - self.mix_loss)**2   # L2 loss
+                    
+                    # 最终损失
+                    # 计算最终损失
+                    # gamma_weight = 0.1 # 不行，[1,0.5,0.3]
+                    # alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
+                    # lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
+                    self.loss = self.source_loss + self.args.gamma_weight * self.mix_loss + self.args.alpha_weight * mean_mmd_loss + self.args.lambda_weight * mean_mse_loss 
+                    self.loss_items = torch.cat([
+                        self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
+                        self.mix_loss_items, # 合成域的
+                        mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
+                        mean_mse_loss.detach().unsqueeze(0)   # 加入 mse 损失
+                    ])
+
+                    # 多GPU训练时的损失调整
+                    if RANK != -1:
+                        self.loss *= world_size
+                    # 更新平均损失
+                    self.tloss = (
+                        (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
+                    )
+                    
+                    # ----------------------------------------------------- 
+                
+                    
+            
+                # Backward
+                self.scaler.scale(self.loss).backward()
+
+                # Optimize - https://pytorch.org/docs/master/notes/amp_examples.html
+                if ni - last_opt_step >= self.accumulate:
+                    self.optimizer_step()
+                    last_opt_step = ni
+
+                    # Timed stopping
                     if self.args.time:
-                        self.stop |= (time.time() - self.train_time_start) > (self.args.time * 3600)
+                        self.stop = (time.time() - self.train_time_start) > (self.args.time * 3600)
+                        if RANK != -1:  # if DDP training
+                            broadcast_list = [self.stop if RANK == 0 else None]
+                            dist.broadcast_object_list(broadcast_list, 0)  # broadcast 'stop' to all ranks
+                            self.stop = broadcast_list[0]
+                        if self.stop:  # training time exceeded
+                            break
 
-                    # Save model
-                    if self.args.save or final_epoch:
-                        self.save_model()
-                        self.run_callbacks("on_model_save")
+                # Log
+                mem = f"{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G"  # (GB)
+                loss_len = self.tloss.shape[0] if len(self.tloss.shape) else 1
+                # 确保 losses 是一个张量
+                losses = self.tloss if loss_len > 1 else torch.unsqueeze(self.tloss, 0)
+                if RANK in {-1, 0}:
+                    pbar.set_description( # 直接显示的值
+                        ("%11s" * 2 + "%11.4g" * (2 + loss_len))
+                        % (f"{epoch + 1}/{self.epochs}", mem, *losses, batch_s["cls"].shape[0], batch_s["img"].shape[-1])
+                    )
+                    self.run_callbacks("on_batch_end")
+                    if self.args.plots and ni in self.plot_idx:
+                        # self.plot_training_samples(batch_s, ni)
+                        self.plot_training_samples(batch_t, ni) # 绘制的就是目标域
+                        # self.plot_uda_samples(batch_daca,ni)
 
-                # Scheduler
-                t = time.time()
-                self.epoch_time = t - self.epoch_time_start
-                self.epoch_time_start = t
+                self.run_callbacks("on_train_batch_end")
+
+            self.lr = {f"lr/pg{ir}": x["lr"] for ir, x in enumerate(self.optimizer.param_groups)}  # for loggers
+            self.run_callbacks("on_train_epoch_end")
+            if RANK in {-1, 0}:
+                final_epoch = epoch + 1 >= self.epochs
+                self.ema.update_attr(self.model, include=["yaml", "nc", "args", "names", "stride", "class_weights"])
+
+                # Validation
+                if self.args.val or final_epoch or self.stopper.possible_stop or self.stop:
+                    self.metrics, self.fitness = self.validate()
+                
+                # # 验证集性能
+                # if self.metrics['metrics/mAP50(B)'] > best_mAP :
+                #     best_mAP = self.metrics['metrics/mAP50(B)']
+                #     best_params = (gamma_weight, alpha_weight, lambda_weight)
+
+                self.save_metrics(metrics={**self.label_loss_items(self.tloss), **self.metrics, **self.lr})
+                self.stop |= self.stopper(epoch + 1, self.fitness) or final_epoch
                 if self.args.time:
-                    mean_epoch_time = (t - self.train_time_start) / (epoch - self.start_epoch + 1)
-                    self.epochs = self.args.epochs = math.ceil(self.args.time * 3600 / mean_epoch_time)
-                    self._setup_scheduler()
-                    self.scheduler.last_epoch = self.epoch  # do not move
-                    self.stop |= epoch >= self.epochs  # stop if exceeded epochs
-                self.run_callbacks("on_fit_epoch_end")
-                gc.collect()
-                torch.cuda.empty_cache()  # clear GPU memory at end of epoch, may help reduce CUDA out of memory errors
+                    self.stop |= (time.time() - self.train_time_start) > (self.args.time * 3600)
 
-                # Early Stopping
-                if RANK != -1:  # if DDP training
-                    broadcast_list = [self.stop if RANK == 0 else None]
-                    dist.broadcast_object_list(broadcast_list, 0)  # broadcast 'stop' to all ranks
-                    self.stop = broadcast_list[0]
-                if self.stop:
-                    break  # must break all DDP ranks
-                epoch += 1
+                # Save model
+                if self.args.save or final_epoch:
+                    self.save_model()
+                    self.run_callbacks("on_model_save")
+
+            # Scheduler
+            t = time.time()
+            self.epoch_time = t - self.epoch_time_start
+            self.epoch_time_start = t
+            if self.args.time:
+                mean_epoch_time = (t - self.train_time_start) / (epoch - self.start_epoch + 1)
+                self.epochs = self.args.epochs = math.ceil(self.args.time * 3600 / mean_epoch_time)
+                self._setup_scheduler()
+                self.scheduler.last_epoch = self.epoch  # do not move
+                self.stop |= epoch >= self.epochs  # stop if exceeded epochs
+            self.run_callbacks("on_fit_epoch_end")
+            gc.collect()
+            torch.cuda.empty_cache()  # clear GPU memory at end of epoch, may help reduce CUDA out of memory errors
+
+            # Early Stopping
+            if RANK != -1:  # if DDP training
+                broadcast_list = [self.stop if RANK == 0 else None]
+                dist.broadcast_object_list(broadcast_list, 0)  # broadcast 'stop' to all ranks
+                self.stop = broadcast_list[0]
+            if self.stop:
+                break  # must break all DDP ranks
+            epoch += 1
+
+
 
         if RANK in {-1, 0}:
             # Do final val with best.pt
             LOGGER.info(
                 f"\n{epoch - self.start_epoch + 1} epochs completed in "
                 f"{(time.time() - self.train_time_start) / 3600:.3f} hours."
-                f"Best parameters (gamma, lambda, alpha): {best_params}, Best mAP: {best_mAP}" 
+                # f"Best parameters (gamma, alpha, lambda): {best_params}, Best mAP: {best_mAP}" 
             )
             self.final_eval()
             if self.args.plots:
