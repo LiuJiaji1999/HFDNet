@@ -12,6 +12,86 @@ import torch.nn.functional as F
 import torch
 import numpy as np
 
+
+import torch
+import numpy as np
+
+def cross_set_cutmix_pseudo(source_img, target_img, source_labels, target_labels, alpha=1.0, conf_threshold=0.5):
+    """
+    Cross-set CutMix for object detection tasks with pseudo-labels for the target domain.
+    
+    Args:
+        source_img (torch.Tensor): Source domain images [B, C, H, W].
+        target_img (torch.Tensor): Target domain images [B, C, H, W].
+        source_labels (torch.Tensor): Source domain labels [N, 7] (batch_id, class_id, x, y, w, h, conf).
+        target_labels (torch.Tensor): Target domain pseudo-labels [M, 7] (batch_id, class_id, x, y, w, h, conf).
+        alpha (float): Beta distribution parameter for CutMix.
+        conf_threshold (float): Confidence threshold for filtering pseudo-labels.
+    
+    Returns:
+        mixed_img (torch.Tensor): Mixed image [B, C, H, W].
+        mixed_labels (torch.Tensor): Mixed labels [K, 7] (batch_id, class_id, x, y, w, h, conf).
+    """
+    B, C, H, W = source_img.shape
+    mixed_img = target_img.clone()
+    
+    # Filter out low-confidence pseudo-labels from the target domain
+    target_labels = target_labels[target_labels[:, 6] >= conf_threshold]  # Filter by confidence
+    
+    # Combine source and target labels
+    all_labels = torch.cat([source_labels, target_labels], dim=0) #[X,7]
+    
+    # Initialize mixed_labels with the same size as all_labels
+    mixed_labels = torch.zeros_like(all_labels)  # Initialize with zeros #[X,7]
+    mixed_labels[:,1] = torch.full_like(all_labels[:,1], -1)
+    mixed_labels[:,2:6] = torch.zeros_like(all_labels[:,2:6])   # 初始化为0
+
+    # Generate random bounding box for CutMix
+    lam = np.random.beta(alpha, alpha)
+    cut_ratio = np.sqrt(1 - lam)
+    cut_w = int(W * cut_ratio)
+    cut_h = int(H * cut_ratio)
+    cx = np.random.randint(0, W)
+    cy = np.random.randint(0, H)
+    x1 = max(0, cx - cut_w // 2)
+    y1 = max(0, cy - cut_h // 2)
+    x2 = min(W, cx + cut_w // 2)
+    y2 = min(H, cy + cut_h // 2)
+    
+    # Copy the region from source image to target image
+    mixed_img[:, :, y1:y2, x1:x2] = source_img[:, :, y1:y2, x1:x2]
+    
+    # Adjust bounding boxes and labels for the mixed region
+    # valid_label_count = 0  # Counter for valid labels
+    for i, label in enumerate(all_labels):
+        batch_id, class_id, x, y, w, h, conf = label
+        if batch_id >= B:  # Skip labels that do not belong to the current batch
+            continue
+        # Convert to absolute coordinates
+        bbox_abs = torch.tensor([x * W, y * H, (x + w) * W, (y + h) * H])
+        # Check if bbox intersects with CutMix region
+        if (bbox_abs[0] < x2 and bbox_abs[2] > x1 and bbox_abs[1] < y2 and bbox_abs[3] > y1):
+            # Clip bbox to CutMix region
+            bbox_abs[0] = max(bbox_abs[0], x1)
+            bbox_abs[1] = max(bbox_abs[1], y1)
+            bbox_abs[2] = min(bbox_abs[2], x2)
+            bbox_abs[3] = min(bbox_abs[3], y2)
+            # Convert back to normalized coordinates
+            bbox_norm = torch.tensor([
+                bbox_abs[0] / W,  # x
+                bbox_abs[1] / H,  # y
+                (bbox_abs[2] - bbox_abs[0]) / W,  # w
+                (bbox_abs[3] - bbox_abs[1]) / H,  # h
+            ])
+            # Fill the mixed_labels tensor
+            mixed_labels = torch.tensor([
+                batch_id, class_id, bbox_norm[0], bbox_norm[1], bbox_norm[2], bbox_norm[3], conf
+            ])
+            # valid_label_count += 1
+    # Truncate mixed_labels to only include valid labels
+    # mixed_labels = mixed_labels[:valid_label_count] 
+    return mixed_img, mixed_labels
+
 def cross_set_cutmix(source_img, target_img, source_cls, source_bbox, alpha=1.0):
     """
     Cross-set CutMix for object detection tasks.
