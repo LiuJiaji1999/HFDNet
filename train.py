@@ -115,8 +115,7 @@ if __name__ == '__main__':
                 # fraction=0.2,
                 cos_lr = True,
                 # project='runs/debug',
-                project='runs/train/baseline',
-                name='sourcecity',
+                project='runs/train/improve',
+                name='sourcecity-mp-aptpse',
                 mixup = 1.0,
-                mosaic = 0.0
                 )

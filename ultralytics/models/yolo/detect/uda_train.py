@@ -116,10 +116,12 @@ class UDADetectionTrainer(UDABaseTrainer):
         """Returns a DetectionValidator for YOLO model validation."""
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss", "mbox_l", "mcls_l", "mdfl_l", "gram_loss","mmd_loss", "mse_loss" # 合成域 + 域差异
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss", "mbox_l", "mcls_l", "mdfl_l", "mmd_loss", "mse_loss" # 合成域+域差异
-        # self.loss_names = "box_loss", "cls_loss", "dfl_loss","psc_box","psc_cls","psc_dfl"  # 伪标签
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss","mse_loss","mmd_loss" # gram_loss 值太小 \ mmd_loss 100epoch的倒数几个值太小
-        self.loss_names = "box_loss", "cls_loss", "dfl_loss","psc_box","psc_cls","psc_dfl","gram_loss","mmd_loss","mse_loss"  # 伪标签 + 域差异
+        # self.loss_names = "box_loss", "cls_loss", "dfl_loss","psc_box","psc_cls","psc_dfl","gram_loss","mmd_loss","mse_loss"  # 伪标签 + 域差异
         
+        # self.loss_names = "box_loss", "cls_loss", "dfl_loss" # 最开始
+        self.loss_names = "box_loss", "cls_loss", "dfl_loss","psc_box","psc_cls","psc_dfl"  # 伪标签
+
         return yolo.detect.DetectionValidator(
             self.test_loader, save_dir=self.save_dir, args=copy(self.args), _callbacks=self.callbacks
         )

@@ -421,6 +421,13 @@ class UDABaseTrainer:
 
                     batch_s = self.preprocess_batch(batch_S)
                     batch_t = self.preprocess_batch(batch_T)
+                    # # 1.原始源域的监督损失
+                    # self.loss, self.loss_items = self.model(batch_s)
+                    # if RANK != -1:
+                    #     self.loss *= world_size
+                    # self.tloss = (
+                    #     (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
+                    # )
                     
                     # -------- 方法一 --------------------------------------------- 
                     #  源域 目标域的特征图 差异，作为第二个损失 最终优化目标为 与源域的检测损失 ，权重相加
@@ -634,24 +641,23 @@ class UDABaseTrainer:
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     )
                     '''
-                        
+                     
                     r = ni / max_iterations
                     delta = 2 / (1 + math.exp(-5. * r)) - 1
                     
                     pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
                     pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
-                
                     pred_t = self.model(batch_t['img'], pseudo=True, delta=delta)  # forward
                     pseudo_t, _ = pred_t # 目标域的 伪标签 和 特征图 pseudo_t.shape(4,5,8400)
                     
                     # filter pseudo detections on source images applying NMS
                     out_s = non_max_suppression(pseudo_s.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
                     out_s = output_to_target(out_s)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
-
                     # filter pseudo detections on target images applying NMS
                     out_t = non_max_suppression(pseudo_t.detach(), conf_thres=0.1, iou_thres=0.5, multi_label=False)
                     out_t = output_to_target(out_t)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
 
+                    # if out_t[:,6] > out_s[:,6]: 
                     # confmix
                     b, c, h, w = batch_s['img'].shape
                     out_s = torch.from_numpy(out_s) if out_s.size else torch.empty([0,7])
@@ -662,8 +668,14 @@ class UDABaseTrainer:
                     tar_lt = out_t[(out_t[:,2] < w//2) & (out_t[:,3] < h//2), :]
                     tar_rb = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] >= h//2), :]
                     tar_rt = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] < h//2), :]
+                    target_regions = [tar_lb, tar_lt, tar_rb, tar_rt]
 
-                    target_regions = [tar_lb, tar_lt, tar_rb, tar_rt] 
+                    # # divide the pseudo detections on the target into  vertical 3  regions ([0,0] is top-left)
+                    # tar_l = out_t[(out_t[:,2] < w//3), :]
+                    # tar_m = out_t[(out_t[:,2] < w//3), :]
+                    # tar_r = out_t[(out_t[:,2] >= w//3), :]
+                    # target_regions = [tar_l, tar_m, tar_r]
+
                     # select the most confident region
                     mean_confidences = torch.nan_to_num(torch.as_tensor([torch.mean(i[:,6]) for i in target_regions]))  # Column 6 includes the confidence of the predictions
                     index = torch.max(mean_confidences, 0)[1]
@@ -706,14 +718,12 @@ class UDABaseTrainer:
                         out_s[out_s[:,2] >= w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] >= w//2, :], 0, w, h//2, h)
 
                         mask[:, :, 0:h//2, w//2:w+1] = 1.
-                    
 
                     # create confmix targets and compute confmix weight
                     targets_confmix_s = out_s #  [batch_id, class_id, x, y, w, h, conf]
                     targets_confmix_t = target_regions[index]
-
                     targets_confmix = torch.cat((targets_confmix_s, targets_confmix_t))
-                    
+
                     c_gamma_thres = 0.5
                     #  .sum() 对布尔张量求和。True=1，False=0。 返回的是满足条件（大于 0.5）的元素个数。
                     #  .nelement() 返回张量中元素的总数。对于 targets_confmix[:, 6]，它是一个形状为 [N] 的一维张量，因此 返回 N。
@@ -729,17 +739,8 @@ class UDABaseTrainer:
                     imgs_confmix = batch_s['img'] * (1-mask) + batch_t['img'] * mask
                     imgs_confmix = imgs_confmix.to(self.device, non_blocking=True).float() / 255.0
                     
-                    # supervised detector loss term on the labelled source samples
-                    # 源域的检测损失
-                    self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
-                    
-                    # batch_s['img'].shape [4,3,640,640]
-                    # batch_s['cls'].shape [109,1]
-                    # batch_s['bboxes'].shape [109,4]
-                    # batch_s['batch_idx'].shape [109]
-
                     # self-supervised consistency loss term on the mixed samples
-                    # 合成域的 二次检测
+                    # 2. 合成域的 二次检测 损失
                     batch_confmix = {}
                     batch_confmix['ori_shape'] = batch_s['ori_shape']
                     batch_confmix['resized_shape'] = [[640,640],[640,640],[640,640],[640,640]]
@@ -748,62 +749,68 @@ class UDABaseTrainer:
                     batch_confmix['bboxes'] = targets_confmix[:,2:6] # [32,4]
                     batch_confmix['batch_idx'] = targets_confmix[:,0] # [32]
                     self.confmix_loss, self.confmix_loss_items = self.model(batch_confmix)
+            
+                    # supervised detector loss term on the labelled source samples
+                    # 1. 源域的检测损失
+                    self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
+                    # batch_s['img'].shape [4,3,640,640]
+                    # batch_s['cls'].shape [109,1]
+                    # batch_s['bboxes'].shape [109,4]
+                    # batch_s['batch_idx'].shape [109]
 
-                    # 仅 源域和目标域图像 的前向传播，返回特征图值
-                    self.source_feature_dict = self.model(batch_s['img'],layers=True)  
-                    self.target_feature_dict = self.model(batch_t['img'],layers=True)
-                    gram_losses = []
-                    mmd_losses = []
-                    mse_losses = [] # l2
 
-                    for layer in [2, 4, 6, 8, 9]:
-                        source_feas = self.source_feature_dict[layer]
-                        target_feas = self.target_feature_dict[layer]
-                        # # 检查批次大小
-                        min_batch_size = min(source_feas.size(0), target_feas.size(0))
-                        source_fea = source_feas[:min_batch_size]
-                        target_fea = target_feas[:min_batch_size]
-                        if source_fea is not None and target_fea is not None:
-                            # 检查源域和目标域特征的形状是否一致
-                            if source_fea.shape != target_fea.shape: 
-                                # 调整 target_feature 的尺寸，使其匹配 source_feature
-                                target_fea = F.interpolate(
-                                    target_fea, 
-                                    size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
-                                    mode="bilinear", 
-                                    align_corners=False
-                                )
-                             # 3.计算源域和目标域的 特定层特征的   ，缩小域间差异
-                            if layer in [2, 4]: 
-                                # gram值太小，对结果影响很小
-                                gram_s = gram_matrix(source_fea)
-                                gram_t = gram_matrix(target_fea)
-                                gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
-                                gram_losses.append(gram_loss)
-                            mean_gram_loss = sum(gram_losses) / 2
+                    # # 仅 源域和目标域图像 的前向传播，返回特征图值
+                    # self.source_feature_dict = self.model(batch_s['img'],layers=True)  
+                    # self.target_feature_dict = self.model(batch_t['img'],layers=True)
+                    # gram_losses = []
+                    # mmd_losses = []
+                    # mse_losses = [] # l2
 
-                            if layer in [6]: 
-                                # mmd_linear 在50epoch还行，100epoch就变很小值了！
-                                mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
-                                mmd_losses.append(mmd_loss)
-                            mean_mmd_loss = sum(mmd_losses)
-
-                            if layer in [8, 9]: # [2,4,6,8,9]
-                                mse_loss = F.mse_loss(source_fea, target_fea)
-                                mse_losses.append(mse_loss)
-                            mean_mse_loss = sum(mse_losses) / 2
-                           
-                    # 计算最终损失
-                    # alpha_weight = 0.05 # 超参数，用于平衡 gram、mmd、swd
-                    # lambda_weight = 0.1  # 超参数，用于平衡 MSE损失              
+                    # for layer in [2, 4, 6, 8, 9]:
+                    #     source_feas = self.source_feature_dict[layer]
+                    #     target_feas = self.target_feature_dict[layer]
+                    #     # # 检查批次大小
+                    #     min_batch_size = min(source_feas.size(0), target_feas.size(0))
+                    #     source_fea = source_feas[:min_batch_size]
+                    #     target_fea = target_feas[:min_batch_size]
+                    #     if source_fea is not None and target_fea is not None:
+                    #         # 检查源域和目标域特征的形状是否一致
+                    #         if source_fea.shape != target_fea.shape: 
+                    #             # 调整 target_feature 的尺寸，使其匹配 source_feature
+                    #             target_fea = F.interpolate(
+                    #                 target_fea, 
+                    #                 size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
+                    #                 mode="bilinear", 
+                    #                 align_corners=False
+                    #             )
+                    #          # 3.计算源域和目标域的 特定层特征差异损失   ，缩小域间差异
+                    #         if layer in [2, 4]: 
+                    #             # gram值太小，对结果影响很小
+                    #             gram_s = gram_matrix(source_fea)
+                    #             gram_t = gram_matrix(target_fea)
+                    #             gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
+                    #             gram_losses.append(gram_loss)
+                    #         mean_gram_loss = sum(gram_losses) / 2
+                            
+                    #         if layer in [6]: 
+                    #             # mmd_linear 在50epoch还行，100epoch就变很小值了！
+                    #             mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
+                    #             mmd_losses.append(mmd_loss)
+                    #         mean_mmd_loss = sum(mmd_losses)
+                            
+                    #         if layer in [8, 9]: # [2,4,6,8,9]
+                    #             mse_loss = F.mse_loss(source_fea, target_fea)
+                    #             mse_losses.append(mse_loss)
+                    #         mean_mse_loss = sum(mse_losses) / 2
                     
-                    self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma) + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
+                    self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma)
+                    # self.loss = self.source_loss +  self.confmix_loss * torch.nan_to_num(gamma) + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
                         self.confmix_loss_items,
-                        mean_gram_loss.detach().unsqueeze(0), # 加入 gram 损失
-                        mean_mmd_loss.detach().unsqueeze(0),  # 加入 mmd 损失
-                        mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
+                        # mean_gram_loss.detach().unsqueeze(0), # 加入 gram 损失
+                        # mean_mmd_loss.detach().unsqueeze(0),  # 加入 mmd 损失
+                        # mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
                     ])
                     
                     # print('最终实际的loss_items',self.loss_items)
@@ -814,12 +821,12 @@ class UDABaseTrainer:
                     self.tloss = (
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     )
-                    '''
+                    
                     # ----------------------------------------------------- 
                     
                     # -----------方法三---------------------------------------- 
                     # 对源域和目标域的合成增强
-                    
+                    '''
                     # 1.原始源域的监督损失
                     self.source_loss, self.source_loss_items = self.model(batch_s)
                     
@@ -944,7 +951,6 @@ class UDABaseTrainer:
                     '''
                     # ----------------------------------------------------- 
                 
-                    
             
                 # Backward
                 self.scaler.scale(self.loss).backward()
