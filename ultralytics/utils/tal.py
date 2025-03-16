@@ -102,7 +102,7 @@ class TaskAlignedAssigner(nn.Module):
     def power_transform(self, array, power=2):
         return torch.where(array < 0.5, array ** power, array ** (1/power))
     
-    def get_box_metrics(self, pd_scores, pd_bboxes, gt_labels, gt_bboxes, mask_gt, power=True):
+    def get_box_metrics(self, pd_scores, pd_bboxes, gt_labels, gt_bboxes, mask_gt, power=False):
         """Compute alignment metric given predicted and ground truth bounding boxes."""
         na = pd_bboxes.shape[-2]
         mask_gt = mask_gt.bool()  # b, max_num_obj, h*w
