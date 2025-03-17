@@ -8,7 +8,7 @@ if __name__ == '__main__':
     model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcecity36/weights/best.pt')
     model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
               split='val',
-              imgsz=800,
+              imgsz=640,
               batch=8,
               # iou=0.7,
               # rect=False,

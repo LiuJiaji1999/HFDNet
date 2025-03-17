@@ -642,6 +642,7 @@ class UDABaseTrainer:
                     )
                     '''
                     
+                    '''
                     
                     # r = ni / max_iterations
                     # delta = 2 / (1 + math.exp(-5. * r)) - 1
@@ -847,6 +848,8 @@ class UDABaseTrainer:
                         mixed_batch_st['bboxes'] = mixed_bbox # [203,12]
                         self.mix_loss, self.mix_loss_items = self.model(mixed_batch_st)
                 #-------------
+                        '''
+                        
                     # 2.2  基于伪标签 重新进行cutmix
                     # r = ni / max_iterations
                     # delta = 2 / (1 + math.exp(-5. * r)) - 1
@@ -878,67 +881,68 @@ class UDABaseTrainer:
                     #     mixed_batch_st['cls'] = mixed_label[:,1].unsqueeze(-1) # [32] -> [32,1]
                     #     mixed_batch_st['bboxes'] = mixed_label[:,2:6] # [32,4]
                     #     self.mix_loss, self.mix_loss_items = self.model(mixed_batch_st)
-                
+                '''
                 #-------------
                 
                     # 仅 源域和目标域图像 的前向传播，返回特征图值
-                    self.source_feature_dict = self.model(batch_s['img'],layers=True)  
-                    self.target_feature_dict = self.model(batch_t['img'],layers=True)  
-                    gram_losses = []
-                    mmd_losses = []
-                    mse_losses = []
-                    for layer in [2, 4, 6, 8, 9]:
-                        source_feas = self.source_feature_dict[layer]
-                        target_feas = self.target_feature_dict[layer]
-                        # mix_target_feas = self.mixed_target_feature_dict[layer]
-                        # # 检查批次大小
-                        min_batch_size = min(source_feas.size(0), target_feas.size(0))
-                        source_fea = source_feas[:min_batch_size]
-                        target_fea = target_feas[:min_batch_size]
-                        # mix_target_fea = mix_target_feas[:min_batch_size]
-                        if source_fea is not None and target_fea is not None:
-                            # 检查源域和目标域特征的形状是否一致
-                            if source_fea.shape != target_fea.shape: 
-                                # 调整 target_feature 的尺寸，使其匹配 source_feature
-                                target_fea = F.interpolate(
-                                    target_fea, 
-                                    size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
-                                    mode="bilinear", 
-                                    align_corners=False
-                                )
-                            # 3.计算源域和目标域的 特定层特征的   ，缩小域间差异
-                            if layer in [2, 4]: 
-                                # gram值太小，对结果影响很小
-                                gram_s = gram_matrix(source_fea)
-                                gram_t = gram_matrix(target_fea)
-                                gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
-                                gram_losses.append(gram_loss)
-                            mean_gram_loss = sum(gram_losses) / 2
+                    # self.source_feature_dict = self.model(batch_s['img'],layers=True)  
+                    # self.target_feature_dict = self.model(batch_t['img'],layers=True)  
+                    # gram_losses = []
+                    # mmd_losses = []
+                    # mse_losses = []
+                    # for layer in [2, 4, 6, 8, 9]:
+                    #     source_feas = self.source_feature_dict[layer]
+                    #     target_feas = self.target_feature_dict[layer]
+                    #     # mix_target_feas = self.mixed_target_feature_dict[layer]
+                    #     # # 检查批次大小
+                    #     min_batch_size = min(source_feas.size(0), target_feas.size(0))
+                    #     source_fea = source_feas[:min_batch_size]
+                    #     target_fea = target_feas[:min_batch_size]
+                    #     # mix_target_fea = mix_target_feas[:min_batch_size]
+                    #     if source_fea is not None and target_fea is not None:
+                    #         # 检查源域和目标域特征的形状是否一致
+                    #         if source_fea.shape != target_fea.shape: 
+                    #             # 调整 target_feature 的尺寸，使其匹配 source_feature
+                    #             target_fea = F.interpolate(
+                    #                 target_fea, 
+                    #                 size=target_fea.shape[2:],  # 调整为目标特征图的高度和宽度
+                    #                 mode="bilinear", 
+                    #                 align_corners=False
+                    #             )
+                    #         # 3.计算源域和目标域的 特定层特征的   ，缩小域间差异
+                    #         if layer in [2, 4]: 
+                    #             # gram值太小，对结果影响很小
+                    #             gram_s = gram_matrix(source_fea)
+                    #             gram_t = gram_matrix(target_fea)
+                    #             gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
+                    #             gram_losses.append(gram_loss)
+                    #         mean_gram_loss = sum(gram_losses) / 2
 
-                            if layer in [6]: 
-                                # mmd_linear 在50epoch还行，100epoch就变很小值了！
-                                mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
-                                mmd_losses.append(mmd_loss)
-                            mean_mmd_loss = sum(mmd_losses)
+                    #         if layer in [6]: 
+                    #             # mmd_linear 在50epoch还行，100epoch就变很小值了！
+                    #             mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
+                    #             mmd_losses.append(mmd_loss)
+                    #         mean_mmd_loss = sum(mmd_losses)
 
-                            if layer in [8, 9]: # [2,4,6,8,9]
-                                mse_loss = F.mse_loss(source_fea, target_fea)
-                                mse_losses.append(mse_loss)
-                            mean_mse_loss = sum(mse_losses) / 2
+                    #         if layer in [8, 9]: # [2,4,6,8,9]
+                    #             mse_loss = F.mse_loss(source_fea, target_fea)
+                    #             mse_losses.append(mse_loss)
+                    #         mean_mse_loss = sum(mse_losses) / 2
                                 
 
-                    # 4.计算源域 和 合成域 的一致性损失,肯定很大啊，标签都复制了，又不是直接改变风格
-                    # loss_cons = torch.abs(self.source_loss - self.mix_loss)  # L1 loss
-                    # loss_cons = torch.abs(self.source_loss - self.mix_loss)**2   # L2 loss
+                    ## 4.计算 源域 和 合成域 的一致性损失,肯定很大啊，标签都复制了，又不是直接改变风格
+                    ## loss_cons = torch.abs(self.source_loss - self.mix_loss)  # L1 loss
+                    ## loss_cons = torch.abs(self.source_loss - self.mix_loss)**2   # L2 loss
                     
                     # 计算最终损失
-                    self.loss = self.source_loss + self.args.mix_weight * self.mix_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
+                    self.loss = self.source_loss + self.args.mix_weight * self.mix_loss 
+                    # self.loss = self.source_loss + self.args.mix_weight * self.mix_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
                         self.mix_loss_items, # 合成域
-                        mean_gram_loss.detach().unsqueeze(0),
-                        mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
-                        mean_mse_loss.detach().unsqueeze(0)   # 加入 mse 损失
+                        # mean_gram_loss.detach().unsqueeze(0),
+                        # mean_mmd_loss.detach().unsqueeze(0),  # 加入 gram\mmd\swd 损失
+                        # mean_mse_loss.detach().unsqueeze(0)   # 加入 mse 损失
                     ])
 
                     # 多GPU训练时的损失调整
@@ -948,7 +952,7 @@ class UDABaseTrainer:
                     self.tloss = (
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     )
-                    '''
+                    
                     # ----------------------------------------------------- 
                 
             

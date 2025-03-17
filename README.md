@@ -49,3 +49,13 @@ python val.py
 </details>
 
 
+##### 改为双输入，可实时更新
+```shell
+/home/lenovo/data/liujiaji/YOLO-DTAD/ultralytics/models/yolo/model.py
+/home/lenovo/data/liujiaji/YOLO-DTAD/ultralytics/models/yolo/detect/__init__.py 
+/home/lenovo/data/liujiaji/YOLO-DTAD/ultralytics/models/yolo/detect/uda_train.py
+/home/lenovo/data/liujiaji/YOLO-DTAD/ultralytics/data/uda_build.py  数据集加载  def uda_build_dataloader
+/home/lenovo/data/liujiaji/YOLO-DTAD/ultralytics/nn/uda_tasks.py  修改模型结构 
+/home/lenovo/data/liujiaji/YOLO-DTAD/ultralytics/engine/uda_trainer.py 修改训练器
+/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/ultralytics/engine/validator.py  plotting中，主要是为了展示其他损失的变化
+```
