@@ -116,6 +116,6 @@ if __name__ == '__main__':
                 cos_lr = True,
                 # project='runs/debug',
                 project='runs/train/improve',
-                name='sourcecity-mp-gdm',
+                name='sourcecity-mp-apt-gdm',
                 mixup = 1.0,
                 )
