@@ -518,7 +518,7 @@ class UDABaseTrainer:
 
                     # ----------方法二 ------------------------------------------- 
                     # 基于伪标签的合成域，二次训练
-                    '''
+                    
                     r = ni / max_iterations
                     delta = 2 / (1 + math.exp(-5. * r)) - 1
                     # pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
@@ -736,7 +736,7 @@ class UDABaseTrainer:
                     # create confmix image
                     imgs_confmix = batch_s['img'] * (1-mask) + batch_t['img'] * mask
                     imgs_confmix = imgs_confmix.to(self.device, non_blocking=True).float() / 255.0
-                    
+
                     # self-supervised consistency loss term on the mixed samples
                     # 2. 合成域的 二次检测 损失
                     batch_confmix = {}
@@ -818,7 +818,7 @@ class UDABaseTrainer:
                     self.tloss = (
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     )
-                    
+                    '''
                     # ----------------------------------------------------- 
                     
                     # -----------方法三---------------------------------------- 
