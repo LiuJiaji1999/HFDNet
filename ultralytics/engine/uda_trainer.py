@@ -744,7 +744,7 @@ class UDABaseTrainer:
                     batch_confmix['resized_shape'] = [[640,640],[640,640],[640,640],[640,640]]
                     batch_confmix['img'] = imgs_confmix #[4,3,640,640]
                     batch_confmix['cls'] = targets_confmix[:,1].unsqueeze(-1) # [32] -> [32,1]
-                    batch_confmix['bboxes'] = targets_confmix[:,2:6] # [32,4]
+                    batch_confmix['bboxes'] = targets_confmix[:,2:] # [32,4]
                     batch_confmix['batch_idx'] = targets_confmix[:,0] # [32]
                     self.confmix_loss, self.confmix_loss_items = self.model(batch_confmix)
             
