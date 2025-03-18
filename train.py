@@ -116,6 +116,6 @@ if __name__ == '__main__':
                 cos_lr = True,
                 # project='runs/debug',
                 project='runs/train/improve',
-                name='sourcecity',
-                mixup = 1.0,
+                name='sourcecity-aptpse',
+                # mixup = 1.0,
                 )
