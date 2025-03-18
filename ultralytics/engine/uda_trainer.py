@@ -602,8 +602,8 @@ class UDABaseTrainer:
                     # targets_daca[:, [3, 5]] /= h
                     
                     # # supervised detector loss term on the labelled source samples
-                    # # 1.源域的检测损失
-                    # self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
+                    # 1.源域的检测损失
+                    self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
                     
                     # # batch_s['img'].shape [4,3,640,640]
                     # # batch_s['cls'].shape [109,1]
