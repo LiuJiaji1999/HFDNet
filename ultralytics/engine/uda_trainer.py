@@ -54,7 +54,7 @@ from ultralytics.nn.extra_modules.kernel_warehouse import get_temperature
 ##########################################################
 from ultralytics.nn.uda_tasks import attempt_load_one_weight, attempt_load_weights
 import torch.nn.functional as F
-from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cross_set_cutmix_pseudo, cross_set_cutmix,adjust_alpha, gram_matrix,compute_mmd_loss, compute_swd_loss,clip_coords_target
+from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cross_set_cutmix_pseudo, cross_set_cutmix,adjust_alpha, gram_matrix,compute_mmd_loss, compute_swd_loss,clip_coords_target,compute_dss_loss
 from ultralytics.utils.ops import  non_max_suppression
 from ultralytics.utils.plotting import output_to_target, plot_images
 import copy
@@ -627,8 +627,13 @@ class UDABaseTrainer:
                     
                     gram_losses = [] # 值太小
                     swd_losses = []
+                    dss_losses = []
                     mmd_losses = []
                     mse_losses = [] # l2
+
+                    smmd_losses = []
+                    mmmd_losses = []
+                    hmmd_losses = []
 
                     for layer in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:
                         source_feas = self.source_feature_dict[layer]
@@ -638,8 +643,8 @@ class UDABaseTrainer:
                                 min_batch_size = min(source_feas[i].shape[0], target_feas[i].shape[0])
                                 source_fea = source_feas[i][:min_batch_size]
                                 target_fea = target_feas[i][:min_batch_size]
-                                mse_loss = F.mse_loss(source_fea, target_fea)
-                                mse_losses.append(mse_loss)
+                                # mse_loss = F.mse_loss(source_fea, target_fea)
+                                # mse_losses.append(mse_loss)
                         else:
                             # # 检查批次大小
                             min_batch_size = min(source_feas.shape[0], target_feas.shape[0])
@@ -655,46 +660,69 @@ class UDABaseTrainer:
                                         mode="bilinear", 
                                         align_corners=False
                                     )
+                                '''
                                 # 3.计算源域和目标域的 特定层特征差异损失   ，缩小域间差异
                                 if layer in [2, 4, 6, 8, 9]:  # backbone
                                     # gram值太小，对结果影响很小
-                                    # gram_s = gram_matrix(source_fea)
-                                    # gram_t = gram_matrix(target_fea)
-                                    # gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
-                                    # # gram_loss = (1000 / source_fea.shape[1]**2) * (F.mse_loss(gram_s, gram_t).to(self.device))
-                                    # gram_losses.append(gram_loss)
+                                    gram_s = gram_matrix(source_fea)
+                                    gram_t = gram_matrix(target_fea)
+                                    gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
+                                    # gram_loss = (1000 / source_fea.shape[1]**2) * (F.mse_loss(gram_s, gram_t).to(self.device))
+                                    gram_losses.append(gram_loss)
 
-                                    swd_loss = torch.tensor(compute_swd_loss(source_fea,target_fea))
-                                    swd_losses.append(swd_loss)
+                                    # swd_loss = torch.tensor(compute_swd_loss(source_fea,target_fea)) # 太慢了
+                                    # swd_losses.append(swd_loss)
 
+                                    # dss_loss = torch.tensor(compute_dss_loss(source_fea,target_fea)) # 太慢了
+                                    # dss_losses.append(dss_loss)
 
-                                # mean_gram_loss = torch.tensor([sum(gram_losses) / 5])
                                 if layer in [12,15,18,21]:  # neck 高斯核
-                                    # mmd_linear 在50epoch还行，100epoch就变很小值了！
                                     mmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
                                     mmd_losses.append(mmd_loss)
-                                # mean_mmd_loss =  torch.tensor([sum(mmd_losses) / 4]) # 标量没有 detach，除非在 torch.tensor
-                                
+
                                 # if layer in [22]: # head
                                 #     for i in range(len(source_fea)):
                                 #         mse_loss = F.mse_loss(source_fea[i], target_fea[i])
                                 #         mse_losses.append(mse_loss)
                                 # mean_mse_loss = torch.tensor([sum(mse_losses)])
+                                ''' 
+                                if layer in [4]:  # neck 高斯核
+                                    smmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
+                                    smmd_losses.append(smmd_loss)
+                                if layer in [6]:  # neck 高斯核
+                                    mmmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
+                                    mmmd_losses.append(mmmd_loss)
+                                if layer in [9]:  # neck 高斯核
+                                    hmmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
+                                    hmmd_losses.append(hmmd_loss)
                     
                     # mean_gram_loss = torch.mean(torch.stack(gram_losses))  # 计算平均值
-                    mean_swd_loss = torch.mean(torch.stack(swd_losses))
-                    mean_mmd_loss = torch.mean(torch.stack(mmd_losses))  # 计算平均值
-                    mean_mse_loss = torch.mean(torch.stack(mse_losses)) 
+                    # mean_swd_loss = torch.mean(torch.stack(swd_losses))
+                    # mean_dss_loss = torch.mean(torch.stack(dss_losses))
+                    # mean_mmd_loss = torch.mean(torch.stack(mmd_losses))  # 计算平均值
+                    # mean_mse_loss = torch.mean(torch.stack(mse_losses)) 
                     
+                    mean_smmd_loss = torch.mean(torch.stack(smmd_losses))
+                    mean_mmmd_loss = torch.mean(torch.stack(mmmd_losses)) 
+                    mean_hmmd_loss = torch.mean(torch.stack(hmmd_losses)) 
+
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss
-                    self.loss = self.source_loss + self.args.gram_weight * mean_swd_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
+                    # self.loss = self.source_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmd_loss + self.args.high_weight * mean_mse_loss 
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
+                    self.loss = self.source_loss + self.args.shallow_weight * mean_smmd_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_hmmd_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
                         # self.daca_loss_items,
-                        mean_swd_loss.detach().unsqueeze(0), # 加入 gram 损失
-                        mean_mmd_loss.detach().unsqueeze(0),  # 加入 mmd 损失
-                        mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
+                        # mean_gram_loss.detach().unsqueeze(0), # 加入 gram 损失
+                        # mean_swd_loss.detach().unsqueeze(0), # 加入 gram 损失
+                        # mean_dss_loss.detach().unsqueeze(0), # 加入 gram 损失
+                        # mean_mmd_loss.detach().unsqueeze(0),  # 加入 mmd 损失
+                        # mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
+
+                        mean_smmd_loss.detach().unsqueeze(0),
+                        mean_mmmd_loss.detach().unsqueeze(0),
+                        mean_hmmd_loss.detach().unsqueeze(0)
+
                     ])
                     
                     # print('最终实际的loss_items',self.loss_items)

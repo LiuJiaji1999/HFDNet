@@ -2,19 +2,10 @@ import copy
 import torch
 import numpy as np
 import ot
-from torch import cdist
 from ultralytics.utils.ops import  xywh2xyxy,xyxy2xywh
-
-import numpy as np
-import torch
 import torch.nn.functional as F
 
-import torch
-import numpy as np
 
-
-import torch
-import numpy as np
 
 def cross_set_cutmix_pseudo(source_img, target_img, source_labels, target_labels, alpha=1.0, conf_threshold=0.5):
     """
@@ -248,8 +239,9 @@ def adjust_alpha(epoch, max_epoch, initial_alpha=1.0, final_alpha=0.0):
 def gram_matrix(x):
     b, c, h, w = x.shape
     features = x.view(b, c, h*w)  # shape: (b, c, N)
-    gram = torch.bmm(features, features.transpose(1, 2)) / (c * h * w)
+    gram = torch.mm(features, features.transpose(1, 2)) / (c * h * w)
     return gram
+
 def gaussian_kernel(x, y, kernel_mul=2.0, kernel_num=5, fix_sigma=None, eps=1e-6):
     """
     计算两个样本集合 x 和 y 之间的多尺度高斯核矩阵。
@@ -300,6 +292,7 @@ def compute_mmd_loss(source_feat, target_feat, kernel_mul=2.0, kernel_num=5, fix
     feas_s = source_feat.view(n, n_channels, -1)
     feas_t = target_feat.view(m, n_channels, -1)
     mmd_val = torch.tensor(0.0, device=source_feat.device)  # 初始化 mmd_val 在 GPU 上
+    
     for i in range(n_channels):
         # 对第 i 个通道：先对空间维度取均值，得到 (n, 1) 和 (m, 1)
         channel_s = feas_s[:, i, :].mean(dim=1, keepdim=True)  # (n, 1)
@@ -329,32 +322,36 @@ def compute_swd_loss(source_feat, target_feat):
     # Flatten height and width dimensions for each channel 每个通道的特征图展平为一维向量，方便后续计算。
     feas_s_flat = source_feat.view(batch_size, n_channels, -1)  # (batch, channel, height*width)
     feas_t_flat = target_feat.view(batch_size, n_channels, -1)  # (batch, channel, height*width)
+    
     for i in range(n_channels):
         feas_s = feas_s_flat[:, i, :]  # (batch, height*width) 
         feas_t = feas_t_flat[:, i, :]  # (batch, height*width)
         # Compute cost matrix on GPU，使用 cdist 函数计算 feas_s 和 feas_t 之间的欧氏距离平方，得到代价矩阵 cost_matrix：
-        cost_matrix = cdist(feas_s, feas_t, p=2)**2  # (batch, height*width, height*width)
-        # Move cost matrix to CPU for OT computation
-        cost_matrix_cpu = cost_matrix.detach().cpu().numpy()
-        # Compute optimal transport
-        '''
-        ot.unif(n) 生成一个均匀分布的概率向量，长度为 n，每个元素的值为 1/n。
-        这里的作用是为 feas_s 和 feas_t 分别生成均匀分布的概率质量函数（PMF），表示每个样本的权重。
-        a=[ 1/n,..,1/n ],n=feas_s.shape[0]
+        cost_matrix = torch.cdist(feas_s, feas_t, p=2)**2  # (batch, height*width, height*width)
+        # # Move cost matrix to CPU for OT computation
+        # cost_matrix_cpu = cost_matrix.detach().cpu().numpy()
+        # # Compute optimal transport
+        # '''
+        # ot.unif(n) 生成一个均匀分布的概率向量，长度为 n，每个元素的值为 1/n。
+        # 这里的作用是为 feas_s 和 feas_t 分别生成均匀分布的概率质量函数（PMF），表示每个样本的权重。
+        # a=[ 1/n,..,1/n ],n=feas_s.shape[0]
 
-        ot.emd(a, b, cost_matrix, numItermax=1e6):是 POT 库中用于计算 Earth Mover's Distance (EMD) 的函数。
-        a: 第一个分布的权重向量（均匀分布）。
-        b: 第二个分布的权重向量（均匀分布）。
-        cost_matrix: 代价矩阵，表示从 a 的每个点到 b 的每个点的传输成本。
-        numItermax: 最大迭代次数，用于控制算法的收敛性。
-        返回值 gamma 是一个最优传输矩阵，表示从分布 a 到分布 b 的最优传输计划。
-        '''
-        gamma = ot.emd(ot.unif(feas_s.shape[0]), ot.unif(feas_t.shape[0]), cost_matrix_cpu, numItermax=1e6)
-        # Compute Wasserstein distance
-        # np.multiply(gamma, cost_matrix_cpu): 计算传输矩阵 gamma 和代价矩阵 cost_matrix_cpu 的逐元素乘积。
-        # torch.sum(torch.tensor(...)): 将结果转换为 PyTorch 张量并求和，得到当前通道的 Wasserstein 距离。
-        wasserstein_distance += torch.sum(torch.tensor(np.multiply(gamma, cost_matrix_cpu), device=source_feat.device))
-        del cost_matrix_cpu
+        # ot.emd(a, b, cost_matrix, numItermax=1e6):是 POT 库中用于计算 Earth Mover's Distance (EMD) 的函数。
+        # a: 第一个分布的权重向量（均匀分布）。
+        # b: 第二个分布的权重向量（均匀分布）。
+        # cost_matrix: 代价矩阵，表示从 a 的每个点到 b 的每个点的传输成本。
+        # numItermax: 最大迭代次数，用于控制算法的收敛性。
+        # 返回值 gamma 是一个最优传输矩阵，表示从分布 a 到分布 b 的最优传输计划。
+        # '''
+        # gamma = ot.emd(ot.unif(feas_s.shape[0]), ot.unif(feas_t.shape[0]), cost_matrix_cpu, numItermax=1e6)
+        # # Compute Wasserstein distance
+        # # np.multiply(gamma, cost_matrix_cpu): 计算传输矩阵 gamma 和代价矩阵 cost_matrix_cpu 的逐元素乘积。
+        # # torch.sum(torch.tensor(...)): 将结果转换为 PyTorch 张量并求和，得到当前通道的 Wasserstein 距离。
+        # wasserstein_distance += torch.sum(torch.tensor(np.multiply(gamma, cost_matrix_cpu), device=source_feat.device))
+        # del cost_matrix_cpu
+
+        gamma = ot.sinkhorn(ot.unif(feas_s.shape[0]), ot.unif(feas_t.shape[0]), cost_matrix.cpu().numpy(), reg=1e-1)
+        wasserstein_distance += torch.sum(torch.tensor(np.multiply(gamma, cost_matrix.cpu().numpy()), device=source_feat.device))
     return wasserstein_distance / n_channels
 
 def compute_dss_loss(source_feat, target_feat):
@@ -371,12 +368,11 @@ def compute_dss_loss(source_feat, target_feat):
     """
     # Get dimensions
     batch_size, n_channels, height, width = source_feat.shape # [1,96,96,160]
-    
-    dss_val = 0
-    
+    dss_val = torch.tensor(0.0, device = source_feat.device)  # 在相同设备上初始化 dss_val
     # Flatten height and width dimensions for each channel
     feas_s_flat = source_feat.view(batch_size, n_channels, -1)  # (batch, channel, height*width)
     feas_t_flat = target_feat.view(batch_size, n_channels, -1)  # (batch, channel, height*width)
+    
     for i in range(n_channels):
         # Extract features for current channel
         feas_s = feas_s_flat[:, i, :].unsqueeze(-1)  # (batch, height*width, 1)
@@ -393,12 +389,12 @@ def compute_dss_loss(source_feat, target_feat):
         xct = xmt.transpose(1, 2) @ xmt / ns  # (d, 1) @ (1, d)
        
         # Frobenius norm between source and target covariances
-        loss = torch.mul((xc - xct), (xc - xct))
+        loss = torch.mul((xc - xct), (xc - xct)) 
         dss = torch.sum(loss) / (4 * d * d)
         dss_val += dss
     
     # Average across all channels
-    return (dss_val / n_channels).item()
+    return dss_val / n_channels
 
 
 def get_features(x, module_type, stage):
