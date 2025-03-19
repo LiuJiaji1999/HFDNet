@@ -636,6 +636,7 @@ class UDABaseTrainer:
                     hmmd_losses = []
 
                     for layer in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:
+                    # for layer in [2, 4, 6, 8, ]:
                         source_feas = self.source_feature_dict[layer]
                         target_feas = self.target_feature_dict[layer]
                         if isinstance(source_feas, torch.Tensor) and isinstance(target_feas, torch.Tensor):
