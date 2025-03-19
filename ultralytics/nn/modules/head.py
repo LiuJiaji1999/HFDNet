@@ -72,14 +72,14 @@ class Detect(nn.Module):
                 self.printed_pseudo = True  # 记录已打印
             
             # cls_conf = y[:,4].sigmoid().detach() # Class confidence (probability) y[:,1].shape[4,8400]
-            # cls_conf = y[:,4].detach() # Class confidence (probability) y[:,1].shape[4,8400]
-            # box_conf = torch.mean(cls_conf, dim=1, keepdim=True).detach()  # Bounding box confidence (average class confidence)
-            # y[:, 4] = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
+            cls_conf = y[:,4].detach() # Class confidence (probability) y[:,1].shape[4,8400]
+            box_conf = torch.mean(cls_conf, dim=1, keepdim=True).detach()  # Bounding box confidence (average class confidence)
+            y[:, 4] = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
 
-            c_det = y[..., 4].detach()  # 检测的置信度
-            c_bbx = (1 - torch.mean(y[..., -4:], axis=2)).detach()  # 边界框的置信度
-            c_comb = c_det * c_bbx  # 综合置信度
-            y[..., 4] = (1 - delta) * c_det + delta * c_comb  # 使用 delta 参数更新置信度
+            # c_det = y[..., 4].detach()  # 检测的置信度
+            # c_bbx = (1 - torch.mean(y[..., -4:], axis=2)).detach()  # 边界框的置信度
+            # c_comb = c_det * c_bbx  # 综合置信度
+            # y[..., 4] = (1 - delta) * c_det + delta * c_comb  # 使用 delta 参数更新置信度
 
         return y if self.export else (y, x)
     
