@@ -308,6 +308,7 @@ def compute_swd_loss(source_feat, target_feat):
  
     return (wasserstein_distance / n_channels).item()
 
+'''
 def process_features(source_dir, target_dir):
     """
     计算源域和目标域 **不同子文件夹下** 的相同 npy 文件的差异，并保存 JSON 结果。
@@ -404,27 +405,150 @@ def process_features(source_dir, target_dir):
             sub_results[key] = {'loss_type': loss_type, 'loss': loss}
             print(f"{key}: {loss_type} difference = {loss}")
 
-        mean_gram_loss = sum(gram_losses) / len(gram_losses)
-        mean_l2_loss = sum(l2_losses) / len(l2_losses)
-        mean_gaussianmmd_loss = sum(gaussianmmd_losses) / len(gaussianmmd_losses)
-        mean_linearmmd_loss = sum(linearmmd_losses) / len(linearmmd_losses)
-        mean_dss_loss = sum(dss_losses) / len(dss_losses)
-        mean_swd_loss = sum(swd_losses) / len(swd_losses)
+        # mean_gram_loss = sum(gram_losses) / len(gram_losses)
+        # mean_l2_loss = sum(l2_losses) / len(l2_losses)
+        # mean_gaussianmmd_loss = sum(gaussianmmd_losses) / len(gaussianmmd_losses)
+        # mean_linearmmd_loss = sum(linearmmd_losses) / len(linearmmd_losses)
+        # mean_dss_loss = sum(dss_losses) / len(dss_losses)
+        # mean_swd_loss = sum(swd_losses) / len(swd_losses)
+
+        mean_gram_loss = sum(gram_losses) * 100
+        mean_l2_loss = sum(l2_losses) 
+        mean_gaussianmmd_loss = sum(gaussianmmd_losses) 
+        mean_linearmmd_loss = sum(linearmmd_losses)
+        mean_dss_loss = sum(dss_losses) 
+        mean_swd_loss = sum(swd_losses) 
 
         # 存储子文件夹的均值
         results[src_sub] = {
             "individual_results": sub_results,
-            "mean_gram_loss": mean_gram_loss,
-            "mean_l2_loss": mean_l2_loss,
-            "mean_gaussianmmd_loss":mean_gaussianmmd_loss,
-            "mean_linearmmd_loss":mean_linearmmd_loss,
-            "mean_dss_loss":mean_dss_loss,
-            "mean_swd_loss":mean_swd_loss
+            "mean_gram_loss": mean_gram_loss.item() if isinstance(mean_gram_loss, torch.Tensor) else mean_gram_loss,
+            "mean_l2_loss": mean_l2_loss.item() if isinstance(mean_l2_loss, torch.Tensor) else mean_l2_loss,
+            "mean_gaussianmmd_loss": mean_gaussianmmd_loss.item() if isinstance(mean_gaussianmmd_loss, torch.Tensor) else mean_gaussianmmd_loss,
+            "mean_linearmmd_loss": mean_linearmmd_loss.item() if isinstance(mean_linearmmd_loss, torch.Tensor) else mean_linearmmd_loss,
+            "mean_dss_loss": mean_dss_loss.item() if isinstance(mean_dss_loss, torch.Tensor) else mean_dss_loss,
+            "mean_swd_loss": mean_swd_loss.item() if isinstance(mean_swd_loss, torch.Tensor) else mean_swd_loss
         }
 
     return results
+'''
 
+def process_features(source_dir, target_dir):
+    """
+    计算源域和目标域 **不同子文件夹下** 的相同 npy 文件的差异，并保存 JSON 结果。
+    """
+    source_subdirs = sorted([d for d in os.listdir(source_dir) if os.path.isdir(os.path.join(source_dir, d))])
+    target_subdirs = sorted([d for d in os.listdir(target_dir) if os.path.isdir(os.path.join(target_dir, d))])
 
+    results = {}  # 存储单个 stage 的损失
+
+    for src_sub, tgt_sub in zip(source_subdirs, target_subdirs):  # 逐个子文件夹匹配
+        src_path = os.path.join(source_dir, src_sub)
+        tgt_path = os.path.join(target_dir, tgt_sub)
+
+        source_files = sorted(glob.glob(os.path.join(src_path, "*.npy")))
+        target_files = sorted(glob.glob(os.path.join(tgt_path, "*.npy")))
+
+        # 获取相同的文件名
+        source_names = set(os.path.basename(f) for f in source_files)
+        target_names = set(os.path.basename(f) for f in target_files)
+        common_files = sorted(source_names & target_names)
+
+        # 取最小文件数作为循环次数
+        loop_count = min(len(source_files), len(target_files), len(common_files))
+
+        if loop_count == 0:
+            print(f"未找到 {src_sub} 和 {tgt_sub} 下的相同 npy 文件！")
+            continue
+
+        sub_results = {}  # 计算当前子文件的所有损失
+        gram_losses = []  # Gram
+        l2_losses = []  # l2
+        gaussianmmd_losses = []  # gaussian-mmd
+        linearmmd_losses = []  # gaussian-mmd
+        dss_losses = []  # dss
+        swd_losses = []
+
+        for file_name in common_files[:loop_count]:  # 仅处理 loop_count 个文件
+            # 解析 stage 信息 ，文件名格式为 "stage{stage}_{module_type}_features.npy"
+            try:
+                stage_part = file_name.split("stage")[1]
+                stage_str = stage_part.split("_")[0]
+            except Exception as e:
+                print(f"解析 {file_name} 失败: {e}")
+                continue
+
+            src_file = os.path.join(src_path, file_name)
+            tgt_file = os.path.join(tgt_path, file_name)
+
+            # 读取 npy 文件，并转换为 torch.Tensor
+            source_feat = torch.from_numpy(np.load(src_file))
+            target_feat = torch.from_numpy(np.load(tgt_file))
+            if source_feat.shape != target_feat.shape:
+                # 调整 target_feat 的尺寸，使其匹配 source_feat
+                target_feat = F.interpolate(target_feat, size=source_feat.shape[2:], mode="bilinear", align_corners=False)
+
+            # 根据 stage 信息选择损失计算方式
+            if stage_str in ['2', '4', '6']:
+                loss = compute_gram_loss(source_feat, target_feat)
+                gram_losses.append(loss)
+                loss_type = 'Gram'
+
+                gaussianmmd_loss = compute_gaussianmmd_loss(source_feat, target_feat)
+                gaussianmmd_losses.append(gaussianmmd_loss)
+                linearmmd_loss = compute_linearmmd_loss(source_feat, target_feat)
+                linearmmd_losses.append(linearmmd_loss)
+
+                dss_loss = compute_dss_loss(source_feat, target_feat)
+                dss_losses.append(dss_loss)
+
+                swd_loss = compute_swd_loss(source_feat, target_feat)
+                swd_losses.append(swd_loss)
+
+            elif stage_str in ['8', '9']:
+                loss = compute_l2_loss(source_feat, target_feat)
+                l2_losses.append(loss)
+                loss_type = 'L2'
+
+                gaussianmmd_loss = compute_gaussianmmd_loss(source_feat, target_feat)
+                gaussianmmd_losses.append(gaussianmmd_loss)
+                linearmmd_loss = compute_linearmmd_loss(source_feat, target_feat)
+                linearmmd_losses.append(linearmmd_loss)
+
+                dss_loss = compute_dss_loss(source_feat, target_feat)
+                dss_losses.append(dss_loss)
+
+                swd_loss = compute_swd_loss(source_feat, target_feat)
+                swd_losses.append(swd_loss)
+
+            else:
+                loss = None
+                loss_type = 'Unknown'
+
+            key = f"{src_sub}->{tgt_sub}/{file_name}"
+            sub_results[key] = {'loss_type': loss_type, 'loss': loss.item() if isinstance(loss, torch.Tensor) else loss}
+            print(f"{key}: {loss_type} difference = {loss}")
+
+        # 计算均值
+        mean_gram_loss = sum(gram_losses) * 1000
+        mean_l2_loss = sum(l2_losses)
+        mean_gaussianmmd_loss = sum(gaussianmmd_losses)
+        mean_linearmmd_loss = sum(linearmmd_losses)
+        mean_dss_loss = sum(dss_losses)
+        mean_swd_loss = sum(swd_losses)
+
+        # 确保所有值为 float 类型
+        results[src_sub] = {
+            "individual_results": sub_results,
+            "mean_gram_loss": mean_gram_loss.item() if isinstance(mean_gram_loss, torch.Tensor) else mean_gram_loss,
+            "mean_l2_loss": mean_l2_loss.item() if isinstance(mean_l2_loss, torch.Tensor) else mean_l2_loss,
+            "mean_gaussianmmd_loss": mean_gaussianmmd_loss.item() if isinstance(mean_gaussianmmd_loss, torch.Tensor) else mean_gaussianmmd_loss,
+            "mean_linearmmd_loss": mean_linearmmd_loss.item() if isinstance(mean_linearmmd_loss, torch.Tensor) else mean_linearmmd_loss,
+            "mean_dss_loss": mean_dss_loss.item() if isinstance(mean_dss_loss, torch.Tensor) else mean_dss_loss,
+            "mean_swd_loss": mean_swd_loss.item() if isinstance(mean_swd_loss, torch.Tensor) else mean_swd_loss
+        }
+
+    return results
 
 # 示例调用
 if __name__ == "__main__":
@@ -437,7 +561,7 @@ if __name__ == "__main__":
     target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/city_to_foggy/target'
     results = process_features(source_directory, target_directory)
     # 保存结果
-    output_path = "./gap/city_to_foggy_gap.json"
+    output_path = "./gap/city_to_foggy_gap-1.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
 

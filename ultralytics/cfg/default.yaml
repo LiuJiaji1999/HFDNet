@@ -93,8 +93,8 @@ nms: False # (bool) CoreML: add NMS
 daca_weight : 1 
 mix_weight: 0.01 #  cutmix参数，[0.01, 0.1, 1]
 # 以下三个参数 应该呈现 递增  [0.1,0.1,0.1] , [0.01,0.1,1] , 
-gram_weight: 0.1 # 用于平衡 gram 
-mmd_weight: 0.1 # 用于平衡 mmd 
+gram_weight: 1 # 用于平衡 gram 
+mmd_weight: 1 # 用于平衡 mmd 
 mse_weight: 1 # 用于平衡 MSE损失
 
 lr0: 0.01 # (float) initial learning rate (i.e. SGD=1E-2, Adam=1E-3)

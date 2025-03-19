@@ -250,9 +250,37 @@ def gram_matrix(x):
     features = x.view(b, c, h*w)  # shape: (b, c, N)
     gram = torch.bmm(features, features.transpose(1, 2)) / (c * h * w)
     return gram
+def gaussian_kernel(x, y, kernel_mul=2.0, kernel_num=5, fix_sigma=None, eps=1e-6):
+    """
+    计算两个样本集合 x 和 y 之间的多尺度高斯核矩阵。
+    
+    Args:
+        x (torch.Tensor): shape (n, feature_dim)
+        y (torch.Tensor): shape (m, feature_dim)
+        kernel_mul (float): 带宽倍数因子
+        kernel_num (int): 高斯核个数
+        fix_sigma (float): 固定带宽（可选）
+        eps (float): 防止除零的小数值
+    Returns:
+        torch.Tensor: 高斯核矩阵，形状 (n, m)
+    """
+    diff = x.unsqueeze(1) - y.unsqueeze(0)  # (n, m, feature_dim)
+    L2_distance = torch.sum(diff ** 2, dim=2)  # (n, m)
+    
+    if fix_sigma is not None:
+        bandwidth = fix_sigma
+    else:
+        bandwidth = torch.mean(L2_distance)
+    # 防止带宽为0 ,导致后面 结果为nan
+    bandwidth = max(bandwidth.item(), eps)
+    # 调整带宽
+    bandwidth = bandwidth / (kernel_mul ** (kernel_num // 2))
+    # 构造多尺度带宽列表
+    bandwidth_list = [bandwidth * (kernel_mul ** i) for i in range(kernel_num)]
+    kernel_val = [torch.exp(-L2_distance / bw) for bw in bandwidth_list]
+    return sum(kernel_val)
 
-
-def compute_linearmmd_loss(source_feat, target_feat, kernel_mul=2.0, kernel_num=5, fix_sigma=None):
+def compute_mmd_loss(source_feat, target_feat, kernel_mul=2.0, kernel_num=5, fix_sigma=None):
     """
     对每个通道分别计算 MMD，然后取所有通道的均值作为最终结果。
     
@@ -276,10 +304,16 @@ def compute_linearmmd_loss(source_feat, target_feat, kernel_mul=2.0, kernel_num=
         # 对第 i 个通道：先对空间维度取均值，得到 (n, 1) 和 (m, 1)
         channel_s = feas_s[:, i, :].mean(dim=1, keepdim=True)  # (n, 1)
         channel_t = feas_t[:, i, :].mean(dim=1, keepdim=True)  # (m, 1)
+        # # # 计算高斯核矩阵
+        K_xx = gaussian_kernel(channel_s, channel_s, kernel_mul, kernel_num, fix_sigma)
+        K_yy = gaussian_kernel(channel_t, channel_t, kernel_mul, kernel_num, fix_sigma)
+        K_xy = gaussian_kernel(channel_s, channel_t, kernel_mul, kernel_num, fix_sigma)
+
         # 使用线性核，即内积。计算核矩阵：
-        K_xx = channel_s @ channel_s.t()  # (n, n)
-        K_yy = channel_t @ channel_t.t()  # (m, m)
-        K_xy = channel_s @ channel_t.t()  # (n, m)
+        # K_xx = channel_s @ channel_s.t()  # (n, n)
+        # K_yy = channel_t @ channel_t.t()  # (m, m)
+        # K_xy = channel_s @ channel_t.t()  # (n, m)
+
         # 检查是否存在 nan
         if torch.isnan(K_xx).any() or torch.isnan(K_yy).any() or torch.isnan(K_xy).any():
             print(f"Warning: nan encountered in channel {i}")
@@ -359,7 +393,6 @@ def get_features(x, module_type, stage):
         out_feas = None  # 如果没有保存特征图，返回 None
 
     return out_feas
-
 
 def get_best_region(out, imgs_t):
     # imgs_t.shape：torch.Size([4, 3, 640, 640])

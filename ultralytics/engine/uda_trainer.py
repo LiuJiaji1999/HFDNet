@@ -54,7 +54,7 @@ from ultralytics.nn.extra_modules.kernel_warehouse import get_temperature
 ##########################################################
 from ultralytics.nn.uda_tasks import attempt_load_one_weight, attempt_load_weights
 import torch.nn.functional as F
-from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cross_set_cutmix_pseudo, cross_set_cutmix,adjust_alpha, gram_matrix,compute_linearmmd_loss, compute_swd_loss,clip_coords_target
+from ultralytics.utils.daca import  get_best_region, transform_img_bboxes, cross_set_cutmix_pseudo, cross_set_cutmix,adjust_alpha, gram_matrix,compute_mmd_loss, compute_swd_loss,clip_coords_target
 from ultralytics.utils.ops import  non_max_suppression
 from ultralytics.utils.plotting import output_to_target, plot_images
 import copy
@@ -624,9 +624,12 @@ class UDABaseTrainer:
                     # 仅 源域和目标域图像 的前向传播，返回特征图值
                     self.source_feature_dict = self.model(batch_s['img'],layers=True)  
                     self.target_feature_dict = self.model(batch_t['img'],layers=True)
-                    gram_losses = []
+                    
+                    gram_losses = [] # 值太小
+                    swd_losses = []
                     mmd_losses = []
                     mse_losses = [] # l2
+
                     for layer in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:
                         source_feas = self.source_feature_dict[layer]
                         target_feas = self.target_feature_dict[layer]
@@ -655,14 +658,20 @@ class UDABaseTrainer:
                                 # 3.计算源域和目标域的 特定层特征差异损失   ，缩小域间差异
                                 if layer in [2, 4, 6, 8, 9]:  # backbone
                                     # gram值太小，对结果影响很小
-                                    gram_s = gram_matrix(source_fea)
-                                    gram_t = gram_matrix(target_fea)
-                                    gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
-                                    gram_losses.append(gram_loss)
+                                    # gram_s = gram_matrix(source_fea)
+                                    # gram_t = gram_matrix(target_fea)
+                                    # gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
+                                    # # gram_loss = (1000 / source_fea.shape[1]**2) * (F.mse_loss(gram_s, gram_t).to(self.device))
+                                    # gram_losses.append(gram_loss)
+
+                                    swd_loss = torch.tensor(compute_swd_loss(source_fea,target_fea))
+                                    swd_losses.append(swd_loss)
+
+
                                 # mean_gram_loss = torch.tensor([sum(gram_losses) / 5])
-                                if layer in [12,15,18,21]:  # neck 
+                                if layer in [12,15,18,21]:  # neck 高斯核
                                     # mmd_linear 在50epoch还行，100epoch就变很小值了！
-                                    mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
+                                    mmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
                                     mmd_losses.append(mmd_loss)
                                 # mean_mmd_loss =  torch.tensor([sum(mmd_losses) / 4]) # 标量没有 detach，除非在 torch.tensor
                                 
@@ -672,10 +681,11 @@ class UDABaseTrainer:
                                 #         mse_losses.append(mse_loss)
                                 # mean_mse_loss = torch.tensor([sum(mse_losses)])
                     
-                    mean_gram_loss = torch.mean(torch.stack(gram_losses))  # 计算平均值
+                    # mean_gram_loss = torch.mean(torch.stack(gram_losses))  # 计算平均值
+                    mean_swd_loss = torch.mean(torch.stack(swd_losses))
                     mean_mmd_loss = torch.mean(torch.stack(mmd_losses))  # 计算平均值
                     mean_mse_loss = torch.mean(torch.stack(mse_losses)) 
-                            
+                    
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss
                     self.loss = self.source_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
