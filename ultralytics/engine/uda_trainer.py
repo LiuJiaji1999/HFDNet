@@ -630,7 +630,7 @@ class UDABaseTrainer:
                     for layer in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:
                         source_feas = self.source_feature_dict[layer]
                         target_feas = self.target_feature_dict[layer]
-                        if isinstance(source_feas, list) and isinstance(target_feas, list): # 22层。多尺度【80，40，20】
+                        if isinstance(source_feas, list) and isinstance(target_feas, list): # head 22层,多尺度【80，40，20】
                             for i in range(len(source_feas)):
                                 min_batch_size = min(source_feas[i].shape[0], target_feas[i].shape[0])
                                 source_fea = source_feas[i][:min_batch_size]
@@ -660,7 +660,6 @@ class UDABaseTrainer:
                                     gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
                                     gram_losses.append(gram_loss)
                                 # mean_gram_loss = torch.tensor([sum(gram_losses) / 5])
-                                
                                 if layer in [12,15,18,21]:  # neck 
                                     # mmd_linear 在50epoch还行，100epoch就变很小值了！
                                     mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
