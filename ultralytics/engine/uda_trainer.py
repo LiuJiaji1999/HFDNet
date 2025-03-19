@@ -645,24 +645,24 @@ class UDABaseTrainer:
                                     align_corners=False
                                 )
                              # 3.计算源域和目标域的 特定层特征差异损失   ，缩小域间差异
-                            if layer in [2, 4]: 
+                            if layer in [2,4,6,8,9]:  # backbone
                                 # gram值太小，对结果影响很小
                                 gram_s = gram_matrix(source_fea)
                                 gram_t = gram_matrix(target_fea)
                                 gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
                                 gram_losses.append(gram_loss)
-                            mean_gram_loss = sum(gram_losses) / 2
+                            mean_gram_loss = sum(gram_losses) / 6
                             
-                            if layer in [6]: 
+                            if layer in [12,15,18,21]:  # neck 
                                 # mmd_linear 在50epoch还行，100epoch就变很小值了！
                                 mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
                                 mmd_losses.append(mmd_loss)
-                            mean_mmd_loss = sum(mmd_losses)
+                            mean_mmd_loss = sum(mmd_losses) / 4
                             
-                            if layer in [8, 9]: # [2,4,6,8,9]
+                            if layer in [22]: # head
                                 mse_loss = F.mse_loss(source_fea, target_fea)
                                 mse_losses.append(mse_loss)
-                            mean_mse_loss = sum(mse_losses) / 2
+                            mean_mse_loss = sum(mse_losses) 
                     
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss
                     self.loss = self.source_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 

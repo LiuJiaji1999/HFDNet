@@ -117,10 +117,10 @@ class BaseModel(nn.Module):
 
             if layers:
                 # print(f"predect.py ⚠️ Computing features at stage {m.i}")
-                if m.i in [2, 4, 6, 8, 9]:  # 判断层数是否属于 [2, 4, 6, 8, 9]
+                if m.i in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:  # 判断层数是否属于 [2, 4, 6, 8, 9]
                     # print(f'Saving features at stage {m.i}')
                     out_feas_dict[m.i] = m(x)  # 保存当前层的特征图
-                if m.i == 9:
+                if m.i == 22:
                     return out_feas_dict
                     
             if hasattr(m, 'backbone'):
