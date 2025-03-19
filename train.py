@@ -115,7 +115,7 @@ if __name__ == '__main__':
                 # fraction=0.2,
                 cos_lr = True,
                 # project='runs/debug',
-                # project='runs/train/improve',
-                # name='sourcesim10k-gdm',
+                project='runs/train/improve',
+                name='sourcesim10k-gdm',
                 # mixup = 1.0,
                 )
