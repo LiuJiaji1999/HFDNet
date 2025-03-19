@@ -638,7 +638,7 @@ class UDABaseTrainer:
                     for layer in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:
                         source_feas = self.source_feature_dict[layer]
                         target_feas = self.target_feature_dict[layer]
-                        if isinstance(source_feas, torch.tensor) and isinstance(target_feas, torch.tensor):
+                        if isinstance(source_feas, torch.Tensor) and isinstance(target_feas, torch.Tensor):
                             min_batch_size = min(source_feas.shape[0], target_feas.shape[0])   # # 检查批次大小
                             source_fea = source_feas[:min_batch_size]
                             target_fea = target_feas[:min_batch_size]
