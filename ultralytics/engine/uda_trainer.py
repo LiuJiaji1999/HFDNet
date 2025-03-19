@@ -627,7 +627,7 @@ class UDABaseTrainer:
                     gram_losses = []
                     mmd_losses = []
                     mse_losses = [] # l2
-                    for layer in [2, 4, 6, 8, 9]:
+                    for layer in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:
                         source_feas = self.source_feature_dict[layer]
                         target_feas = self.target_feature_dict[layer]
                         # # 检查批次大小
@@ -651,18 +651,21 @@ class UDABaseTrainer:
                                 gram_t = gram_matrix(target_fea)
                                 gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
                                 gram_losses.append(gram_loss)
-                            mean_gram_loss = sum(gram_losses) / 6
+                            # mean_gram_loss = torch.tensor([sum(gram_losses) / 5])
+                            mean_gram_loss = torch.mean(torch.stack(gram_losses))  # 计算平均值 
                             
                             if layer in [12,15,18,21]:  # neck 
                                 # mmd_linear 在50epoch还行，100epoch就变很小值了！
                                 mmd_loss = torch.tensor(compute_linearmmd_loss(source_fea,target_fea))
                                 mmd_losses.append(mmd_loss)
-                            mean_mmd_loss = sum(mmd_losses) / 4
+                            # mean_mmd_loss =  torch.tensor([sum(mmd_losses) / 4]) # 标量没有 detach，除非在 torch.tensor
+                            mean_mmd_loss = torch.mean(torch.stack(mmd_losses))  # 计算平均值
                             
                             if layer in [22]: # head
                                 mse_loss = F.mse_loss(source_fea, target_fea)
                                 mse_losses.append(mse_loss)
-                            mean_mse_loss = sum(mse_losses) 
+                            # mean_mse_loss = torch.tensor([sum(mse_losses)])
+                            mean_mse_loss = torch.mean(torch.stack(mse_losses))
                     
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss
                     self.loss = self.source_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
