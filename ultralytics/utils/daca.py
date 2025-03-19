@@ -357,6 +357,50 @@ def compute_swd_loss(source_feat, target_feat):
         del cost_matrix_cpu
     return wasserstein_distance / n_channels
 
+def compute_dss_loss(source_feat, target_feat):
+    """
+    Compute the average DSS (Domain Shift Score) difference between source and target domain features.
+    Features are 4D tensors with shape (batch, channel, height, width).
+    
+    Args:
+        source_feat (torch.Tensor): Source domain features (batch, channel, height, width)
+        target_feat (torch.Tensor): Target domain features (batch, channel, height, width)
+    
+    Returns:
+        float: Average DSS value across all channels
+    """
+    # Get dimensions
+    batch_size, n_channels, height, width = source_feat.shape # [1,96,96,160]
+    
+    dss_val = 0
+    
+    # Flatten height and width dimensions for each channel
+    feas_s_flat = source_feat.view(batch_size, n_channels, -1)  # (batch, channel, height*width)
+    feas_t_flat = target_feat.view(batch_size, n_channels, -1)  # (batch, channel, height*width)
+    for i in range(n_channels):
+        # Extract features for current channel
+        feas_s = feas_s_flat[:, i, :].unsqueeze(-1)  # (batch, height*width, 1)
+        feas_t = feas_t_flat[:, i, :].unsqueeze(-1)  # (batch, height*width, 1)
+        # Calculate dimensions
+        ns = feas_s.shape[0]  # batch size 1
+        d = feas_s.shape[1]   # height*width (feature dimension) 15360
+        
+        # Source covariance
+        xm = torch.mean(feas_s, 1, keepdim=True) - feas_s
+        xc = xm.transpose(1, 2) @ xm / ns  # (d, 1) @ (1, d)
+        # Target covariance
+        xmt = torch.mean(feas_t, 1, keepdim=True) - feas_t
+        xct = xmt.transpose(1, 2) @ xmt / ns  # (d, 1) @ (1, d)
+       
+        # Frobenius norm between source and target covariances
+        loss = torch.mul((xc - xct), (xc - xct))
+        dss = torch.sum(loss) / (4 * d * d)
+        dss_val += dss
+    
+    # Average across all channels
+    return (dss_val / n_channels).item()
+
+
 def get_features(x, module_type, stage):
     """
     获取特定层的输出特征。
