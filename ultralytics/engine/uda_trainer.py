@@ -638,16 +638,8 @@ class UDABaseTrainer:
                     for layer in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:
                         source_feas = self.source_feature_dict[layer]
                         target_feas = self.target_feature_dict[layer]
-                        if isinstance(source_feas, list) and isinstance(target_feas, list): # head 22层,多尺度【80，40，20】
-                            for i in range(len(source_feas)):
-                                min_batch_size = min(source_feas[i].shape[0], target_feas[i].shape[0])
-                                source_fea = source_feas[i][:min_batch_size]
-                                target_fea = target_feas[i][:min_batch_size]
-                                # mse_loss = F.mse_loss(source_fea, target_fea)
-                                # mse_losses.append(mse_loss)
-                        else:
-                            # # 检查批次大小
-                            min_batch_size = min(source_feas.shape[0], target_feas.shape[0])
+                        if isinstance(source_feas, torch.tensor) and isinstance(target_feas, torch.tensor):
+                            min_batch_size = min(source_feas.shape[0], target_feas.shape[0])   # # 检查批次大小
                             source_fea = source_feas[:min_batch_size]
                             target_fea = target_feas[:min_batch_size]
                             if source_fea is not None and target_fea is not None:
@@ -679,13 +671,8 @@ class UDABaseTrainer:
                                 if layer in [12,15,18,21]:  # neck 高斯核
                                     mmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
                                     mmd_losses.append(mmd_loss)
-
-                                # if layer in [22]: # head
-                                #     for i in range(len(source_fea)):
-                                #         mse_loss = F.mse_loss(source_fea[i], target_fea[i])
-                                #         mse_losses.append(mse_loss)
-                                # mean_mse_loss = torch.tensor([sum(mse_losses)])
                                 ''' 
+
                                 if layer in [4]:  # neck 高斯核
                                     smmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
                                     smmd_losses.append(smmd_loss)
@@ -695,7 +682,16 @@ class UDABaseTrainer:
                                 if layer in [9]:  # neck 高斯核
                                     hmmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
                                     hmmd_losses.append(hmmd_loss)
-                    
+                        
+                        # # head layer = [22] 层,多尺度【80，40，20】
+                        # if isinstance(source_feas, list) and isinstance(target_feas, list): 
+                        #     for i in range(len(source_feas)):
+                        #         min_batch_size = min(source_feas[i].shape[0], target_feas[i].shape[0])
+                        #         source_fea = source_feas[i][:min_batch_size]
+                        #         target_fea = target_feas[i][:min_batch_size]
+                        #         mse_loss = F.mse_loss(source_fea, target_fea)
+                        #         mse_losses.append(mse_loss)
+                        
                     # mean_gram_loss = torch.mean(torch.stack(gram_losses))  # 计算平均值
                     # mean_swd_loss = torch.mean(torch.stack(swd_losses))
                     # mean_dss_loss = torch.mean(torch.stack(dss_losses))
