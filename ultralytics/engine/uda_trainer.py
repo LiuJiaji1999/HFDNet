@@ -687,12 +687,12 @@ class UDABaseTrainer:
                     mean_mse_loss = torch.mean(torch.stack(mse_losses)) 
                     
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss
-                    self.loss = self.source_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
+                    self.loss = self.source_loss + self.args.gram_weight * mean_swd_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
                         # self.daca_loss_items,
-                        mean_gram_loss.detach().unsqueeze(0), # 加入 gram 损失
+                        mean_swd_loss.detach().unsqueeze(0), # 加入 gram 损失
                         mean_mmd_loss.detach().unsqueeze(0),  # 加入 mmd 损失
                         mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
                     ])
