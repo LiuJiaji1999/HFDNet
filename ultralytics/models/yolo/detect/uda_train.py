@@ -125,8 +125,8 @@ class UDADetectionTrainer(UDABaseTrainer):
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss","psc_box","psc_cls","psc_dfl"  # 伪标签 confmix
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss","gram_loss","mmd_loss","mse_loss"  # 域差异
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss","swd_loss","gmmd_loss","mse_loss"  # 域差异
-        # self.loss_names = "box_loss", "cls_loss", "dfl_loss","dss_loss","gmmd_loss","mse_loss"  # 域差异
-        self.loss_names = "box_loss", "cls_loss", "dfl_loss","daca_bl", "daca_cl", "daca_dl", "dss_loss","gmmd_loss","mse_loss"  # 域差异
+        self.loss_names = "box_loss", "cls_loss", "dfl_loss","dss_loss","gmmd_loss","mse_loss"  # 域差异
+        # self.loss_names = "box_loss", "cls_loss", "dfl_loss","daca_bl", "daca_cl", "daca_dl", "dss_loss","gmmd_loss","mse_loss"  # 域差异
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss","smmd_loss","mmmd_loss","hmmd"  # 域差异
        
         # self.loss_names = "box_loss", "cls_loss", "dfl_loss","psc_box","psc_cls","psc_dfl","gram_loss","mmd_loss","mse_loss"  # 伪标签 confmix + 域差异
