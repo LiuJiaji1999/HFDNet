@@ -674,15 +674,17 @@ class UDABaseTrainer:
                                     mmd_losses.append(mmd_loss)
                                 ''' 
 
-                                if layer in [4]:  # neck 高斯核
-                                    smmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
-                                    smmd_losses.append(smmd_loss)
-                                if layer in [6]:  # neck 高斯核
+                                if layer in [2,4]:  # 
+                                    gram_s = gram_matrix(source_fea)
+                                    gram_t = gram_matrix(target_fea)
+                                    gram_loss = F.mse_loss(gram_s, gram_t).to(self.device)
+                                    gram_losses.append(gram_loss)
+                                if layer in [6]:  # 
                                     mmmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
                                     mmmd_losses.append(mmmd_loss)
-                                if layer in [9]:  # neck 高斯核
-                                    hmmd_loss = torch.tensor(compute_mmd_loss(source_fea,target_fea))
-                                    hmmd_losses.append(hmmd_loss)
+                                if layer in [8,9]:  # 
+                                    mse_loss = F.mse_loss(source_fea, target_fea)
+                                    mse_losses.append(mse_loss)
                         
                         # # head layer = [22] 层,多尺度【80，40，20】
                         # if isinstance(source_feas, list) and isinstance(target_feas, list): 
@@ -693,32 +695,38 @@ class UDABaseTrainer:
                         #         mse_loss = F.mse_loss(source_fea, target_fea)
                         #         mse_losses.append(mse_loss)
                         
-                    # mean_gram_loss = torch.mean(torch.stack(gram_losses))  # 计算平均值
+                    mean_gram_loss = torch.mean(torch.stack(gram_losses))  # 计算平均值
                     # mean_swd_loss = torch.mean(torch.stack(swd_losses))
                     # mean_dss_loss = torch.mean(torch.stack(dss_losses))
                     # mean_mmd_loss = torch.mean(torch.stack(mmd_losses))  # 计算平均值
-                    # mean_mse_loss = torch.mean(torch.stack(mse_losses)) 
                     
-                    mean_smmd_loss = torch.mean(torch.stack(smmd_losses))
+                    # mean_smmd_loss = torch.mean(torch.stack(smmd_losses))
                     mean_mmmd_loss = torch.mean(torch.stack(mmmd_losses)) 
-                    mean_hmmd_loss = torch.mean(torch.stack(hmmd_losses)) 
+                    # mean_hmmd_loss = torch.mean(torch.stack(hmmd_losses)) 
+
+                    mean_mse_loss = torch.mean(torch.stack(mse_losses)) 
+                    
+                    
 
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss
                     # self.loss = self.source_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmd_loss + self.args.high_weight * mean_mse_loss 
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss + self.args.gram_weight * mean_gram_loss + self.args.mmd_weight * mean_mmd_loss + self.args.mse_weight * mean_mse_loss 
-                    self.loss = self.source_loss + self.args.shallow_weight * mean_smmd_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_hmmd_loss 
+                    self.loss = self.source_loss + self.args.shallow_weight * mean_gram_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
                         # self.daca_loss_items,
-                        # mean_gram_loss.detach().unsqueeze(0), # 加入 gram 损失
+                        mean_gram_loss.detach().unsqueeze(0), # 加入 gram 损失
                         # mean_swd_loss.detach().unsqueeze(0), # 加入 gram 损失
                         # mean_dss_loss.detach().unsqueeze(0), # 加入 gram 损失
                         # mean_mmd_loss.detach().unsqueeze(0),  # 加入 mmd 损失
-                        # mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
 
-                        mean_smmd_loss.detach().unsqueeze(0),
+                         # mean_smmd_loss.detach().unsqueeze(0),
                         mean_mmmd_loss.detach().unsqueeze(0),
-                        mean_hmmd_loss.detach().unsqueeze(0)
+                        # mean_hmmd_loss.detach().unsqueeze(0)
+
+                        mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
+
+                       
 
                     ])
                     
