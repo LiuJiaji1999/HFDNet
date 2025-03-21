@@ -941,7 +941,7 @@ class Albumentations:
                 A.ImageCompression(quality_lower=75, p=0.0),
 
                 # A.BBoxSafeRandomCrop(erosion_rate=0.1, always_apply=False, p=0.2),
-                A.HorizontalFlip(p=0.5),
+                # A.HorizontalFlip(p=0.5),
                 A.Blur(blur_limit=1, always_apply=True, p=0.5), 
                 A.ColorJitter (brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2, always_apply=False, p=0.5),
                 A.Downscale (scale_min=0.5, scale_max=0.99, interpolation=None, always_apply=False, p=0.5),
