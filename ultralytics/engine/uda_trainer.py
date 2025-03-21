@@ -649,6 +649,7 @@ class UDABaseTrainer:
                     # filter pseudo detections on target images applying NMS
                     out_t = non_max_suppression(pseudo_t.detach(), conf_thres=0.25, iou_thres=0.5, multi_label=False)
                     out_t = output_to_target(out_t)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+
                     b, c, h, w = batch_s['img'].shape
                     out_s = torch.from_numpy(out_s) if out_s.size else torch.empty([0,7])
                     out_t = torch.from_numpy(out_t) if out_t.size else torch.empty([0,7]) 
@@ -834,9 +835,8 @@ class UDABaseTrainer:
                     self.tloss = (
                         (self.tloss * i + self.loss_items) / (i + 1) if self.tloss is not None else self.loss_items
                     )
+
                     '''
-                    
-                    
                     # r = ni / max_iterations
                     # delta = 2 / (1 + math.exp(-5. * r)) - 1
                     
