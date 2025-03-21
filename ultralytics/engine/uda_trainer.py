@@ -533,11 +533,11 @@ class UDABaseTrainer:
                     out_original = copy.deepcopy(out)  
                     
                     # # 2 简单的 基于目标域伪标签的训练
-                    # psbatch_t = batch_t.copy()
-                    # psbatch_t['cls'] = out[:,1].unsqueeze(-1) # [32] -> [32,1]
-                    # psbatch_t['bboxes'] = out[:,2:6] # [32,4]
-                    # psbatch_t['batch_idx'] = out[:,0] # [32]
-                    # self.daca_loss, self.daca_loss_items = self.model(psbatch_t)
+                    psbatch_t = batch_t.copy()
+                    psbatch_t['cls'] = out[:,1].unsqueeze(-1) # [32] -> [32,1]
+                    psbatch_t['bboxes'] = out[:,2:6] # [32,4]
+                    psbatch_t['batch_idx'] = out[:,0] # [32]
+                    self.daca_loss, self.daca_loss_items = self.model(psbatch_t)
   
                     '''
                    
@@ -722,11 +722,11 @@ class UDABaseTrainer:
                     
 
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss
-                    # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss  
-                    self.loss = self.source_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss 
+                    self.loss = self.source_loss + self.args.daca_weight * self.daca_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss  
+                    # self.loss = self.source_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
-                        # self.daca_loss_items,
+                        self.daca_loss_items,
                         mean_dss_loss.detach().unsqueeze(0), # 加入 gram 损失
                         # mean_swd_loss.detach().unsqueeze(0), # 加入 gram 损失
                         # mean_dss_loss.detach().unsqueeze(0), # 加入 gram 损失
