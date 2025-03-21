@@ -518,6 +518,10 @@ class UDABaseTrainer:
 
                     # ----------方法二 ------------------------------------------- 
                     # 基于伪标签的合成域，二次训练
+                      
+                    # # supervised detector loss term on the labelled source samples
+                    # 1.源域的检测损失
+                    self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
                     
                     r = ni / max_iterations
                     delta = 2 / (1 + math.exp(-5. * r)) - 1
@@ -628,10 +632,7 @@ class UDABaseTrainer:
                     self.daca_loss, self.daca_loss_items = self.model(batch_daca)
                      '''
                     
-                    # # supervised detector loss term on the labelled source samples
-                    # 1.源域的检测损失
-                    self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
-                    
+                  
                     # 仅 源域和目标域图像 的前向传播，返回特征图值
                     self.source_feature_dict = self.model(batch_s['img'],layers=True)  
                     self.target_feature_dict = self.model(batch_t['img'],layers=True)
