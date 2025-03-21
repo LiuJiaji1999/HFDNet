@@ -936,11 +936,11 @@ class Albumentations:
                 A.MedianBlur(p=0.01),
                 A.ToGray(p=0.01),
                 A.CLAHE(p=0.01),
-                A.RandomBrightnessContrast(p=0.0),
+                # A.RandomBrightnessContrast(p=0.0),
                 A.RandomGamma(p=0.0),
                 A.ImageCompression(quality_lower=75, p=0.0),
 
-                A.BBoxSafeRandomCrop(erosion_rate=0.1, always_apply=False, p=0.2),
+                # A.BBoxSafeRandomCrop(erosion_rate=0.1, always_apply=False, p=0.2),
                 A.HorizontalFlip(p=0.5),
                 A.Blur(blur_limit=1, always_apply=True, p=0.5), 
                 A.ColorJitter (brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2, always_apply=False, p=0.5),
