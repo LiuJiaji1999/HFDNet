@@ -69,7 +69,7 @@ def visualize_losses(json_file, output_dir="vis"):
         print(f"已保存 {loss_type} 图: {out_path}")
 
 # 示例调用：
-# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/city_to_foggy_gap.json", output_dir="vis/city_to_foggy")
+visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/city_to_foggy_gap.json", output_dir="vis/city_to_foggy")
 # visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/sim10k_to_city_gap.json", output_dir="vis/sim10k_to_city")
-visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/voc_to_clipart1k_gap.json", output_dir="vis/voc_to_clipart1k")
+# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/voc_to_clipart1k_gap.json", output_dir="vis/voc_to_clipart1k")
 # visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/privatepower_to_publicpower_gap.json", output_dir="vis/privatepower_to_publicpower")

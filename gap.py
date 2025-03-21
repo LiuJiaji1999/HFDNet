@@ -490,23 +490,26 @@ def process_features(source_dir, target_dir):
 
             # 根据 stage 信息选择损失计算方式
             if stage_str in ['2', '4']:
+                loss = compute_dss_loss(source_feat, target_feat)
+                dss_losses.append(loss)
+                loss_type = 'dss'
+
                 gram_loss = compute_gram_loss(source_feat, target_feat)
                 gram_losses.append(gram_loss)
-                loss_type = 'Gram'
-            
-                dss_loss = compute_dss_loss(source_feat, target_feat)
-                dss_losses.append(dss_loss)
-                loss_type = 'Gram'
-
+                # loss_type = 'Gram'
+                
                 swd_loss = compute_swd_loss(source_feat, target_feat)
                 swd_losses.append(swd_loss)
-                loss_type = 'Gram'
+                # loss_type = 'swd'
 
             elif stage_str in ['6']:
-                gaussianmmd_loss = compute_gaussianmmd_loss(source_feat, target_feat)
-                gaussianmmd_losses.append(gaussianmmd_loss)
+                loss = compute_gaussianmmd_loss(source_feat, target_feat)
+                gaussianmmd_losses.append(loss)
+                loss_type = 'gmmd'
+                
                 linearmmd_loss = compute_linearmmd_loss(source_feat, target_feat)
                 linearmmd_losses.append(linearmmd_loss)
+                # loss_type = 'lmmd'
 
             elif stage_str in ['8', '9']:
                 loss = compute_l2_loss(source_feat, target_feat)
@@ -549,11 +552,12 @@ if __name__ == "__main__":
     # target_feature()
 
     ###  2.计算对应层级特征分布差异
-    source_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/city_to_foggy/source'
-    target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/city_to_foggy/target'
+    # city_to_foggy，sim10k_to_city 、voc_to_clipart1k、  privatepower_to_publicpower
+    source_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/privatepower_to_publicpower/source' 
+    target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/privatepower_to_publicpower/target'
     results = process_features(source_directory, target_directory)
     # 保存结果
-    output_path = "./gap/c2f_gap.json"
+    output_path = "./gap/pr2pu_gap.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
 
