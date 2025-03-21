@@ -5,17 +5,18 @@ from ultralytics import YOLO
 # 验证参数官方详解链接：https://docs.ultralytics.com/modes/val/#usage-examples:~:text=of%20each%20category-,Arguments%20for%20YOLO%20Model%20Validation,-When%20validating%20YOLO
 
 if __name__ == '__main__':
-    model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcevoc/weights/last.pt')
-    model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
+    model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcesim10k-aptpse-dmm4/weights/best.pt')
+    model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/sim10k_to_cityscapes.yaml',
               split='val',
-              imgsz=640,
+              imgsz=960,
               batch=8,
-            #   iou=0.7,
+              # iou=0.7,
               # rect=False,
               save_json=True, # if you need to cal coco metrice
               project='runs/val/improve',
-              name='sourcevoc',
+              name='sourcesim10k',
               )
+    
     # city_to_foggycity.yaml sourcecity
     # foggycityscapes.yaml oraclefoggy
 
