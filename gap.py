@@ -489,37 +489,29 @@ def process_features(source_dir, target_dir):
                 target_feat = F.interpolate(target_feat, size=source_feat.shape[2:], mode="bilinear", align_corners=False)
 
             # 根据 stage 信息选择损失计算方式
-            if stage_str in ['2', '4', '6']:
-                loss = compute_gram_loss(source_feat, target_feat)
-                gram_losses.append(loss)
+            if stage_str in ['2', '4']:
+                gram_loss = compute_gram_loss(source_feat, target_feat)
+                gram_losses.append(gram_loss)
+                loss_type = 'Gram'
+            
+                dss_loss = compute_dss_loss(source_feat, target_feat)
+                dss_losses.append(dss_loss)
                 loss_type = 'Gram'
 
+                swd_loss = compute_swd_loss(source_feat, target_feat)
+                swd_losses.append(swd_loss)
+                loss_type = 'Gram'
+
+            elif stage_str in ['6']:
                 gaussianmmd_loss = compute_gaussianmmd_loss(source_feat, target_feat)
                 gaussianmmd_losses.append(gaussianmmd_loss)
                 linearmmd_loss = compute_linearmmd_loss(source_feat, target_feat)
                 linearmmd_losses.append(linearmmd_loss)
-
-                dss_loss = compute_dss_loss(source_feat, target_feat)
-                dss_losses.append(dss_loss)
-
-                swd_loss = compute_swd_loss(source_feat, target_feat)
-                swd_losses.append(swd_loss)
 
             elif stage_str in ['8', '9']:
                 loss = compute_l2_loss(source_feat, target_feat)
                 l2_losses.append(loss)
                 loss_type = 'L2'
-
-                gaussianmmd_loss = compute_gaussianmmd_loss(source_feat, target_feat)
-                gaussianmmd_losses.append(gaussianmmd_loss)
-                linearmmd_loss = compute_linearmmd_loss(source_feat, target_feat)
-                linearmmd_losses.append(linearmmd_loss)
-
-                dss_loss = compute_dss_loss(source_feat, target_feat)
-                dss_losses.append(dss_loss)
-
-                swd_loss = compute_swd_loss(source_feat, target_feat)
-                swd_losses.append(swd_loss)
 
             else:
                 loss = None
@@ -530,12 +522,12 @@ def process_features(source_dir, target_dir):
             print(f"{key}: {loss_type} difference = {loss}")
 
         # 计算均值
-        mean_gram_loss = sum(gram_losses) * 1000
-        mean_l2_loss = sum(l2_losses)
-        mean_gaussianmmd_loss = sum(gaussianmmd_losses)
-        mean_linearmmd_loss = sum(linearmmd_losses)
-        mean_dss_loss = sum(dss_losses)
-        mean_swd_loss = sum(swd_losses)
+        mean_gram_loss = sum(gram_losses) / len(gram_losses)
+        mean_l2_loss = sum(l2_losses) / len(l2_losses)
+        mean_gaussianmmd_loss = sum(gaussianmmd_losses) / len(gaussianmmd_losses)
+        mean_linearmmd_loss = sum(linearmmd_losses) / len(linearmmd_losses)
+        mean_dss_loss = sum(dss_losses) / len(dss_losses)
+        mean_swd_loss = sum(swd_losses)/  len(swd_losses)
 
         # 确保所有值为 float 类型
         results[src_sub] = {
@@ -561,7 +553,7 @@ if __name__ == "__main__":
     target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/city_to_foggy/target'
     results = process_features(source_directory, target_directory)
     # 保存结果
-    output_path = "./gap/city_to_foggy_gap-1.json"
+    output_path = "./gap/c2f_gap.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
 
