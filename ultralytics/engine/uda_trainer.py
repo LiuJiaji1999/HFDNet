@@ -523,38 +523,39 @@ class UDABaseTrainer:
                     # 1.源域的检测损失
                     self.source_loss, self.source_loss_items = self.model(batch_s) # pred_s 
                     
+                    ## 伪标签
                     r = ni / max_iterations
                     delta = 2 / (1 + math.exp(-5. * r)) - 1
-                    # pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
-                    # pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
+                    pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
+                    pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
                 
                     pred_t = self.model(batch_t['img'], pseudo=True, delta=delta)  # forward
                     pseudo_t, _ = pred_t # 目标域的 伪标签 和 特征图 pseudo_t.shape(4,5,8400)
-
-                    # # filter pseudo detections on target images applying NMS
-                    out = non_max_suppression(pseudo_t.detach(), conf_thres=0.25, iou_thres=0.25, multi_label=False)
-                    out = torch.tensor(output_to_target(out))  # [batch_id, class_id, x, y, w, h, conf] (16,7)
-                    out_original = copy.deepcopy(out)
-                    b, c, h, w = batch_t['img'].shape
-                    out[:, [2, 4]] /= w
-                    out[:, [3, 5]] /= h  
-                    
-                    # # 2 简单的 基于目标域伪标签的训练
-                    psbatch_t = batch_t.copy()
-                    psbatch_t['cls'] = out[:,1].unsqueeze(-1) # [32] -> [32,1]
-                    psbatch_t['bboxes'] = out[:,2:6] # [32,4]
-                    psbatch_t['batch_idx'] = out[:,0] # [32]
-                    self.daca_loss, self.daca_loss_items = self.model(psbatch_t)
-
-                    c_gamma_thres = 0.5
-                    #  .sum() 对布尔张量求和。True=1，False=0。 返回的是满足条件（大于 0.5）的元素个数。
-                    #  .nelement() 返回张量中元素的总数。对于 targets_confmix[:, 6]，它是一个形状为 [N] 的一维张量，因此 返回 N。
-                    gamma = (out[:,6] > c_gamma_thres).sum() / \
-                                    (out[:,6]).nelement()
-  
-                    '''
                    
-                    # DACA
+                    '''
+                    ##  2.1 简单的 基于目标域伪标签的训练
+                    # # # filter pseudo detections on target images applying NMS
+                    # out = non_max_suppression(pseudo_t.detach(), conf_thres=0.25, iou_thres=0.25, multi_label=False)
+                    # out = torch.tensor(output_to_target(out))  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+                    # out_original = copy.deepcopy(out)
+                    # b, c, h, w = batch_t['img'].shape
+                    # out[:, [2, 4]] /= w
+                    # out[:, [3, 5]] /= h  
+                
+                    # psbatch_t = batch_t.copy()
+                    # psbatch_t['cls'] = out[:,1].unsqueeze(-1) # [32] -> [32,1]
+                    # psbatch_t['bboxes'] = out[:,2:6] # [32,4]
+                    # psbatch_t['batch_idx'] = out[:,0] # [32]
+                    # self.daca_loss, self.daca_loss_items = self.model(psbatch_t)
+
+                    # c_gamma_thres = 0.5
+                    # #  .sum() 对布尔张量求和。True=1，False=0。 返回的是满足条件（大于 0.5）的元素个数。
+                    # #  .nelement() 返回张量中元素的总数。对于 targets_confmix[:, 6]，它是一个形状为 [N] 的一维张量，因此 返回 N。
+                    # gamma = (out[:,6] > c_gamma_thres).sum() / \
+                    #                 (out[:,6]).nelement()
+                    '''
+                    ''' 
+                    # 2.2 DACA
                     # 创建一个与源图像 imgs_s 形状相同的全 1 张量，并将其乘以 imgs_s 的均值。
                     # 目的是生成一个与 imgs_s 大小相同的空白图像，用于后续拼接增强后的图像。
                     imgs_concat = torch.ones_like(batch_s['img']) * torch.mean(batch_s['img']) #  初始化合成图像，进行再次训练
@@ -640,22 +641,101 @@ class UDABaseTrainer:
                     batch_daca['batch_idx'] = targets_daca[:,0] # [32]
                     self.daca_loss, self.daca_loss_items = self.model(batch_daca)
                      '''
-                    
-                  
+
+                    # 2.3 Confmix
+                    # filter pseudo detections on source images applying NMS
+                    out_s = non_max_suppression(pseudo_s.detach(), conf_thres=0.25, iou_thres=0.5, multi_label=False)
+                    out_s = output_to_target(out_s)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+                    # filter pseudo detections on target images applying NMS
+                    out_t = non_max_suppression(pseudo_t.detach(), conf_thres=0.25, iou_thres=0.5, multi_label=False)
+                    out_t = output_to_target(out_t)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+                    b, c, h, w = batch_s['img'].shape
+                    out_s = torch.from_numpy(out_s) if out_s.size else torch.empty([0,7])
+                    out_t = torch.from_numpy(out_t) if out_t.size else torch.empty([0,7]) 
+                    # divide the pseudo detections on the target into 4 regions ([0,0] is top-left)
+                    tar_lb = out_t[(out_t[:,2] < w//2) & (out_t[:,3] >= h//2), :]
+                    tar_lt = out_t[(out_t[:,2] < w//2) & (out_t[:,3] < h//2), :]
+                    tar_rb = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] >= h//2), :]
+                    tar_rt = out_t[(out_t[:,2] >= w//2) & (out_t[:,3] < h//2), :]
+                    target_regions = [tar_lb, tar_lt, tar_rb, tar_rt]
+                    # select the most confident region
+                    mean_confidences = torch.nan_to_num(torch.as_tensor([torch.mean(i[:,6]) for i in target_regions]))  # Column 6 includes the confidence of the predictions
+                    index = torch.max(mean_confidences, 0)[1]
+                    # create binary mask for the confmix image and filter the source pseudo detections based on the selected region
+                    mask = torch.zeros((b, c, h, w)).to(self.device)
+                    if index == 0:
+                        # tar_lb
+                        tar_lb[:,2:6] = clip_coords_target(tar_lb, 0, w//2, h//2, h)
+                        out_s = out_s[(out_s[:,2] >= w//2) | (out_s[:,3] < h//2), :]
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] < w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] < w//2, :], 0, w, 0, h//2)
+
+                        mask[:, :, h//2:h+1, 0:w//2] = 1.
+                    elif index == 1:
+                        # tar_lt
+                        tar_lt[:,2:6] = clip_coords_target(tar_lt, 0, w//2, 0, h//2)
+                        out_s = out_s[(out_s[:,2] >= w//2) | (out_s[:,3] >= h//2), :]
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] < h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] >= w//2) & (out_s[:,3] >= h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] < w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] < w//2, :], 0, w, h//2, h)
+
+                        mask[:, :, 0:h//2, 0:w//2] = 1.
+                    elif index == 2:
+                        # tar_rb
+                        tar_rb[:,2:6] = clip_coords_target(tar_rb, w//2, w, h//2, h)
+                        out_s = out_s[(out_s[:,2] < w//2) | (out_s[:,3] < h//2), :]
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] >= w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] >= w//2, :], 0, w, 0, h//2)
+
+                        mask[:, :, h//2:h+1, w//2:w+1] = 1.
+                    elif index == 3:
+                        # tar_rt
+                        tar_rt[:,2:6] = clip_coords_target(tar_rt, w//2, w, 0, h//2)
+                        out_s = out_s[(out_s[:,2] < w//2) | (out_s[:,3] >= h//2), :]
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] < h//2), :], w//2, w, 0, h)
+                        out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), 2:6] = clip_coords_target(out_s[(out_s[:,2] < w//2) & (out_s[:,3] >= h//2), :], 0, w, 0, h)
+                        out_s[out_s[:,2] >= w//2, 2:6] = clip_coords_target(out_s[out_s[:,2] >= w//2, :], 0, w, h//2, h)
+
+                        mask[:, :, 0:h//2, w//2:w+1] = 1.
+                    # create confmix targets and compute confmix weight
+                    targets_confmix_s = out_s #  [batch_id, class_id, x, y, w, h, conf]
+                    targets_confmix_t = target_regions[index]
+                    targets_confmix = torch.cat((targets_confmix_s, targets_confmix_t))
+                    c_gamma_thres = 0.5
+                    #  .sum() 对布尔张量求和。True=1，False=0。 返回的是满足条件（大于 0.5）的元素个数。
+                    #  .nelement() 返回张量中元素的总数。对于 targets_confmix[:, 6]，它是一个形状为 [N] 的一维张量，因此 返回 N。
+                    gamma = (targets_confmix[:,6] > c_gamma_thres).sum() / \
+                                    (targets_confmix[:,6]).nelement()
+                    targets_confmix = targets_confmix[:,:6] # remove confidence values
+                    # normalize
+                    targets_confmix[:, [2, 4]] /= w
+                    targets_confmix[:, [3, 5]] /= h
+                    # create confmix image
+                    imgs_confmix = batch_s['img'] * (1-mask) + batch_t['img'] * mask
+                    imgs_confmix = imgs_confmix.to(self.device, non_blocking=True).float() / 255.0
+                    # self-supervised consistency loss term on the mixed samples
+                    batch_confmix = {}
+                    batch_confmix['ori_shape'] = batch_s['ori_shape']
+                    batch_confmix['resized_shape'] = [[640,640],[640,640],[640,640],[640,640]]
+                    batch_confmix['img'] = imgs_confmix #[4,3,640,640]
+                    batch_confmix['cls'] = targets_confmix[:,1].unsqueeze(-1) # [32] -> [32,1]
+                    batch_confmix['bboxes'] = targets_confmix[:,2:] # [32,4]
+                    batch_confmix['batch_idx'] = targets_confmix[:,0] # [32]
+                    self.confmix_loss, self.confmix_loss_items = self.model(batch_confmix)
+
                     # 仅 源域和目标域图像 的前向传播，返回特征图值
                     self.source_feature_dict = self.model(batch_s['img'],layers=True)  
                     self.target_feature_dict = self.model(batch_t['img'],layers=True)
-                    
                     gram_losses = [] # 值太小
                     swd_losses = []
                     dss_losses = []
                     mmd_losses = []
                     mse_losses = [] # l2
-
                     smmd_losses = []
                     mmmd_losses = []
                     hmmd_losses = []
-
                     # for layer in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:
                     for layer in [2, 4, 6, 8, 9]:
                         source_feas = self.source_feature_dict[layer]
@@ -722,33 +802,27 @@ class UDABaseTrainer:
                     # mean_swd_loss = torch.mean(torch.stack(swd_losses))
                     mean_dss_loss = torch.mean(torch.stack(dss_losses))
                     # mean_mmd_loss = torch.mean(torch.stack(mmd_losses))  # 计算平均值
-                    
                     # mean_smmd_loss = torch.mean(torch.stack(smmd_losses))
                     mean_mmmd_loss = torch.mean(torch.stack(mmmd_losses)) 
                     # mean_hmmd_loss = torch.mean(torch.stack(hmmd_losses)) 
-
                     mean_mse_loss = torch.mean(torch.stack(mse_losses)) 
-                    
                     
 
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss
-                    self.loss = self.source_loss + torch.nan_to_num(gamma) * self.daca_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss  
+                    self.loss = self.source_loss + torch.nan_to_num(gamma) * self.confmix_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss  
                     # self.loss = self.source_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
-                        self.daca_loss_items,
+                        # self.daca_loss_items,
+                        self.confmix_loss_items,
                         mean_dss_loss.detach().unsqueeze(0), # 加入 gram 损失
                         # mean_swd_loss.detach().unsqueeze(0), # 加入 gram 损失
                         # mean_dss_loss.detach().unsqueeze(0), # 加入 gram 损失
                         # mean_mmd_loss.detach().unsqueeze(0),  # 加入 mmd 损失
-
-                         # mean_smmd_loss.detach().unsqueeze(0),
+                        # mean_smmd_loss.detach().unsqueeze(0),
                         mean_mmmd_loss.detach().unsqueeze(0),
                         # mean_hmmd_loss.detach().unsqueeze(0)
-
                         mean_mse_loss.detach().unsqueeze(0),   # 加入 mse 损失
-
-                       
 
                     ])
                     
