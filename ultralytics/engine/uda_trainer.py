@@ -545,6 +545,12 @@ class UDABaseTrainer:
                     psbatch_t['bboxes'] = out[:,2:6] # [32,4]
                     psbatch_t['batch_idx'] = out[:,0] # [32]
                     self.daca_loss, self.daca_loss_items = self.model(psbatch_t)
+
+                    c_gamma_thres = 0.5
+                    #  .sum() 对布尔张量求和。True=1，False=0。 返回的是满足条件（大于 0.5）的元素个数。
+                    #  .nelement() 返回张量中元素的总数。对于 targets_confmix[:, 6]，它是一个形状为 [N] 的一维张量，因此 返回 N。
+                    gamma = (out[:,6] > c_gamma_thres).sum() / \
+                                    (out[:,6]).nelement()
   
                     '''
                    
@@ -726,7 +732,7 @@ class UDABaseTrainer:
                     
 
                     # self.loss = self.source_loss + self.args.daca_weight * self.daca_loss
-                    self.loss = self.source_loss + self.args.daca_weight * self.daca_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss  
+                    self.loss = self.source_loss + torch.nan_to_num(gamma) * self.daca_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss  
                     # self.loss = self.source_loss + self.args.shallow_weight * mean_dss_loss + self.args.middle_weight * mean_mmmd_loss + self.args.high_weight * mean_mse_loss 
                     self.loss_items = torch.cat([
                         self.source_loss_items,  # 原有的 cls、bbox、dfl 损失
