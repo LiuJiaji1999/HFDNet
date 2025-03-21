@@ -421,6 +421,7 @@ class UDABaseTrainer:
 
                     batch_s = self.preprocess_batch(batch_S)
                     batch_t = self.preprocess_batch(batch_T)
+
                     # # 1.原始源域的监督损失
                     # self.loss, self.loss_items = self.model(batch_s)
                     # if RANK != -1:
@@ -751,7 +752,11 @@ class UDABaseTrainer:
                     '''
                     
 
-                    
+                    if batch_s['img'].shape[0] != batch_t['img'].shape[0]:
+                        min_batch_size = min(batch_s['img'].shape[0], batch_t['img'].shape[0])
+                        batch_s['img'] = batch_s['img'][:min_batch_size]
+                        batch_t['img'] = batch_t['img'][:min_batch_size]
+
                     r = ni / max_iterations
                     delta = 2 / (1 + math.exp(-5. * r)) - 1
                     
@@ -840,6 +845,9 @@ class UDABaseTrainer:
                     targets_confmix[:, [3, 5]] /= h
 
                     # create confmix image
+                    # print(f"batch_s['img'] shape: {batch_s['img'].shape}")
+                    # print(f"batch_t['img'] shape: {batch_t['img'].shape}")
+                    # print(f"mask shape: {mask.shape}")
                     imgs_confmix = batch_s['img'] * (1-mask) + batch_t['img'] * mask
                     imgs_confmix = imgs_confmix.to(self.device, non_blocking=True).float() / 255.0
 
