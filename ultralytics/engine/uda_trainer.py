@@ -533,8 +533,11 @@ class UDABaseTrainer:
 
                     # # filter pseudo detections on target images applying NMS
                     out = non_max_suppression(pseudo_t.detach(), conf_thres=0.25, iou_thres=0.25, multi_label=False)
-                    out = output_to_target(out)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
-                    out_original = copy.deepcopy(out)  
+                    out = torch.tensor(output_to_target(out))  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+                    out_original = copy.deepcopy(out)
+                    b, c, h, w = batch_t['img'].shape
+                    out[:, [2, 4]] /= w
+                    out[:, [3, 5]] /= h  
                     
                     # # 2 简单的 基于目标域伪标签的训练
                     psbatch_t = batch_t.copy()
