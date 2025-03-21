@@ -930,8 +930,6 @@ class Albumentations:
                 # A.RandomRain(p=0.3),
                 # A.RandomSnow(p=0.3),
                 
-                # A.Rotate(p=0.01),
-
                 # A.Blur(p=0.01),
                 A.MedianBlur(p=0.01),
                 A.ToGray(p=0.01),
