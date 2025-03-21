@@ -519,18 +519,25 @@ class UDABaseTrainer:
                     # ----------方法二 ------------------------------------------- 
                     # 基于伪标签的合成域，二次训练
                     
-                    # r = ni / max_iterations
-                    # delta = 2 / (1 + math.exp(-5. * r)) - 1
-                    # # pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
-                    # # pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
+                    r = ni / max_iterations
+                    delta = 2 / (1 + math.exp(-5. * r)) - 1
+                    # pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
+                    # pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
                 
-                    # pred_t = self.model(batch_t['img'], pseudo=True, delta=delta)  # forward
-                    # pseudo_t, _ = pred_t # 目标域的 伪标签 和 特征图 pseudo_t.shape(4,5,8400)
+                    pred_t = self.model(batch_t['img'], pseudo=True, delta=delta)  # forward
+                    pseudo_t, _ = pred_t # 目标域的 伪标签 和 特征图 pseudo_t.shape(4,5,8400)
 
                     # # filter pseudo detections on target images applying NMS
-                    # out = non_max_suppression(pseudo_t.detach(), conf_thres=0.25, iou_thres=0.25, multi_label=False)
-                    # out = output_to_target(out)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
-                    # out_original = copy.deepcopy(out)    
+                    out = non_max_suppression(pseudo_t.detach(), conf_thres=0.25, iou_thres=0.25, multi_label=False)
+                    out = output_to_target(out)  # [batch_id, class_id, x, y, w, h, conf] (16,7)
+                    out_original = copy.deepcopy(out)  
+                    
+                    # psbatch_t = batch_t.copy()
+                    # psbatch_t['cls'] = out[:,1].unsqueeze(-1) # [32] -> [32,1]
+                    # psbatch_t['bboxes'] = out[:,2:6] # [32,4]
+                    # psbatch_t['batch_idx'] = out[:,0] # [32]
+                    # self.daca_loss, self.daca_loss_items = self.model(psbatch_t)
+  
 
                     # # DACA
                     # # 创建一个与源图像 imgs_s 形状相同的全 1 张量，并将其乘以 imgs_s 的均值。
@@ -636,7 +643,7 @@ class UDABaseTrainer:
                     hmmd_losses = []
 
                     # for layer in [2, 4, 6, 8, 9, 12, 15, 18, 21, 22]:
-                    for layer in [2, 4, 6, 8, ]:
+                    for layer in [2, 4, 6, 8, 9]:
                         source_feas = self.source_feature_dict[layer]
                         target_feas = self.target_feature_dict[layer]
                         if isinstance(source_feas, torch.Tensor) and isinstance(target_feas, torch.Tensor):
