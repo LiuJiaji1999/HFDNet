@@ -5,15 +5,22 @@ matplotlib.use("Agg")  # 非交互式后端，适用于远程服务器
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import os
+import json
+import random
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-def visualize_losses(json_file, output_dir="vis"):
+def visualize_losses(json_file, output_dir="vis", sample_size=20):
     """
-    读取 JSON 文件中各实验的指标数据，分别生成各个 loss 的柱状图，
-    每个指标生成一张图，不在柱子上显示数值，图表简单大方、易于直观对比。
+    读取 JSON 文件中各实验的指标数据，随机选择 50 个实验（如果不足 50 个则选择全部），
+    分别生成各个 loss 的柱状图，每个指标生成一张图，不在柱子上显示数值，图表简单大方、易于直观对比。
     
     参数:
         json_file (str): 存储结果的 JSON 文件路径。
         output_dir (str): 保存图像的目录，默认为 "vis"。
+        sample_size (int): 随机采样的实验数量，默认为 50。
     """
     # 读取 JSON 数据
     with open(json_file, "r", encoding="utf-8") as f:
@@ -24,7 +31,10 @@ def visualize_losses(json_file, output_dir="vis"):
     
     # 获取所有实验/子文件夹的名称
     subs = list(results.keys())
-    sub_indices = np.arange(len(subs))  # 用索引代替实验名称
+    
+    # 随机采样 50 个实验（如果不足 50 个则选择全部）
+    if len(subs) > sample_size:
+        subs = random.sample(subs, sample_size)
     
     # 定义需要绘制的指标列表
     loss_types = [
@@ -43,6 +53,27 @@ def visualize_losses(json_file, output_dir="vis"):
             # 如果某个指标缺失，则设置为 None 或者 0，这里采用 None
             data[loss_type].append(results[sub].get(loss_type, None))
     
+    # 统计每个 loss 类型的最小值和最大值
+    loss_stats = {}
+    for loss_type in loss_types:
+        valid_values = [value for value in data[loss_type] if value is not None]
+        if valid_values:
+            loss_stats[loss_type] = {
+                "min": min(valid_values),
+                "max": max(valid_values)
+            }
+        else:
+            loss_stats[loss_type] = {
+                "min": None,
+                "max": None
+            }
+    
+    # 将统计结果保存到 JSON 文件
+    stats_file = os.path.join(output_dir, "loss_stats.json")
+    with open(stats_file, "w", encoding="utf-8") as f:
+        json.dump(loss_stats, f, indent=4, ensure_ascii=False)
+    print(f"已保存 loss 统计结果: {stats_file}")
+    
     # 设置 Seaborn 主题
     sns.set_theme(style="whitegrid")
     
@@ -57,9 +88,10 @@ def visualize_losses(json_file, output_dir="vis"):
         plt.title(f"{loss_type.replace('_', ' ').title()} Across Sub-folder", fontsize=14)
         plt.xlabel("Sub-folder", fontsize=12)
         plt.ylabel("Loss Value", fontsize=12)
-         # 仅显示部分索引，防止过于密集
-        step = max(1, len(sub_indices) // 10)  # 每 10% 取一个刻度
-        plt.xticks(ticks=sub_indices[::step], labels=sub_indices[::step])
+        
+        # 仅显示部分索引，防止过于密集
+        step = max(1, len(subs) // 10)  # 每 10% 取一个刻度
+        plt.xticks(ticks=np.arange(len(subs))[::step], labels=np.arange(len(subs))[::step])
 
         plt.tight_layout()
         # 保存图像，每个指标保存为独立文件
@@ -69,7 +101,8 @@ def visualize_losses(json_file, output_dir="vis"):
         print(f"已保存 {loss_type} 图: {out_path}")
 
 # 示例调用：
-visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/city_to_foggy_gap.json", output_dir="vis/city_to_foggy")
-# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/sim10k_to_city_gap.json", output_dir="vis/sim10k_to_city")
-# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/voc_to_clipart1k_gap.json", output_dir="vis/voc_to_clipart1k")
-# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/privatepower_to_publicpower_gap.json", output_dir="vis/privatepower_to_publicpower")
+
+visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/c2f_gap.json", output_dir="vis/city_to_foggy")
+# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/s2c_gap.json", output_dir="vis/sim10k_to_city")
+# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/v2c_gap.json", output_dir="vis/voc_to_clipart1k")
+# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/pr2pu_gap.json", output_dir="vis/privatepower_to_publicpower")
