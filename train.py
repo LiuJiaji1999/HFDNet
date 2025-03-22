@@ -116,5 +116,5 @@ if __name__ == '__main__':
                 # project='runs/debug',
                 project='runs/train/improve',
                 name='sourceprivate-aptpse-dmm',
-                # mixup = 1.0,
+                mixup = 1.0,
                 )
