@@ -95,10 +95,10 @@ if __name__ == '__main__':
     model = YOLO('ultralytics/cfg/models/v8/yolov8m.yaml')
     # model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main/runs/train/exp2/weights/last.pt') # 断点续训
     # 域适应会使用 源域 pre-trained weight
-    model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity/weights/best.pt') # loading pretrain weights
+    model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcevoc/weights/best.pt') # loading pretrain weights
     # COCO pre-trained weight
 #     model.load('yolov8m.pt')
-    result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
+    result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
                 cache=False,
                 imgsz=640,
                 epochs=50,
@@ -115,6 +115,6 @@ if __name__ == '__main__':
                 cos_lr = True,
                 # project='runs/debug',
                 project='runs/train/improve',
-                name='sourcecity-aptpse-dmm',
+                name='sourcevoc-aptpse-dmm',
                 # mixup = 1.0,
                 )
