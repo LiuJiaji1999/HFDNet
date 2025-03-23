@@ -92,12 +92,12 @@ from ultralytics import YOLO
 
 # # 训练参数官方详解链接：https://docs.ultralytics.com/modes/train/#resuming-interrupted-trainings:~:text=a%20training%20run.-,Train%20Settings,-The%20training%20settings
 if __name__ == '__main__':
-    model = YOLO('ultralytics/cfg/models/v5/yolov5m.yaml')
+    model = YOLO('ultralytics/cfg/models/v6/yolov6m.yaml')
     # model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main/runs/train/exp2/weights/last.pt') # 断点续训
     # 域适应会使用 源域 pre-trained weight
     # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourceprivate/weights/best.pt') # loading pretrain weights
     # COCO pre-trained weight
-    model.load('yolov5m.pt')
+    model.load('yolov6m.pt')
     result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
                 cache=False,
                 imgsz=640,
@@ -116,6 +116,6 @@ if __name__ == '__main__':
                 # project='runs/debug',
                 project='runs/train/baseline',
                 # name='sourceprivate-aptpse-dmm',
-                name = 'sourcevoc-v5'
+                name = 'sourcevoc-v6'
                 # mixup = 1.0,
                 )
