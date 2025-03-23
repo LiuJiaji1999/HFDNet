@@ -11,12 +11,12 @@ def get_weight_size(path):
     return f'{stats.st_size / 1024 / 1024:.1f}'
 
 if __name__ == '__main__':
-    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity/weights/best.pt'
+    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcevoc-v5/weights/best.pt'
     model = YOLO(model_path) # 选择训练好的权重路径
-    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
+    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
                         split='val', # split可以选择train、val、test 根据自己的数据集情况来选择.
                         imgsz=640,
-                        batch=16,
+                        batch=8,
                         project='runs/val',
                         name='exp',
                         )
