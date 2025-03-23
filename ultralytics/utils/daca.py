@@ -356,7 +356,7 @@ def compute_swd_loss(source_feat, target_feat):
 
 def compute_dss_loss(source_feat, target_feat):
     """
-    Compute the average DSS (Domain Shift Score) difference between source and target domain features.
+    Compute the average DSS (Distance ofsecond-order statistics ) difference between source and target domain features.
     Features are 4D tensors with shape (batch, channel, height, width).
     
     Args:
@@ -379,6 +379,7 @@ def compute_dss_loss(source_feat, target_feat):
         feas_t = feas_t_flat[:, i, :].unsqueeze(-1)  # (batch, height*width, 1)
         # Calculate dimensions
         ns = feas_s.shape[0]  # batch size 1
+        nt = feas_t.shape[0]
         d = feas_s.shape[1]   # height*width (feature dimension) 15360
         
         # Source covariance
@@ -386,7 +387,7 @@ def compute_dss_loss(source_feat, target_feat):
         xc = xm.transpose(1, 2) @ xm / ns  # (d, 1) @ (1, d)
         # Target covariance
         xmt = torch.mean(feas_t, 1, keepdim=True) - feas_t
-        xct = xmt.transpose(1, 2) @ xmt / ns  # (d, 1) @ (1, d)
+        xct = xmt.transpose(1, 2) @ xmt / nt  # (d, 1) @ (1, d)
        
         # Frobenius norm between source and target covariances
         loss = torch.mul((xc - xct), (xc - xct)) 
