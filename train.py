@@ -109,7 +109,7 @@ if __name__ == '__main__':
     result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/publicpower_to_privatepower.yaml',
                 cache=False,
                 imgsz=640,
-                epochs=100,
+                epochs=50,
                 batch=8, # 32
                 close_mosaic=10, 
                 workers=8,# 4
@@ -124,6 +124,6 @@ if __name__ == '__main__':
                 # project='runs/debug',
                 project='runs/train/improve',
                 # name='sourceprivate-aptpse-dmm',
-                name = 'sourcepiblic-aptpse-dmm'
+                name = 'sourcepublic-aptpse-dmm'
                 # mixup = 1.0,
                 )
