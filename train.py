@@ -89,7 +89,7 @@ from ultralytics import YOLO
         # privatepower_to_publicpower.yaml sourceprivate
         # publicpower.yaml oraclepublic
 
-        # publicpower_to_privatepower.yaml sourcepiblic
+        # publicpower_to_privatepower.yaml sourcepublic
         # privatepower.yaml oracleprivate
 
         # domestic_to_foreign.yaml sourcedomestic
