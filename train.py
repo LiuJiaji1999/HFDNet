@@ -123,6 +123,6 @@ if __name__ == '__main__':
                 cos_lr = True,
                 # project='runs/debug',
                 project='runs/train/improve',
-                name = 'sourcepublic-dmm',
-                # mixup = 1.0,
+                name = 'sourcepublic-aptpse-dmm',
+                mixup = 1.0,
                 )
