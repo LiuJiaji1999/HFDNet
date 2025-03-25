@@ -16,7 +16,7 @@ This is our PyTorch implementation of the paper "[``]()" published in ***   ***.
 First, clone the project and configure the environment.
 
 ```bash
-git clone https://github.com/LiuJiaji1999/udayolo.git 
+git clone https://github.com/LiuJiaji1999/dgda-yolo.git
 ultralytics版本为8.2.50           
 NVIDIA GeForce RTX 3090
 pip install -r 
