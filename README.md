@@ -47,7 +47,8 @@ python val.py
 
 <details>
 <summary>dual-input</summary>
-```shell
+
+```bash
 /ultralytics/models/yolo/model.py
 /ultralytics/models/yolo/detect/__init__.py 
 /ultralytics/models/yolo/detect/uda_train.py
