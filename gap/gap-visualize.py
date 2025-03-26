@@ -104,4 +104,5 @@ def visualize_losses(json_file, output_dir="vis", sample_size=20):
 # visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/c2f_gap.json", output_dir="vis/city_to_foggy")
 # visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/s2c_gap.json", output_dir="vis/sim10k_to_city")
 # visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/v2c_gap.json", output_dir="vis/voc_to_clipart1k")
-visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/pr2pu_gap.json", output_dir="vis/privatepower_to_publicpower")
+# # visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/pr2pu_gap.json", output_dir="vis/privatepower_to_publicpower")
+visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/pu2pr_gap.json", output_dir="vis/publicpower_to_privatepower")

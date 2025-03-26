@@ -1,0 +1,2942 @@
+{
+    "000000795": {
+        "individual_results": {
+            "000000795->2020jishuyanzheng_100009/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005045105237513781
+            },
+            "000000795->2020jishuyanzheng_100009/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0033195645082741976
+            },
+            "000000795->2020jishuyanzheng_100009/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.144047260284424
+            },
+            "000000795->2020jishuyanzheng_100009/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4303165078163147
+            },
+            "000000795->2020jishuyanzheng_100009/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.09696011245250702
+            }
+        },
+        "mean_gram_loss": 4.786849672200333e-07,
+        "mean_l2_loss": 0.26363831758499146,
+        "mean_gaussianmmd_loss": 6.144047260284424,
+        "mean_linearmmd_loss": 0.015283025801181793,
+        "mean_dss_loss": 0.004182334872893989,
+        "mean_swd_loss": 3950.8378726243973
+    },
+    "000000795h": {
+        "individual_results": {
+            "000000795h->2020jishuyanzheng_100194/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0021309382282197475
+            },
+            "000000795h->2020jishuyanzheng_100194/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0015014688251540065
+            },
+            "000000795h->2020jishuyanzheng_100194/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.171698093414307
+            },
+            "000000795h->2020jishuyanzheng_100194/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.33795294165611267
+            },
+            "000000795h->2020jishuyanzheng_100194/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.05232562869787216
+            }
+        },
+        "mean_gram_loss": 1.5508688022691786e-07,
+        "mean_l2_loss": 0.19513928890228271,
+        "mean_gaussianmmd_loss": 6.171698093414307,
+        "mean_linearmmd_loss": 0.007160920184105635,
+        "mean_dss_loss": 0.001816203526686877,
+        "mean_swd_loss": 4295.8543897469835
+    },
+    "000000795v": {
+        "individual_results": {
+            "000000795v->2020jishuyanzheng_100303/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0034253268968313932
+            },
+            "000000795v->2020jishuyanzheng_100303/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.00259009120054543
+            },
+            "000000795v->2020jishuyanzheng_100303/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.068637847900391
+            },
+            "000000795v->2020jishuyanzheng_100303/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4269927442073822
+            },
+            "000000795v->2020jishuyanzheng_100303/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.09721129387617111
+            }
+        },
+        "mean_gram_loss": 3.0461575306617306e-07,
+        "mean_l2_loss": 0.26210200786590576,
+        "mean_gaussianmmd_loss": 6.068637847900391,
+        "mean_linearmmd_loss": 0.014174246229231358,
+        "mean_dss_loss": 0.0030077090486884117,
+        "mean_swd_loss": 4201.26401424408
+    },
+    "000000986v": {
+        "individual_results": {
+            "000000986v->2020jishuyanzheng_101168/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.007028056774288416
+            },
+            "000000986v->2020jishuyanzheng_101168/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003790337825194001
+            },
+            "000000986v->2020jishuyanzheng_101168/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.153348922729492
+            },
+            "000000986v->2020jishuyanzheng_101168/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4414067268371582
+            },
+            "000000986v->2020jishuyanzheng_101168/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12348457425832748
+            }
+        },
+        "mean_gram_loss": 4.81434710764006e-07,
+        "mean_l2_loss": 0.28244563937187195,
+        "mean_gaussianmmd_loss": 6.153348922729492,
+        "mean_linearmmd_loss": 0.02111031301319599,
+        "mean_dss_loss": 0.0054091972997412086,
+        "mean_swd_loss": 4267.901868422826
+    },
+    "000001268d": {
+        "individual_results": {
+            "000001268d->2020jishuyanzheng_101336_0albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005112670827656984
+            },
+            "000001268d->2020jishuyanzheng_101336_0albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0032426028046756983
+            },
+            "000001268d->2020jishuyanzheng_101336_0albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.186278820037842
+            },
+            "000001268d->2020jishuyanzheng_101336_0albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5039312243461609
+            },
+            "000001268d->2020jishuyanzheng_101336_0albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1222982257604599
+            }
+        },
+        "mean_gram_loss": 1.090446176021942e-06,
+        "mean_l2_loss": 0.313114732503891,
+        "mean_gaussianmmd_loss": 6.186278820037842,
+        "mean_linearmmd_loss": 0.024136612191796303,
+        "mean_dss_loss": 0.004177636816166341,
+        "mean_swd_loss": 4048.0743912855783
+    },
+    "007": {
+        "individual_results": {
+            "007->2020jishuyanzheng_101458/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0015950720990076661
+            },
+            "007->2020jishuyanzheng_101458/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.001659056986682117
+            },
+            "007->2020jishuyanzheng_101458/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.125648498535156
+            },
+            "007->2020jishuyanzheng_101458/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5396510362625122
+            },
+            "007->2020jishuyanzheng_101458/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.15056459605693817
+            }
+        },
+        "mean_gram_loss": 5.924972015236563e-07,
+        "mean_l2_loss": 0.3451078236103058,
+        "mean_gaussianmmd_loss": 6.125648498535156,
+        "mean_linearmmd_loss": 0.016627684235572815,
+        "mean_dss_loss": 0.0016270645428448915,
+        "mean_swd_loss": 3312.5726146300635
+    },
+    "01-15-_jpg.rf.9a30b9cc3e2cef6c2194703427c2ffc4": {
+        "individual_results": {
+            "01-15-_jpg.rf.9a30b9cc3e2cef6c2194703427c2ffc4->2020jishuyanzheng_101720/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004207235760986805
+            },
+            "01-15-_jpg.rf.9a30b9cc3e2cef6c2194703427c2ffc4->2020jishuyanzheng_101720/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0024974714033305645
+            },
+            "01-15-_jpg.rf.9a30b9cc3e2cef6c2194703427c2ffc4->2020jishuyanzheng_101720/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.131555080413818
+            },
+            "01-15-_jpg.rf.9a30b9cc3e2cef6c2194703427c2ffc4->2020jishuyanzheng_101720/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5221782922744751
+            },
+            "01-15-_jpg.rf.9a30b9cc3e2cef6c2194703427c2ffc4->2020jishuyanzheng_101720/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13022302091121674
+            }
+        },
+        "mean_gram_loss": 1.5703039935033303e-07,
+        "mean_l2_loss": 0.3262006640434265,
+        "mean_gaussianmmd_loss": 6.131555080413818,
+        "mean_linearmmd_loss": 0.01294486504048109,
+        "mean_dss_loss": 0.0033523535821586847,
+        "mean_swd_loss": 6005.357527653377
+    },
+    "010": {
+        "individual_results": {
+            "010->2020jishuyanzheng_101820/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0020732299890369177
+            },
+            "010->2020jishuyanzheng_101820/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002613539109006524
+            },
+            "010->2020jishuyanzheng_101820/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.149074554443359
+            },
+            "010->2020jishuyanzheng_101820/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4679839015007019
+            },
+            "010->2020jishuyanzheng_101820/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.08997303247451782
+            }
+        },
+        "mean_gram_loss": 4.044138961489807e-07,
+        "mean_l2_loss": 0.27897846698760986,
+        "mean_gaussianmmd_loss": 6.149074554443359,
+        "mean_linearmmd_loss": 0.014737778343260288,
+        "mean_dss_loss": 0.002343384549021721,
+        "mean_swd_loss": 4305.102034727733
+    },
+    "014": {
+        "individual_results": {
+            "014->2020jishuyanzheng_101830/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002869574585929513
+            },
+            "014->2020jishuyanzheng_101830/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003499214304611087
+            },
+            "014->2020jishuyanzheng_101830/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.157066822052002
+            },
+            "014->2020jishuyanzheng_101830/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4693891108036041
+            },
+            "014->2020jishuyanzheng_101830/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11392343044281006
+            }
+        },
+        "mean_gram_loss": 6.057593964214902e-07,
+        "mean_l2_loss": 0.2916562557220459,
+        "mean_gaussianmmd_loss": 6.157066822052002,
+        "mean_linearmmd_loss": 0.022573096677660942,
+        "mean_dss_loss": 0.0031843944452703,
+        "mean_swd_loss": 3640.4057387510934
+    },
+    "016": {
+        "individual_results": {
+            "016->2020jishuyanzheng_102466_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002395364223048091
+            },
+            "016->2020jishuyanzheng_102466_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002289499156177044
+            },
+            "016->2020jishuyanzheng_102466_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.134328365325928
+            },
+            "016->2020jishuyanzheng_102466_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5033020377159119
+            },
+            "016->2020jishuyanzheng_102466_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11358971148729324
+            }
+        },
+        "mean_gram_loss": 2.9339017260099354e-07,
+        "mean_l2_loss": 0.30844587087631226,
+        "mean_gaussianmmd_loss": 6.134328365325928,
+        "mean_linearmmd_loss": 0.009804125875234604,
+        "mean_dss_loss": 0.0023424316896125674,
+        "mean_swd_loss": 4757.076637983322
+    },
+    "019": {
+        "individual_results": {
+            "019->2020jishuyanzheng_102609_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0035105186980217695
+            },
+            "019->2020jishuyanzheng_102609_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0021417869720607996
+            },
+            "019->2020jishuyanzheng_102609_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.16873025894165
+            },
+            "019->2020jishuyanzheng_102609_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4887760281562805
+            },
+            "019->2020jishuyanzheng_102609_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1298079788684845
+            }
+        },
+        "mean_gram_loss": 4.670623923175299e-07,
+        "mean_l2_loss": 0.3092920184135437,
+        "mean_gaussianmmd_loss": 6.16873025894165,
+        "mean_linearmmd_loss": 0.012195300310850143,
+        "mean_dss_loss": 0.0028261528350412846,
+        "mean_swd_loss": 3101.924703081449
+    },
+    "029": {
+        "individual_results": {
+            "029->2020jishuyanzheng_102890_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0030566155910491943
+            },
+            "029->2020jishuyanzheng_102890_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002549816621467471
+            },
+            "029->2020jishuyanzheng_102890_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.165342330932617
+            },
+            "029->2020jishuyanzheng_102890_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.543807327747345
+            },
+            "029->2020jishuyanzheng_102890_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13984033465385437
+            }
+        },
+        "mean_gram_loss": 5.549541697291716e-07,
+        "mean_l2_loss": 0.3418238162994385,
+        "mean_gaussianmmd_loss": 6.165342330932617,
+        "mean_linearmmd_loss": 0.018238335847854614,
+        "mean_dss_loss": 0.0028032161062583327,
+        "mean_swd_loss": 4089.520611683528
+    },
+    "031": {
+        "individual_results": {
+            "031->2020jishuyanzheng_102891_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0019100484205409884
+            },
+            "031->2020jishuyanzheng_102891_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0024118488654494286
+            },
+            "031->2020jishuyanzheng_102891_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.146223068237305
+            },
+            "031->2020jishuyanzheng_102891_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.48891767859458923
+            },
+            "031->2020jishuyanzheng_102891_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14490272104740143
+            }
+        },
+        "mean_gram_loss": 4.6063178160693496e-07,
+        "mean_l2_loss": 0.3169102072715759,
+        "mean_gaussianmmd_loss": 6.146223068237305,
+        "mean_linearmmd_loss": 0.023094678297638893,
+        "mean_dss_loss": 0.0021609486429952085,
+        "mean_swd_loss": 3709.4112498760223
+    },
+    "035": {
+        "individual_results": {
+            "035->2020jishuyanzheng_102892_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0029096491634845734
+            },
+            "035->2020jishuyanzheng_102892_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003716853214427829
+            },
+            "035->2020jishuyanzheng_102892_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.174013137817383
+            },
+            "035->2020jishuyanzheng_102892_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.6218629479408264
+            },
+            "035->2020jishuyanzheng_102892_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14205141365528107
+            }
+        },
+        "mean_gram_loss": 3.888954438480141e-07,
+        "mean_l2_loss": 0.38195717334747314,
+        "mean_gaussianmmd_loss": 6.174013137817383,
+        "mean_linearmmd_loss": 0.022193847224116325,
+        "mean_dss_loss": 0.003313251188956201,
+        "mean_swd_loss": 4619.50095017751
+    },
+    "084": {
+        "individual_results": {
+            "084->2020jishuyanzheng_102894_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005603882949799299
+            },
+            "084->2020jishuyanzheng_102894_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003578463802114129
+            },
+            "084->2020jishuyanzheng_102894_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.15973424911499
+            },
+            "084->2020jishuyanzheng_102894_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4760269820690155
+            },
+            "084->2020jishuyanzheng_102894_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11261546611785889
+            }
+        },
+        "mean_gram_loss": 7.124487524379219e-07,
+        "mean_l2_loss": 0.2943212389945984,
+        "mean_gaussianmmd_loss": 6.15973424911499,
+        "mean_linearmmd_loss": 0.01898668147623539,
+        "mean_dss_loss": 0.004591173375956714,
+        "mean_swd_loss": 3746.2574898401895
+    },
+    "095": {
+        "individual_results": {
+            "095->2020jishuyanzheng_102894_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002422690624371171
+            },
+            "095->2020jishuyanzheng_102894_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0033209004905074835
+            },
+            "095->2020jishuyanzheng_102894_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.1615729331970215
+            },
+            "095->2020jishuyanzheng_102894_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5983198285102844
+            },
+            "095->2020jishuyanzheng_102894_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1329568475484848
+            }
+        },
+        "mean_gram_loss": 2.4326706693500455e-07,
+        "mean_l2_loss": 0.3656383454799652,
+        "mean_gaussianmmd_loss": 6.1615729331970215,
+        "mean_linearmmd_loss": 0.01946057751774788,
+        "mean_dss_loss": 0.0028717955574393272,
+        "mean_swd_loss": 4252.923251946767
+    },
+    "100009h": {
+        "individual_results": {
+            "100009h->2020jishuyanzheng_102895_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0052244761027395725
+            },
+            "100009h->2020jishuyanzheng_102895_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0034872284159064293
+            },
+            "100009h->2020jishuyanzheng_102895_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.140195846557617
+            },
+            "100009h->2020jishuyanzheng_102895_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.42900440096855164
+            },
+            "100009h->2020jishuyanzheng_102895_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.09488728642463684
+            }
+        },
+        "mean_gram_loss": 5.434402510218206e-07,
+        "mean_l2_loss": 0.26194584369659424,
+        "mean_gaussianmmd_loss": 6.140195846557617,
+        "mean_linearmmd_loss": 0.01940971612930298,
+        "mean_dss_loss": 0.004355852259323001,
+        "mean_swd_loss": 4624.270545085272
+    },
+    "100124d": {
+        "individual_results": {
+            "100124d->2020jishuyanzheng_102905_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002752319211140275
+            },
+            "100124d->2020jishuyanzheng_102905_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0021046886686235666
+            },
+            "100124d->2020jishuyanzheng_102905_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.170457363128662
+            },
+            "100124d->2020jishuyanzheng_102905_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4257664680480957
+            },
+            "100124d->2020jishuyanzheng_102905_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.16877904534339905
+            }
+        },
+        "mean_gram_loss": 6.013494839862688e-07,
+        "mean_l2_loss": 0.2972727417945862,
+        "mean_gaussianmmd_loss": 6.170457363128662,
+        "mean_linearmmd_loss": 0.01955186016857624,
+        "mean_dss_loss": 0.002428503939881921,
+        "mean_swd_loss": 3322.0610006252923
+    },
+    "100136": {
+        "individual_results": {
+            "100136->2020jishuyanzheng_102906_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005025588441640139
+            },
+            "100136->2020jishuyanzheng_102906_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002333349082618952
+            },
+            "100136->2020jishuyanzheng_102906_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.160736560821533
+            },
+            "100136->2020jishuyanzheng_102906_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5107296109199524
+            },
+            "100136->2020jishuyanzheng_102906_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.10166741907596588
+            }
+        },
+        "mean_gram_loss": 5.455660812003771e-07,
+        "mean_l2_loss": 0.30619850754737854,
+        "mean_gaussianmmd_loss": 6.160736560821533,
+        "mean_linearmmd_loss": 0.016629861667752266,
+        "mean_dss_loss": 0.003679468762129545,
+        "mean_swd_loss": 4260.631282925606
+    },
+    "100136v": {
+        "individual_results": {
+            "100136v->2020jishuyanzheng_102923_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004223204683512449
+            },
+            "100136v->2020jishuyanzheng_102923_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002578349784016609
+            },
+            "100136v->2020jishuyanzheng_102923_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.142258167266846
+            },
+            "100136v->2020jishuyanzheng_102923_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5370367169380188
+            },
+            "100136v->2020jishuyanzheng_102923_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.16880351305007935
+            }
+        },
+        "mean_gram_loss": 5.06880553530209e-07,
+        "mean_l2_loss": 0.3529201149940491,
+        "mean_gaussianmmd_loss": 6.142258167266846,
+        "mean_linearmmd_loss": 0.01741374284029007,
+        "mean_dss_loss": 0.0034007772337645292,
+        "mean_swd_loss": 3721.1654001673064
+    },
+    "100138": {
+        "individual_results": {
+            "100138->2020jishuyanzheng_102930_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002683946629986167
+            },
+            "100138->2020jishuyanzheng_102930_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002408999716863036
+            },
+            "100138->2020jishuyanzheng_102930_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.161645889282227
+            },
+            "100138->2020jishuyanzheng_102930_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5703839063644409
+            },
+            "100138->2020jishuyanzheng_102930_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.16524969041347504
+            }
+        },
+        "mean_gram_loss": 3.787118032505532e-07,
+        "mean_l2_loss": 0.3678168058395386,
+        "mean_gaussianmmd_loss": 6.161645889282227,
+        "mean_linearmmd_loss": 0.02580132521688938,
+        "mean_dss_loss": 0.0025464731734246016,
+        "mean_swd_loss": 3756.79459742705
+    },
+    "100200": {
+        "individual_results": {
+            "100200->2020jishuyanzheng_102932_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004961326718330383
+            },
+            "100200->2020jishuyanzheng_102932_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0028365657199174166
+            },
+            "100200->2020jishuyanzheng_102932_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.154943466186523
+            },
+            "100200->2020jishuyanzheng_102932_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5747123956680298
+            },
+            "100200->2020jishuyanzheng_102932_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12457412481307983
+            }
+        },
+        "mean_gram_loss": 5.017411126573279e-07,
+        "mean_l2_loss": 0.3496432602405548,
+        "mean_gaussianmmd_loss": 6.154943466186523,
+        "mean_linearmmd_loss": 0.019253848120570183,
+        "mean_dss_loss": 0.0038989462191239,
+        "mean_swd_loss": 4143.429807861646
+    },
+    "100201v": {
+        "individual_results": {
+            "100201v->2020jishuyanzheng_103514/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004055588971823454
+            },
+            "100201v->2020jishuyanzheng_103514/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0033913804218173027
+            },
+            "100201v->2020jishuyanzheng_103514/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.17030668258667
+            },
+            "100201v->2020jishuyanzheng_103514/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4291834235191345
+            },
+            "100201v->2020jishuyanzheng_103514/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11882263422012329
+            }
+        },
+        "mean_gram_loss": 7.800198886798171e-07,
+        "mean_l2_loss": 0.2740030288696289,
+        "mean_gaussianmmd_loss": 6.17030668258667,
+        "mean_linearmmd_loss": 0.02217899076640606,
+        "mean_dss_loss": 0.0037234846968203783,
+        "mean_swd_loss": 4042.7939313252764
+    },
+    "100213v": {
+        "individual_results": {
+            "100213v->2020jishuyanzheng_103531_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0034572940785437822
+            },
+            "100213v->2020jishuyanzheng_103531_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002462581731379032
+            },
+            "100213v->2020jishuyanzheng_103531_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.162015438079834
+            },
+            "100213v->2020jishuyanzheng_103531_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5475591421127319
+            },
+            "100213v->2020jishuyanzheng_103531_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11890564113855362
+            }
+        },
+        "mean_gram_loss": 3.0139639761728176e-07,
+        "mean_l2_loss": 0.33323240280151367,
+        "mean_gaussianmmd_loss": 6.162015438079834,
+        "mean_linearmmd_loss": 0.01591625064611435,
+        "mean_dss_loss": 0.002959937904961407,
+        "mean_swd_loss": 3491.8246196508408
+    },
+    "100281": {
+        "individual_results": {
+            "100281->2020jishuyanzheng_103534_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.006553114857524633
+            },
+            "100281->2020jishuyanzheng_103534_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003121345303952694
+            },
+            "100281->2020jishuyanzheng_103534_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.133312225341797
+            },
+            "100281->2020jishuyanzheng_103534_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4700673818588257
+            },
+            "100281->2020jishuyanzheng_103534_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12385912984609604
+            }
+        },
+        "mean_gram_loss": 5.642223754875886e-07,
+        "mean_l2_loss": 0.29696324467658997,
+        "mean_gaussianmmd_loss": 6.133312225341797,
+        "mean_linearmmd_loss": 0.017335979267954826,
+        "mean_dss_loss": 0.004837230080738664,
+        "mean_swd_loss": 3720.772658745448
+    },
+    "100293": {
+        "individual_results": {
+            "100293->2020jishuyanzheng_103534_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005642323289066553
+            },
+            "100293->2020jishuyanzheng_103534_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0028264152351766825
+            },
+            "100293->2020jishuyanzheng_103534_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.146062850952148
+            },
+            "100293->2020jishuyanzheng_103534_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.44689878821372986
+            },
+            "100293->2020jishuyanzheng_103534_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1556725949048996
+            }
+        },
+        "mean_gram_loss": 6.981747446843656e-07,
+        "mean_l2_loss": 0.30128568410873413,
+        "mean_gaussianmmd_loss": 6.146062850952148,
+        "mean_linearmmd_loss": 0.023373156785964966,
+        "mean_dss_loss": 0.004234369262121618,
+        "mean_swd_loss": 4055.9949828386307
+    },
+    "107": {
+        "individual_results": {
+            "107->2020jishuyanzheng_103534_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0026271000970155
+            },
+            "107->2020jishuyanzheng_103534_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0024556817952543497
+            },
+            "107->2020jishuyanzheng_103534_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.16461181640625
+            },
+            "107->2020jishuyanzheng_103534_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5196337103843689
+            },
+            "107->2020jishuyanzheng_103534_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1321856677532196
+            }
+        },
+        "mean_gram_loss": 4.560229456274101e-07,
+        "mean_l2_loss": 0.32590967416763306,
+        "mean_gaussianmmd_loss": 6.16461181640625,
+        "mean_linearmmd_loss": 0.02128545753657818,
+        "mean_dss_loss": 0.002541390946134925,
+        "mean_swd_loss": 4125.888497312863
+    },
+    "110009": {
+        "individual_results": {
+            "110009->2020jishuyanzheng_103537_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003227835288271308
+            },
+            "110009->2020jishuyanzheng_103537_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003000779077410698
+            },
+            "110009->2020jishuyanzheng_103537_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.143956661224365
+            },
+            "110009->2020jishuyanzheng_103537_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5898743271827698
+            },
+            "110009->2020jishuyanzheng_103537_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.0980316698551178
+            }
+        },
+        "mean_gram_loss": 5.714678650292626e-07,
+        "mean_l2_loss": 0.343953013420105,
+        "mean_gaussianmmd_loss": 6.143956661224365,
+        "mean_linearmmd_loss": 0.01794070564210415,
+        "mean_dss_loss": 0.003114307182841003,
+        "mean_swd_loss": 3218.445124944051
+    },
+    "110018": {
+        "individual_results": {
+            "110018->2020jishuyanzheng_103591_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0027538517024368048
+            },
+            "110018->2020jishuyanzheng_103591_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002768166596069932
+            },
+            "110018->2020jishuyanzheng_103591_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.161898136138916
+            },
+            "110018->2020jishuyanzheng_103591_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5397745966911316
+            },
+            "110018->2020jishuyanzheng_103591_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11730857938528061
+            }
+        },
+        "mean_gram_loss": 4.4726766645908356e-07,
+        "mean_l2_loss": 0.3285415768623352,
+        "mean_gaussianmmd_loss": 6.161898136138916,
+        "mean_linearmmd_loss": 0.021457495167851448,
+        "mean_dss_loss": 0.0027610091492533684,
+        "mean_swd_loss": 3687.411015152931
+    },
+    "110018v": {
+        "individual_results": {
+            "110018v->2020jishuyanzheng_103592_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002298524370416999
+            },
+            "110018v->2020jishuyanzheng_103592_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0026427926495671272
+            },
+            "110018v->2020jishuyanzheng_103592_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.124319076538086
+            },
+            "110018v->2020jishuyanzheng_103592_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5792814493179321
+            },
+            "110018v->2020jishuyanzheng_103592_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.10729777067899704
+            }
+        },
+        "mean_gram_loss": 3.794035592363798e-07,
+        "mean_l2_loss": 0.3432896137237549,
+        "mean_gaussianmmd_loss": 6.124319076538086,
+        "mean_linearmmd_loss": 0.022252701222896576,
+        "mean_dss_loss": 0.002470658509992063,
+        "mean_swd_loss": 3386.737040758133
+    },
+    "118": {
+        "individual_results": {
+            "118->2020jishuyanzheng_103593_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0021693988237529993
+            },
+            "118->2020jishuyanzheng_103593_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003341873176395893
+            },
+            "118->2020jishuyanzheng_103593_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.168592929840088
+            },
+            "118->2020jishuyanzheng_103593_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.674972414970398
+            },
+            "118->2020jishuyanzheng_103593_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13452516496181488
+            }
+        },
+        "mean_gram_loss": 4.45473261834195e-07,
+        "mean_l2_loss": 0.404748797416687,
+        "mean_gaussianmmd_loss": 6.168592929840088,
+        "mean_linearmmd_loss": 0.022592784836888313,
+        "mean_dss_loss": 0.002755636000074446,
+        "mean_swd_loss": 3988.539043148359
+    },
+    "130015d": {
+        "individual_results": {
+            "130015d->2020jishuyanzheng_103596_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.006675014737993479
+            },
+            "130015d->2020jishuyanzheng_103596_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004706802312284708
+            },
+            "130015d->2020jishuyanzheng_103596_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.169087886810303
+            },
+            "130015d->2020jishuyanzheng_103596_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5380300879478455
+            },
+            "130015d->2020jishuyanzheng_103596_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14697164297103882
+            }
+        },
+        "mean_gram_loss": 6.609651563849184e-07,
+        "mean_l2_loss": 0.34250086545944214,
+        "mean_gaussianmmd_loss": 6.169087886810303,
+        "mean_linearmmd_loss": 0.020641500130295753,
+        "mean_dss_loss": 0.005690908525139093,
+        "mean_swd_loss": 3951.6180506149926
+    },
+    "130027": {
+        "individual_results": {
+            "130027->2020jishuyanzheng_103597_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0024338059592992067
+            },
+            "130027->2020jishuyanzheng_103597_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002075595548376441
+            },
+            "130027->2020jishuyanzheng_103597_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.122193813323975
+            },
+            "130027->2020jishuyanzheng_103597_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5777005553245544
+            },
+            "130027->2020jishuyanzheng_103597_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1806221604347229
+            }
+        },
+        "mean_gram_loss": 3.1700571412329737e-07,
+        "mean_l2_loss": 0.37916135787963867,
+        "mean_gaussianmmd_loss": 6.122193813323975,
+        "mean_linearmmd_loss": 0.021645216271281242,
+        "mean_dss_loss": 0.002254700753837824,
+        "mean_swd_loss": 3686.610777894656
+    },
+    "130045h": {
+        "individual_results": {
+            "130045h->2020jishuyanzheng_103682_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0031448621302843094
+            },
+            "130045h->2020jishuyanzheng_103682_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002440548734739423
+            },
+            "130045h->2020jishuyanzheng_103682_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.123167037963867
+            },
+            "130045h->2020jishuyanzheng_103682_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5177111625671387
+            },
+            "130045h->2020jishuyanzheng_103682_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12476011365652084
+            }
+        },
+        "mean_gram_loss": 3.8828244441901916e-07,
+        "mean_l2_loss": 0.32123562693595886,
+        "mean_gaussianmmd_loss": 6.123167037963867,
+        "mean_linearmmd_loss": 0.019072243943810463,
+        "mean_dss_loss": 0.002792705432511866,
+        "mean_swd_loss": 4189.7503000895185
+    },
+    "130060": {
+        "individual_results": {
+            "130060->2020jishuyanzheng_103736_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0022513598669320345
+            },
+            "130060->2020jishuyanzheng_103736_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0017936532385647297
+            },
+            "130060->2020jishuyanzheng_103736_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.1709980964660645
+            },
+            "130060->2020jishuyanzheng_103736_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5751001834869385
+            },
+            "130060->2020jishuyanzheng_103736_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11729128658771515
+            }
+        },
+        "mean_gram_loss": 2.2217031414584199e-07,
+        "mean_l2_loss": 0.3461957275867462,
+        "mean_gaussianmmd_loss": 6.1709980964660645,
+        "mean_linearmmd_loss": 0.013023476116359234,
+        "mean_dss_loss": 0.002022506552748382,
+        "mean_swd_loss": 3954.693132241567
+    },
+    "130061v": {
+        "individual_results": {
+            "130061v->2020jishuyanzheng_103750_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005252180155366659
+            },
+            "130061v->2020jishuyanzheng_103750_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003920762334018946
+            },
+            "130061v->2020jishuyanzheng_103750_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.148095607757568
+            },
+            "130061v->2020jishuyanzheng_103750_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.49326205253601074
+            },
+            "130061v->2020jishuyanzheng_103750_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.15955018997192383
+            }
+        },
+        "mean_gram_loss": 5.21794220276206e-07,
+        "mean_l2_loss": 0.3264061212539673,
+        "mean_gaussianmmd_loss": 6.148095607757568,
+        "mean_linearmmd_loss": 0.02478884346783161,
+        "mean_dss_loss": 0.004586471244692802,
+        "mean_swd_loss": 4493.207240581512
+    },
+    "130119d": {
+        "individual_results": {
+            "130119d->2020jishuyanzheng_103751/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0031746283639222383
+            },
+            "130119d->2020jishuyanzheng_103751/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002676100702956319
+            },
+            "130119d->2020jishuyanzheng_103751/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.107182025909424
+            },
+            "130119d->2020jishuyanzheng_103751/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4419543147087097
+            },
+            "130119d->2020jishuyanzheng_103751/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1572856456041336
+            }
+        },
+        "mean_gram_loss": 4.264465758296865e-07,
+        "mean_l2_loss": 0.29961997270584106,
+        "mean_gaussianmmd_loss": 6.107182025909424,
+        "mean_linearmmd_loss": 0.015760712325572968,
+        "mean_dss_loss": 0.0029253645334392786,
+        "mean_swd_loss": 4157.619856119156
+    },
+    "130126h": {
+        "individual_results": {
+            "130126h->2020jishuyanzheng_103756/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0026103605050593615
+            },
+            "130126h->2020jishuyanzheng_103756/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0026763463392853737
+            },
+            "130126h->2020jishuyanzheng_103756/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.1830220222473145
+            },
+            "130126h->2020jishuyanzheng_103756/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4454593360424042
+            },
+            "130126h->2020jishuyanzheng_103756/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.10729510337114334
+            }
+        },
+        "mean_gram_loss": 2.61081083863246e-07,
+        "mean_l2_loss": 0.27637723088264465,
+        "mean_gaussianmmd_loss": 6.1830220222473145,
+        "mean_linearmmd_loss": 0.013055399991571903,
+        "mean_dss_loss": 0.0026433534221723676,
+        "mean_swd_loss": 4731.023916721344
+    },
+    "131": {
+        "individual_results": {
+            "131->2020jishuyanzheng_103785_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003511156653985381
+            },
+            "131->2020jishuyanzheng_103785_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0031806870829313993
+            },
+            "131->2020jishuyanzheng_103785_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.153604507446289
+            },
+            "131->2020jishuyanzheng_103785_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5015875697135925
+            },
+            "131->2020jishuyanzheng_103785_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12834979593753815
+            }
+        },
+        "mean_gram_loss": 7.085088782332605e-07,
+        "mean_l2_loss": 0.31496867537498474,
+        "mean_gaussianmmd_loss": 6.153604507446289,
+        "mean_linearmmd_loss": 0.021282704547047615,
+        "mean_dss_loss": 0.0033459218684583902,
+        "mean_swd_loss": 4415.718648473421
+    },
+    "140030h": {
+        "individual_results": {
+            "140030h->2020jishuyanzheng_104815_0albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003065788419917226
+            },
+            "140030h->2020jishuyanzheng_104815_0albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002928604371845722
+            },
+            "140030h->2020jishuyanzheng_104815_0albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.163296222686768
+            },
+            "140030h->2020jishuyanzheng_104815_0albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5227532982826233
+            },
+            "140030h->2020jishuyanzheng_104815_0albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.09720046073198318
+            }
+        },
+        "mean_gram_loss": 6.124075753177749e-07,
+        "mean_l2_loss": 0.30997687578201294,
+        "mean_gaussianmmd_loss": 6.163296222686768,
+        "mean_linearmmd_loss": 0.024919239804148674,
+        "mean_dss_loss": 0.002997196395881474,
+        "mean_swd_loss": 3944.146036684513
+    },
+    "140030v": {
+        "individual_results": {
+            "140030v->2020jishuyanzheng_104816/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0024403242859989405
+            },
+            "140030v->2020jishuyanzheng_104816/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002348812762647867
+            },
+            "140030v->2020jishuyanzheng_104816/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.164876937866211
+            },
+            "140030v->2020jishuyanzheng_104816/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5401675701141357
+            },
+            "140030v->2020jishuyanzheng_104816/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12179038673639297
+            }
+        },
+        "mean_gram_loss": 6.076189720261027e-07,
+        "mean_l2_loss": 0.33097898960113525,
+        "mean_gaussianmmd_loss": 6.164876937866211,
+        "mean_linearmmd_loss": 0.022113822400569916,
+        "mean_dss_loss": 0.002394568524323404,
+        "mean_swd_loss": 3732.2514193058014
+    },
+    "140032d": {
+        "individual_results": {
+            "140032d->2020jishuyanzheng_104831_0albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002864306792616844
+            },
+            "140032d->2020jishuyanzheng_104831_0albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0027927968185395002
+            },
+            "140032d->2020jishuyanzheng_104831_0albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.170415878295898
+            },
+            "140032d->2020jishuyanzheng_104831_0albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5817687511444092
+            },
+            "140032d->2020jishuyanzheng_104831_0albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1349092274904251
+            }
+        },
+        "mean_gram_loss": 5.549536581384018e-07,
+        "mean_l2_loss": 0.35833898186683655,
+        "mean_gaussianmmd_loss": 6.170415878295898,
+        "mean_linearmmd_loss": 0.021980931982398033,
+        "mean_dss_loss": 0.002828551805578172,
+        "mean_swd_loss": 4179.587800661723
+    },
+    "140032v": {
+        "individual_results": {
+            "140032v->2020jishuyanzheng_105224_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002546027535572648
+            },
+            "140032v->2020jishuyanzheng_105224_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0029691457748413086
+            },
+            "140032v->2020jishuyanzheng_105224_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.143007755279541
+            },
+            "140032v->2020jishuyanzheng_105224_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.6377012729644775
+            },
+            "140032v->2020jishuyanzheng_105224_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14396460354328156
+            }
+        },
+        "mean_gram_loss": 5.15969077241607e-07,
+        "mean_l2_loss": 0.39083293080329895,
+        "mean_gaussianmmd_loss": 6.143007755279541,
+        "mean_linearmmd_loss": 0.0191816296428442,
+        "mean_dss_loss": 0.0027575866552069783,
+        "mean_swd_loss": 3581.652975042661
+    },
+    "140064": {
+        "individual_results": {
+            "140064->2020jishuyanzheng_105408_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005481922999024391
+            },
+            "140064->2020jishuyanzheng_105408_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004094965755939484
+            },
+            "140064->2020jishuyanzheng_105408_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.15253210067749
+            },
+            "140064->2020jishuyanzheng_105408_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.7157177925109863
+            },
+            "140064->2020jishuyanzheng_105408_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1678238958120346
+            }
+        },
+        "mean_gram_loss": 4.3359125356801087e-07,
+        "mean_l2_loss": 0.44177085161209106,
+        "mean_gaussianmmd_loss": 6.15253210067749,
+        "mean_linearmmd_loss": 0.025712385773658752,
+        "mean_dss_loss": 0.004788444377481937,
+        "mean_swd_loss": 3961.3759308656054
+    },
+    "148": {
+        "individual_results": {
+            "148->2020jishuyanzheng_105409_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0022716380190104246
+            },
+            "148->2020jishuyanzheng_105409_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003141891211271286
+            },
+            "148->2020jishuyanzheng_105409_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.1579670906066895
+            },
+            "148->2020jishuyanzheng_105409_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5078339576721191
+            },
+            "148->2020jishuyanzheng_105409_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.0975198894739151
+            }
+        },
+        "mean_gram_loss": 5.230972988101712e-07,
+        "mean_l2_loss": 0.3026769161224365,
+        "mean_gaussianmmd_loss": 6.1579670906066895,
+        "mean_linearmmd_loss": 0.03605303913354874,
+        "mean_dss_loss": 0.0027067646151408553,
+        "mean_swd_loss": 4193.89462808768
+    },
+    "150039v": {
+        "individual_results": {
+            "150039v->2020jishuyanzheng_105410_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005323739256709814
+            },
+            "150039v->2020jishuyanzheng_105410_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003742506494745612
+            },
+            "150039v->2020jishuyanzheng_105410_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.184650421142578
+            },
+            "150039v->2020jishuyanzheng_105410_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.503993809223175
+            },
+            "150039v->2020jishuyanzheng_105410_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13604004681110382
+            }
+        },
+        "mean_gram_loss": 7.771947139190161e-07,
+        "mean_l2_loss": 0.32001692056655884,
+        "mean_gaussianmmd_loss": 6.184650421142578,
+        "mean_linearmmd_loss": 0.023435747250914574,
+        "mean_dss_loss": 0.004533122875727713,
+        "mean_swd_loss": 4472.033633470535
+    },
+    "150267d": {
+        "individual_results": {
+            "150267d->2020jishuyanzheng_105665/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0014065508730709553
+            },
+            "150267d->2020jishuyanzheng_105665/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0013697304530069232
+            },
+            "150267d->2020jishuyanzheng_105665/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.136465072631836
+            },
+            "150267d->2020jishuyanzheng_105665/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.40573590993881226
+            },
+            "150267d->2020jishuyanzheng_105665/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13355544209480286
+            }
+        },
+        "mean_gram_loss": 3.574924676286173e-07,
+        "mean_l2_loss": 0.26964569091796875,
+        "mean_gaussianmmd_loss": 6.136465072631836,
+        "mean_linearmmd_loss": 0.01642528921365738,
+        "mean_dss_loss": 0.0013881406630389392,
+        "mean_swd_loss": 2584.8813630143804
+    },
+    "150267v": {
+        "individual_results": {
+            "150267v->2020jishuyanzheng_87136/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.00846740324050188
+            },
+            "150267v->2020jishuyanzheng_87136/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004441019147634506
+            },
+            "150267v->2020jishuyanzheng_87136/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.16405725479126
+            },
+            "150267v->2020jishuyanzheng_87136/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.3862878680229187
+            },
+            "150267v->2020jishuyanzheng_87136/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11707418411970139
+            }
+        },
+        "mean_gram_loss": 4.1046516230380803e-07,
+        "mean_l2_loss": 0.25168102979660034,
+        "mean_gaussianmmd_loss": 6.16405725479126,
+        "mean_linearmmd_loss": 0.01434276346117258,
+        "mean_dss_loss": 0.0064542111940681934,
+        "mean_swd_loss": 3906.3096656004586
+    },
+    "150438h": {
+        "individual_results": {
+            "150438h->2020jishuyanzheng_87233/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.00272827479057014
+            },
+            "150438h->2020jishuyanzheng_87233/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0030138222500681877
+            },
+            "150438h->2020jishuyanzheng_87233/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.180339336395264
+            },
+            "150438h->2020jishuyanzheng_87233/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5735170245170593
+            },
+            "150438h->2020jishuyanzheng_87233/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1622392237186432
+            }
+        },
+        "mean_gram_loss": 4.471588113119651e-07,
+        "mean_l2_loss": 0.36787813901901245,
+        "mean_gaussianmmd_loss": 6.180339336395264,
+        "mean_linearmmd_loss": 0.019882189109921455,
+        "mean_dss_loss": 0.002871048520319164,
+        "mean_swd_loss": 3760.526823480924
+    },
+    "150447d": {
+        "individual_results": {
+            "150447d->2020jishuyanzheng_87305/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.00594348507001996
+            },
+            "150447d->2020jishuyanzheng_87305/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004853412043303251
+            },
+            "150447d->2020jishuyanzheng_87305/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.182750225067139
+            },
+            "150447d->2020jishuyanzheng_87305/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5708045363426208
+            },
+            "150447d->2020jishuyanzheng_87305/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.10450933873653412
+            }
+        },
+        "mean_gram_loss": 3.9911176941132e-07,
+        "mean_l2_loss": 0.3376569449901581,
+        "mean_gaussianmmd_loss": 6.182750225067139,
+        "mean_linearmmd_loss": 0.016870424151420593,
+        "mean_dss_loss": 0.005398448556661606,
+        "mean_swd_loss": 4707.472149610519
+    },
+    "150452": {
+        "individual_results": {
+            "150452->2020jishuyanzheng_87326/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004460915457457304
+            },
+            "150452->2020jishuyanzheng_87326/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004771319217979908
+            },
+            "150452->2020jishuyanzheng_87326/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.12775182723999
+            },
+            "150452->2020jishuyanzheng_87326/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5542750358581543
+            },
+            "150452->2020jishuyanzheng_87326/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1164914220571518
+            }
+        },
+        "mean_gram_loss": 4.914505211672804e-07,
+        "mean_l2_loss": 0.33538323640823364,
+        "mean_gaussianmmd_loss": 6.12775182723999,
+        "mean_linearmmd_loss": 0.012518000788986683,
+        "mean_dss_loss": 0.004616117337718606,
+        "mean_swd_loss": 4404.854546546936
+    },
+    "150462h": {
+        "individual_results": {
+            "150462h->2020jishuyanzheng_87877/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0026623301673680544
+            },
+            "150462h->2020jishuyanzheng_87877/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0024249465204775333
+            },
+            "150462h->2020jishuyanzheng_87877/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.117164611816406
+            },
+            "150462h->2020jishuyanzheng_87877/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4988544285297394
+            },
+            "150462h->2020jishuyanzheng_87877/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1720121055841446
+            }
+        },
+        "mean_gram_loss": 4.6224505467762356e-07,
+        "mean_l2_loss": 0.3354332745075226,
+        "mean_gaussianmmd_loss": 6.117164611816406,
+        "mean_linearmmd_loss": 0.01914949156343937,
+        "mean_dss_loss": 0.002543638343922794,
+        "mean_swd_loss": 3984.330556035042
+    },
+    "150477": {
+        "individual_results": {
+            "150477->2020jishuyanzheng_88101/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003866789164021611
+            },
+            "150477->2020jishuyanzheng_88101/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003638859838247299
+            },
+            "150477->2020jishuyanzheng_88101/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.120506286621094
+            },
+            "150477->2020jishuyanzheng_88101/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.48313066363334656
+            },
+            "150477->2020jishuyanzheng_88101/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14125174283981323
+            }
+        },
+        "mean_gram_loss": 4.3409798422544554e-07,
+        "mean_l2_loss": 0.3121911883354187,
+        "mean_gaussianmmd_loss": 6.120506286621094,
+        "mean_linearmmd_loss": 0.018758678808808327,
+        "mean_dss_loss": 0.003752824501134455,
+        "mean_swd_loss": 4338.051543156306
+    },
+    "150480v": {
+        "individual_results": {
+            "150480v->2020jishuyanzheng_88186/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.006843917537480593
+            },
+            "150480v->2020jishuyanzheng_88186/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0051481775008141994
+            },
+            "150480v->2020jishuyanzheng_88186/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.128419399261475
+            },
+            "150480v->2020jishuyanzheng_88186/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.48653432726860046
+            },
+            "150480v->2020jishuyanzheng_88186/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.18220587074756622
+            }
+        },
+        "mean_gram_loss": 6.932281735316792e-07,
+        "mean_l2_loss": 0.33437010645866394,
+        "mean_gaussianmmd_loss": 6.128419399261475,
+        "mean_linearmmd_loss": 0.029352499172091484,
+        "mean_dss_loss": 0.005996047519147396,
+        "mean_swd_loss": 3919.626187324524
+    },
+    "150526h": {
+        "individual_results": {
+            "150526h->2020jishuyanzheng_88811/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002096563810482621
+            },
+            "150526h->2020jishuyanzheng_88811/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003923117648810148
+            },
+            "150526h->2020jishuyanzheng_88811/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.1631598472595215
+            },
+            "150526h->2020jishuyanzheng_88811/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.6148226261138916
+            },
+            "150526h->2020jishuyanzheng_88811/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.15058845281600952
+            }
+        },
+        "mean_gram_loss": 3.361223264164437e-07,
+        "mean_l2_loss": 0.38270553946495056,
+        "mean_gaussianmmd_loss": 6.1631598472595215,
+        "mean_linearmmd_loss": 0.02368287183344364,
+        "mean_dss_loss": 0.0030098407296463847,
+        "mean_swd_loss": 3638.135430733363
+    },
+    "150602 (2)v": {
+        "individual_results": {
+            "150602 (2)v->2020jishuyanzheng_88869/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0015541358152404428
+            },
+            "150602 (2)v->2020jishuyanzheng_88869/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0018784430576488376
+            },
+            "150602 (2)v->2020jishuyanzheng_88869/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.175705432891846
+            },
+            "150602 (2)v->2020jishuyanzheng_88869/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5110921263694763
+            },
+            "150602 (2)v->2020jishuyanzheng_88869/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13044433295726776
+            }
+        },
+        "mean_gram_loss": 2.0733948247197986e-07,
+        "mean_l2_loss": 0.32076823711395264,
+        "mean_gaussianmmd_loss": 6.175705432891846,
+        "mean_linearmmd_loss": 0.013048307038843632,
+        "mean_dss_loss": 0.0017162894364446402,
+        "mean_swd_loss": 3483.44282690684
+    },
+    "150603 (2)h": {
+        "individual_results": {
+            "150603 (2)h->2020jishuyanzheng_88872/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0010105186374858022
+            },
+            "150603 (2)h->2020jishuyanzheng_88872/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0009771514451131225
+            },
+            "150603 (2)h->2020jishuyanzheng_88872/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.133913040161133
+            },
+            "150603 (2)h->2020jishuyanzheng_88872/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.38196852803230286
+            },
+            "150603 (2)h->2020jishuyanzheng_88872/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1005311906337738
+            }
+        },
+        "mean_gram_loss": 3.175311746872467e-07,
+        "mean_l2_loss": 0.24124985933303833,
+        "mean_gaussianmmd_loss": 6.133913040161133,
+        "mean_linearmmd_loss": 0.009541694074869156,
+        "mean_dss_loss": 0.0009938350412994623,
+        "mean_swd_loss": 2741.407890856266
+    },
+    "150603 (2)v": {
+        "individual_results": {
+            "150603 (2)v->2020jishuyanzheng_89178/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004144735634326935
+            },
+            "150603 (2)v->2020jishuyanzheng_89178/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0033385315909981728
+            },
+            "150603 (2)v->2020jishuyanzheng_89178/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.159133434295654
+            },
+            "150603 (2)v->2020jishuyanzheng_89178/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.39885032176971436
+            },
+            "150603 (2)v->2020jishuyanzheng_89178/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11927247047424316
+            }
+        },
+        "mean_gram_loss": 5.137610514793778e-07,
+        "mean_l2_loss": 0.25906139612197876,
+        "mean_gaussianmmd_loss": 6.159133434295654,
+        "mean_linearmmd_loss": 0.018211236223578453,
+        "mean_dss_loss": 0.003741633612662554,
+        "mean_swd_loss": 3399.4454495310783
+    },
+    "150606": {
+        "individual_results": {
+            "150606->2020jishuyanzheng_89279/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0026717267464846373
+            },
+            "150606->2020jishuyanzheng_89279/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003124864073470235
+            },
+            "150606->2020jishuyanzheng_89279/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.105483531951904
+            },
+            "150606->2020jishuyanzheng_89279/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5495962500572205
+            },
+            "150606->2020jishuyanzheng_89279/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12321633100509644
+            }
+        },
+        "mean_gram_loss": 2.4571551193730556e-07,
+        "mean_l2_loss": 0.33640629053115845,
+        "mean_gaussianmmd_loss": 6.105483531951904,
+        "mean_linearmmd_loss": 0.013644143007695675,
+        "mean_dss_loss": 0.002898295409977436,
+        "mean_swd_loss": 4110.458075086276
+    },
+    "150606h": {
+        "individual_results": {
+            "150606h->2020jishuyanzheng_89308/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.001686680014245212
+            },
+            "150606h->2020jishuyanzheng_89308/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0028069496620446444
+            },
+            "150606h->2020jishuyanzheng_89308/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.169305801391602
+            },
+            "150606h->2020jishuyanzheng_89308/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.579669177532196
+            },
+            "150606h->2020jishuyanzheng_89308/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13163435459136963
+            }
+        },
+        "mean_gram_loss": 1.9006553486633493e-07,
+        "mean_l2_loss": 0.35565176606178284,
+        "mean_gaussianmmd_loss": 6.169305801391602,
+        "mean_linearmmd_loss": 0.014499316923320293,
+        "mean_dss_loss": 0.0022468148381449282,
+        "mean_swd_loss": 4370.086674888928
+    },
+    "150631": {
+        "individual_results": {
+            "150631->2020jishuyanzheng_90218/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003221215447410941
+            },
+            "150631->2020jishuyanzheng_90218/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0035165215376764536
+            },
+            "150631->2020jishuyanzheng_90218/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.148163318634033
+            },
+            "150631->2020jishuyanzheng_90218/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5269648432731628
+            },
+            "150631->2020jishuyanzheng_90218/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13346414268016815
+            }
+        },
+        "mean_gram_loss": 2.270503642876065e-07,
+        "mean_l2_loss": 0.3302145004272461,
+        "mean_gaussianmmd_loss": 6.148163318634033,
+        "mean_linearmmd_loss": 0.013379770331084728,
+        "mean_dss_loss": 0.0033688684925436974,
+        "mean_swd_loss": 3676.3683174053826
+    },
+    "150638 (2)d": {
+        "individual_results": {
+            "150638 (2)d->2020jishuyanzheng_90738/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003637419082224369
+            },
+            "150638 (2)d->2020jishuyanzheng_90738/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002766053192317486
+            },
+            "150638 (2)d->2020jishuyanzheng_90738/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.12721586227417
+            },
+            "150638 (2)d->2020jishuyanzheng_90738/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.3862046003341675
+            },
+            "150638 (2)d->2020jishuyanzheng_90738/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.09297826886177063
+            }
+        },
+        "mean_gram_loss": 2.002877437234929e-07,
+        "mean_l2_loss": 0.23959143459796906,
+        "mean_gaussianmmd_loss": 6.12721586227417,
+        "mean_linearmmd_loss": 0.009667233563959599,
+        "mean_dss_loss": 0.0032017361372709274,
+        "mean_swd_loss": 4604.88580840826
+    },
+    "150679 (2)": {
+        "individual_results": {
+            "150679 (2)->2020jishuyanzheng_90787/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005984175484627485
+            },
+            "150679 (2)->2020jishuyanzheng_90787/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0058404202573001385
+            },
+            "150679 (2)->2020jishuyanzheng_90787/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.14595365524292
+            },
+            "150679 (2)->2020jishuyanzheng_90787/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.41752028465270996
+            },
+            "150679 (2)->2020jishuyanzheng_90787/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.08503493666648865
+            }
+        },
+        "mean_gram_loss": 3.6429833016882185e-07,
+        "mean_l2_loss": 0.2512776255607605,
+        "mean_gaussianmmd_loss": 6.14595365524292,
+        "mean_linearmmd_loss": 0.009500292129814625,
+        "mean_dss_loss": 0.005912297870963812,
+        "mean_swd_loss": 4283.883868058522
+    },
+    "150693 (2)h": {
+        "individual_results": {
+            "150693 (2)h->2020jishuyanzheng_90842/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.006761557888239622
+            },
+            "150693 (2)h->2020jishuyanzheng_90842/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005259224679321051
+            },
+            "150693 (2)h->2020jishuyanzheng_90842/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.158507823944092
+            },
+            "150693 (2)h->2020jishuyanzheng_90842/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5540112257003784
+            },
+            "150693 (2)h->2020jishuyanzheng_90842/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.10476473718881607
+            }
+        },
+        "mean_gram_loss": 2.442693869397772e-07,
+        "mean_l2_loss": 0.32938799262046814,
+        "mean_gaussianmmd_loss": 6.158507823944092,
+        "mean_linearmmd_loss": 0.01501662191003561,
+        "mean_dss_loss": 0.006010391283780336,
+        "mean_swd_loss": 5894.734475135803
+    },
+    "150694 (2)v": {
+        "individual_results": {
+            "150694 (2)v->2020jishuyanzheng_90990/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0014292564010247588
+            },
+            "150694 (2)v->2020jishuyanzheng_90990/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0021988244261592627
+            },
+            "150694 (2)v->2020jishuyanzheng_90990/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.179311275482178
+            },
+            "150694 (2)v->2020jishuyanzheng_90990/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5196705460548401
+            },
+            "150694 (2)v->2020jishuyanzheng_90990/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1254512369632721
+            }
+        },
+        "mean_gram_loss": 2.081935406295088e-07,
+        "mean_l2_loss": 0.3225609064102173,
+        "mean_gaussianmmd_loss": 6.179311275482178,
+        "mean_linearmmd_loss": 0.009276016615331173,
+        "mean_dss_loss": 0.0018140404135920107,
+        "mean_swd_loss": 4042.0353721380234
+    },
+    "150714 (2)d": {
+        "individual_results": {
+            "150714 (2)d->2020jishuyanzheng_91004/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002377838362008333
+            },
+            "150714 (2)d->2020jishuyanzheng_91004/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0018703880487009883
+            },
+            "150714 (2)d->2020jishuyanzheng_91004/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.173717498779297
+            },
+            "150714 (2)d->2020jishuyanzheng_91004/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4597196578979492
+            },
+            "150714 (2)d->2020jishuyanzheng_91004/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.08699756860733032
+            }
+        },
+        "mean_gram_loss": 2.8616904046430136e-07,
+        "mean_l2_loss": 0.27335861325263977,
+        "mean_gaussianmmd_loss": 6.173717498779297,
+        "mean_linearmmd_loss": 0.005196624901145697,
+        "mean_dss_loss": 0.0021241132053546607,
+        "mean_swd_loss": 4571.456487139066
+    },
+    "150722 (2)": {
+        "individual_results": {
+            "150722 (2)->2020jishuyanzheng_91012/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0014362229267135262
+            },
+            "150722 (2)->2020jishuyanzheng_91012/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0017156979301944375
+            },
+            "150722 (2)->2020jishuyanzheng_91012/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.162699222564697
+            },
+            "150722 (2)->2020jishuyanzheng_91012/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4986812174320221
+            },
+            "150722 (2)->2020jishuyanzheng_91012/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1152278259396553
+            }
+        },
+        "mean_gram_loss": 1.6171210859283747e-07,
+        "mean_l2_loss": 0.3069545328617096,
+        "mean_gaussianmmd_loss": 6.162699222564697,
+        "mean_linearmmd_loss": 0.013118979521095753,
+        "mean_dss_loss": 0.0015759604284539819,
+        "mean_swd_loss": 4379.11146136125
+    },
+    "15073d": {
+        "individual_results": {
+            "15073d->2020jishuyanzheng_91018/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004626160487532616
+            },
+            "15073d->2020jishuyanzheng_91018/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0036765553522855043
+            },
+            "15073d->2020jishuyanzheng_91018/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.172658920288086
+            },
+            "15073d->2020jishuyanzheng_91018/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5224613547325134
+            },
+            "15073d->2020jishuyanzheng_91018/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.10160750150680542
+            }
+        },
+        "mean_gram_loss": 7.122487204469508e-07,
+        "mean_l2_loss": 0.3120344281196594,
+        "mean_gaussianmmd_loss": 6.172658920288086,
+        "mean_linearmmd_loss": 0.02185795269906521,
+        "mean_dss_loss": 0.00415135791990906,
+        "mean_swd_loss": 4506.93867067496
+    },
+    "150843": {
+        "individual_results": {
+            "150843->2020jishuyanzheng_91022/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0024525339249521494
+            },
+            "150843->2020jishuyanzheng_91022/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.00252659828402102
+            },
+            "150843->2020jishuyanzheng_91022/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.176184177398682
+            },
+            "150843->2020jishuyanzheng_91022/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.49734991788864136
+            },
+            "150843->2020jishuyanzheng_91022/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11919157207012177
+            }
+        },
+        "mean_gram_loss": 2.1581359987976612e-07,
+        "mean_l2_loss": 0.30827075242996216,
+        "mean_gaussianmmd_loss": 6.176184177398682,
+        "mean_linearmmd_loss": 0.011676800437271595,
+        "mean_dss_loss": 0.0024895661044865847,
+        "mean_swd_loss": 4649.831643184026
+    },
+    "150867v": {
+        "individual_results": {
+            "150867v->2020jishuyanzheng_91024/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0017250041710212827
+            },
+            "150867v->2020jishuyanzheng_91024/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.001755582052282989
+            },
+            "150867v->2020jishuyanzheng_91024/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.163343906402588
+            },
+            "150867v->2020jishuyanzheng_91024/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4556267559528351
+            },
+            "150867v->2020jishuyanzheng_91024/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11510543525218964
+            }
+        },
+        "mean_gram_loss": 1.7826086207151093e-07,
+        "mean_l2_loss": 0.28536608815193176,
+        "mean_gaussianmmd_loss": 6.163343906402588,
+        "mean_linearmmd_loss": 0.010235434398055077,
+        "mean_dss_loss": 0.0017402931116521358,
+        "mean_swd_loss": 3878.4333065350847
+    },
+    "150878h": {
+        "individual_results": {
+            "150878h->2020jishuyanzheng_91060/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0013581388629972935
+            },
+            "150878h->2020jishuyanzheng_91060/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002829119795933366
+            },
+            "150878h->2020jishuyanzheng_91060/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.087947845458984
+            },
+            "150878h->2020jishuyanzheng_91060/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5940913558006287
+            },
+            "150878h->2020jishuyanzheng_91060/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13415417075157166
+            }
+        },
+        "mean_gram_loss": 2.0192936744933832e-07,
+        "mean_l2_loss": 0.36412274837493896,
+        "mean_gaussianmmd_loss": 6.087947845458984,
+        "mean_linearmmd_loss": 0.007055685389786959,
+        "mean_dss_loss": 0.0020936293294653296,
+        "mean_swd_loss": 4100.7666610082
+    },
+    "150879h": {
+        "individual_results": {
+            "150879h->2020jishuyanzheng_91142/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004716974217444658
+            },
+            "150879h->2020jishuyanzheng_91142/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004208591300994158
+            },
+            "150879h->2020jishuyanzheng_91142/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.14838981628418
+            },
+            "150879h->2020jishuyanzheng_91142/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.538875162601471
+            },
+            "150879h->2020jishuyanzheng_91142/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11817601323127747
+            }
+        },
+        "mean_gram_loss": 6.935404712749005e-07,
+        "mean_l2_loss": 0.3285256028175354,
+        "mean_gaussianmmd_loss": 6.14838981628418,
+        "mean_linearmmd_loss": 0.022205695509910583,
+        "mean_dss_loss": 0.004462782759219408,
+        "mean_swd_loss": 4322.491719762484
+    },
+    "150907h": {
+        "individual_results": {
+            "150907h->2020jishuyanzheng_91346/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0028401222079992294
+            },
+            "150907h->2020jishuyanzheng_91346/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003436981001868844
+            },
+            "150907h->2020jishuyanzheng_91346/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.1352972984313965
+            },
+            "150907h->2020jishuyanzheng_91346/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4698830246925354
+            },
+            "150907h->2020jishuyanzheng_91346/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11034636944532394
+            }
+        },
+        "mean_gram_loss": 2.52678859169464e-07,
+        "mean_l2_loss": 0.29011470079421997,
+        "mean_gaussianmmd_loss": 6.1352972984313965,
+        "mean_linearmmd_loss": 0.012155693955719471,
+        "mean_dss_loss": 0.0031385516049340367,
+        "mean_swd_loss": 5013.5441539684925
+    },
+    "150949v": {
+        "individual_results": {
+            "150949v->2020jishuyanzheng_91759/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0010469256667420268
+            },
+            "150949v->2020jishuyanzheng_91759/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0012399335391819477
+            },
+            "150949v->2020jishuyanzheng_91759/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.140224456787109
+            },
+            "150949v->2020jishuyanzheng_91759/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5247352719306946
+            },
+            "150949v->2020jishuyanzheng_91759/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11152192205190659
+            }
+        },
+        "mean_gram_loss": 1.951810304490209e-07,
+        "mean_l2_loss": 0.3181285858154297,
+        "mean_gaussianmmd_loss": 6.140224456787109,
+        "mean_linearmmd_loss": 0.008492988534271717,
+        "mean_dss_loss": 0.0011434296029619873,
+        "mean_swd_loss": 3514.4553352991743
+    },
+    "150950h": {
+        "individual_results": {
+            "150950h->2020jishuyanzheng_91954_3albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0028334660455584526
+            },
+            "150950h->2020jishuyanzheng_91954_3albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0020280026365071535
+            },
+            "150950h->2020jishuyanzheng_91954_3albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.186278820037842
+            },
+            "150950h->2020jishuyanzheng_91954_3albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.500985860824585
+            },
+            "150950h->2020jishuyanzheng_91954_3albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.09697676450014114
+            }
+        },
+        "mean_gram_loss": 4.19907962623256e-07,
+        "mean_l2_loss": 0.29898130893707275,
+        "mean_gaussianmmd_loss": 6.186278820037842,
+        "mean_linearmmd_loss": 0.013126871548593044,
+        "mean_dss_loss": 0.002430734341032803,
+        "mean_swd_loss": 3209.447835981846
+    },
+    "150951v": {
+        "individual_results": {
+            "150951v->2020jishuyanzheng_91956_2albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0038038911297917366
+            },
+            "150951v->2020jishuyanzheng_91956_2albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002886946313083172
+            },
+            "150951v->2020jishuyanzheng_91956_2albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.173513889312744
+            },
+            "150951v->2020jishuyanzheng_91956_2albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.575729489326477
+            },
+            "150951v->2020jishuyanzheng_91956_2albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1411006599664688
+            }
+        },
+        "mean_gram_loss": 3.1181306781036255e-07,
+        "mean_l2_loss": 0.35841506719589233,
+        "mean_gaussianmmd_loss": 6.173513889312744,
+        "mean_linearmmd_loss": 0.02314479649066925,
+        "mean_dss_loss": 0.0033454187214374542,
+        "mean_swd_loss": 3012.2137375275297
+    },
+    "150952h": {
+        "individual_results": {
+            "150952h->2020jishuyanzheng_91957_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0013723644660785794
+            },
+            "150952h->2020jishuyanzheng_91957_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0013736039400100708
+            },
+            "150952h->2020jishuyanzheng_91957_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.155302047729492
+            },
+            "150952h->2020jishuyanzheng_91957_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5308988690376282
+            },
+            "150952h->2020jishuyanzheng_91957_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13924957811832428
+            }
+        },
+        "mean_gram_loss": 1.8191830974956247e-07,
+        "mean_l2_loss": 0.33507421612739563,
+        "mean_gaussianmmd_loss": 6.155302047729492,
+        "mean_linearmmd_loss": 0.01027271244674921,
+        "mean_dss_loss": 0.0013729842030443251,
+        "mean_swd_loss": 3156.201612552007
+    },
+    "151397h": {
+        "individual_results": {
+            "151397h->2020jishuyanzheng_91958/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0015284387627616525
+            },
+            "151397h->2020jishuyanzheng_91958/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002099263947457075
+            },
+            "151397h->2020jishuyanzheng_91958/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.178239822387695
+            },
+            "151397h->2020jishuyanzheng_91958/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.41917937994003296
+            },
+            "151397h->2020jishuyanzheng_91958/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.09941958636045456
+            }
+        },
+        "mean_gram_loss": 3.4810452120837e-07,
+        "mean_l2_loss": 0.25929948687553406,
+        "mean_gaussianmmd_loss": 6.178239822387695,
+        "mean_linearmmd_loss": 0.015696914866566658,
+        "mean_dss_loss": 0.0018138513551093638,
+        "mean_swd_loss": 3327.4395109216375
+    },
+    "160041h": {
+        "individual_results": {
+            "160041h->2020jishuyanzheng_91972/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004155563190579414
+            },
+            "160041h->2020jishuyanzheng_91972/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0023802632931619883
+            },
+            "160041h->2020jishuyanzheng_91972/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.129453182220459
+            },
+            "160041h->2020jishuyanzheng_91972/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.48060405254364014
+            },
+            "160041h->2020jishuyanzheng_91972/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14839407801628113
+            }
+        },
+        "mean_gram_loss": 8.280127872239973e-07,
+        "mean_l2_loss": 0.3144990801811218,
+        "mean_gaussianmmd_loss": 6.129453182220459,
+        "mean_linearmmd_loss": 0.022705622017383575,
+        "mean_dss_loss": 0.0032679132418707013,
+        "mean_swd_loss": 3715.425998648008
+    },
+    "160082 (2)d": {
+        "individual_results": {
+            "160082 (2)d->2020jishuyanzheng_91977/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0059567163698375225
+            },
+            "160082 (2)d->2020jishuyanzheng_91977/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0029689965303987265
+            },
+            "160082 (2)d->2020jishuyanzheng_91977/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.182928562164307
+            },
+            "160082 (2)d->2020jishuyanzheng_91977/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.42660894989967346
+            },
+            "160082 (2)d->2020jishuyanzheng_91977/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1173134595155716
+            }
+        },
+        "mean_gram_loss": 8.365897770090669e-07,
+        "mean_l2_loss": 0.2719612121582031,
+        "mean_gaussianmmd_loss": 6.182928562164307,
+        "mean_linearmmd_loss": 0.02495480887591839,
+        "mean_dss_loss": 0.0044628564501181245,
+        "mean_swd_loss": 3240.575096845627
+    },
+    "160096d": {
+        "individual_results": {
+            "160096d->2020jishuyanzheng_93900/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0025491865817457438
+            },
+            "160096d->2020jishuyanzheng_93900/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002307963091880083
+            },
+            "160096d->2020jishuyanzheng_93900/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.151784420013428
+            },
+            "160096d->2020jishuyanzheng_93900/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4474516808986664
+            },
+            "160096d->2020jishuyanzheng_93900/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11251260340213776
+            }
+        },
+        "mean_gram_loss": 3.4702870266301034e-07,
+        "mean_l2_loss": 0.27998214960098267,
+        "mean_gaussianmmd_loss": 6.151784420013428,
+        "mean_linearmmd_loss": 0.02080484665930271,
+        "mean_dss_loss": 0.0024285748368129134,
+        "mean_swd_loss": 2537.2187673846884
+    },
+    "160164v": {
+        "individual_results": {
+            "160164v->2020jishuyanzheng_94728/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0025241810362786055
+            },
+            "160164v->2020jishuyanzheng_94728/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002430681837722659
+            },
+            "160164v->2020jishuyanzheng_94728/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.151233673095703
+            },
+            "160164v->2020jishuyanzheng_94728/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5570486187934875
+            },
+            "160164v->2020jishuyanzheng_94728/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14783875644207
+            }
+        },
+        "mean_gram_loss": 3.4864609688156634e-07,
+        "mean_l2_loss": 0.3524436950683594,
+        "mean_gaussianmmd_loss": 6.151233673095703,
+        "mean_linearmmd_loss": 0.010736132971942425,
+        "mean_dss_loss": 0.0024774314370006323,
+        "mean_swd_loss": 4476.235358635585
+    },
+    "160190d": {
+        "individual_results": {
+            "160190d->2020jishuyanzheng_95803/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0037589138373732567
+            },
+            "160190d->2020jishuyanzheng_95803/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003138493048027158
+            },
+            "160190d->2020jishuyanzheng_95803/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.116255283355713
+            },
+            "160190d->2020jishuyanzheng_95803/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.43921899795532227
+            },
+            "160190d->2020jishuyanzheng_95803/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1395038217306137
+            }
+        },
+        "mean_gram_loss": 1.135087586590089e-06,
+        "mean_l2_loss": 0.2893614172935486,
+        "mean_gaussianmmd_loss": 6.116255283355713,
+        "mean_linearmmd_loss": 0.012426660396158695,
+        "mean_dss_loss": 0.0034487034427002072,
+        "mean_swd_loss": 3288.677428007126
+    },
+    "160190h": {
+        "individual_results": {
+            "160190h->2020jishuyanzheng_95816/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005748374853283167
+            },
+            "160190h->2020jishuyanzheng_95816/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004552803002297878
+            },
+            "160190h->2020jishuyanzheng_95816/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.148321151733398
+            },
+            "160190h->2020jishuyanzheng_95816/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5069506168365479
+            },
+            "160190h->2020jishuyanzheng_95816/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12314193695783615
+            }
+        },
+        "mean_gram_loss": 6.201095175129012e-07,
+        "mean_l2_loss": 0.3150462806224823,
+        "mean_gaussianmmd_loss": 6.148321151733398,
+        "mean_linearmmd_loss": 0.016028741374611855,
+        "mean_dss_loss": 0.005150588927790523,
+        "mean_swd_loss": 3990.7338593403497
+    },
+    "160376": {
+        "individual_results": {
+            "160376->2020jishuyanzheng_96910/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004788981284946203
+            },
+            "160376->2020jishuyanzheng_96910/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0037049241364002228
+            },
+            "160376->2020jishuyanzheng_96910/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.151026248931885
+            },
+            "160376->2020jishuyanzheng_96910/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4444192051887512
+            },
+            "160376->2020jishuyanzheng_96910/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1476288139820099
+            }
+        },
+        "mean_gram_loss": 5.773378575213428e-07,
+        "mean_l2_loss": 0.29602402448654175,
+        "mean_gaussianmmd_loss": 6.151026248931885,
+        "mean_linearmmd_loss": 0.024488313123583794,
+        "mean_dss_loss": 0.004246952710673213,
+        "mean_swd_loss": 3834.8666828870773
+    },
+    "160437v": {
+        "individual_results": {
+            "160437v->2020jishuyanzheng_97256/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0033209538087248802
+            },
+            "160437v->2020jishuyanzheng_97256/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0028670774772763252
+            },
+            "160437v->2020jishuyanzheng_97256/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.147528171539307
+            },
+            "160437v->2020jishuyanzheng_97256/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5378175973892212
+            },
+            "160437v->2020jishuyanzheng_97256/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12557151913642883
+            }
+        },
+        "mean_gram_loss": 4.180302823897364e-07,
+        "mean_l2_loss": 0.3316945433616638,
+        "mean_gaussianmmd_loss": 6.147528171539307,
+        "mean_linearmmd_loss": 0.010913561098277569,
+        "mean_dss_loss": 0.0030940156430006027,
+        "mean_swd_loss": 3878.7971688508987
+    },
+    "160440d": {
+        "individual_results": {
+            "160440d->2020jishuyanzheng_97312/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002876496873795986
+            },
+            "160440d->2020jishuyanzheng_97312/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003204582491889596
+            },
+            "160440d->2020jishuyanzheng_97312/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.183929920196533
+            },
+            "160440d->2020jishuyanzheng_97312/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.43661344051361084
+            },
+            "160440d->2020jishuyanzheng_97312/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13017234206199646
+            }
+        },
+        "mean_gram_loss": 5.869384835932578e-07,
+        "mean_l2_loss": 0.28339290618896484,
+        "mean_gaussianmmd_loss": 6.183929920196533,
+        "mean_linearmmd_loss": 0.024095864966511726,
+        "mean_dss_loss": 0.003040539682842791,
+        "mean_swd_loss": 3320.275053481261
+    },
+    "160440h": {
+        "individual_results": {
+            "160440h->2020jishuyanzheng_97339/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0038064380642026663
+            },
+            "160440h->2020jishuyanzheng_97339/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003368107369169593
+            },
+            "160440h->2020jishuyanzheng_97339/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.186278820037842
+            },
+            "160440h->2020jishuyanzheng_97339/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.49859121441841125
+            },
+            "160440h->2020jishuyanzheng_97339/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14488886296749115
+            }
+        },
+        "mean_gram_loss": 1.081537675418076e-06,
+        "mean_l2_loss": 0.3217400312423706,
+        "mean_gaussianmmd_loss": 6.186278820037842,
+        "mean_linearmmd_loss": 0.02844352088868618,
+        "mean_dss_loss": 0.0035872727166861296,
+        "mean_swd_loss": 4012.7760592301684
+    },
+    "160559d": {
+        "individual_results": {
+            "160559d->2020jishuyanzheng_97758/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004923093598335981
+            },
+            "160559d->2020jishuyanzheng_97758/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0032614872325211763
+            },
+            "160559d->2020jishuyanzheng_97758/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.186278820037842
+            },
+            "160559d->2020jishuyanzheng_97758/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.45612871646881104
+            },
+            "160559d->2020jishuyanzheng_97758/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.11343974620103836
+            }
+        },
+        "mean_gram_loss": 3.83206526066715e-07,
+        "mean_l2_loss": 0.2847842276096344,
+        "mean_gaussianmmd_loss": 6.186278820037842,
+        "mean_linearmmd_loss": 0.020312214270234108,
+        "mean_dss_loss": 0.004092290415428579,
+        "mean_swd_loss": 3002.5710175037384
+    },
+    "160705v": {
+        "individual_results": {
+            "160705v->2020jishuyanzheng_97821/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003377047600224614
+            },
+            "160705v->2020jishuyanzheng_97821/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.003698565298691392
+            },
+            "160705v->2020jishuyanzheng_97821/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.175292491912842
+            },
+            "160705v->2020jishuyanzheng_97821/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5208650231361389
+            },
+            "160705v->2020jishuyanzheng_97821/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14179697632789612
+            }
+        },
+        "mean_gram_loss": 4.5276851778908167e-07,
+        "mean_l2_loss": 0.3313310146331787,
+        "mean_gaussianmmd_loss": 6.175292491912842,
+        "mean_linearmmd_loss": 0.03032689355313778,
+        "mean_dss_loss": 0.003537806449458003,
+        "mean_swd_loss": 3515.7673950990043
+    },
+    "160778v": {
+        "individual_results": {
+            "160778v->2020jishuyanzheng_98614/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.008267412893474102
+            },
+            "160778v->2020jishuyanzheng_98614/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004956922959536314
+            },
+            "160778v->2020jishuyanzheng_98614/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.154765605926514
+            },
+            "160778v->2020jishuyanzheng_98614/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5678068399429321
+            },
+            "160778v->2020jishuyanzheng_98614/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12880229949951172
+            }
+        },
+        "mean_gram_loss": 5.240386258265062e-07,
+        "mean_l2_loss": 0.3483045697212219,
+        "mean_gaussianmmd_loss": 6.154765605926514,
+        "mean_linearmmd_loss": 0.01090747956186533,
+        "mean_dss_loss": 0.006612167926505208,
+        "mean_swd_loss": 4237.510828733444
+    },
+    "160782d": {
+        "individual_results": {
+            "160782d->2020jishuyanzheng_98786/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.00327751855365932
+            },
+            "160782d->2020jishuyanzheng_98786/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.00445358594879508
+            },
+            "160782d->2020jishuyanzheng_98786/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.145740509033203
+            },
+            "160782d->2020jishuyanzheng_98786/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.6150199770927429
+            },
+            "160782d->2020jishuyanzheng_98786/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12139082700014114
+            }
+        },
+        "mean_gram_loss": 2.400422260961932e-07,
+        "mean_l2_loss": 0.36820539832115173,
+        "mean_gaussianmmd_loss": 6.145740509033203,
+        "mean_linearmmd_loss": 0.0161628145724535,
+        "mean_dss_loss": 0.0038655522512272,
+        "mean_swd_loss": 5875.611832459767
+    },
+    "160785v": {
+        "individual_results": {
+            "160785v->2020jishuyanzheng_98812/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005588453263044357
+            },
+            "160785v->2020jishuyanzheng_98812/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0035592718049883842
+            },
+            "160785v->2020jishuyanzheng_98812/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.1729207038879395
+            },
+            "160785v->2020jishuyanzheng_98812/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4168474078178406
+            },
+            "160785v->2020jishuyanzheng_98812/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.1084706261754036
+            }
+        },
+        "mean_gram_loss": 3.758130731057463e-07,
+        "mean_l2_loss": 0.2626590132713318,
+        "mean_gaussianmmd_loss": 6.1729207038879395,
+        "mean_linearmmd_loss": 0.013874304480850697,
+        "mean_dss_loss": 0.004573862534016371,
+        "mean_swd_loss": 3488.498402913411
+    },
+    "160786h": {
+        "individual_results": {
+            "160786h->2020jishuyanzheng_98976_1albu/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.005538685247302055
+            },
+            "160786h->2020jishuyanzheng_98976_1albu/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.004526093136519194
+            },
+            "160786h->2020jishuyanzheng_98976_1albu/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.156946182250977
+            },
+            "160786h->2020jishuyanzheng_98976_1albu/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.5214920043945312
+            },
+            "160786h->2020jishuyanzheng_98976_1albu/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.14069725573062897
+            }
+        },
+        "mean_gram_loss": 6.370793812493503e-07,
+        "mean_l2_loss": 0.3310946226119995,
+        "mean_gaussianmmd_loss": 6.156946182250977,
+        "mean_linearmmd_loss": 0.01834123767912388,
+        "mean_dss_loss": 0.0050323891919106245,
+        "mean_swd_loss": 4294.92759112517
+    },
+    "160842": {
+        "individual_results": {
+            "160842->2020jishuyanzheng_99599/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0023222926538437605
+            },
+            "160842->2020jishuyanzheng_99599/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0023520856630057096
+            },
+            "160842->2020jishuyanzheng_99599/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.170948505401611
+            },
+            "160842->2020jishuyanzheng_99599/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.3750293254852295
+            },
+            "160842->2020jishuyanzheng_99599/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.16245175898075104
+            }
+        },
+        "mean_gram_loss": 7.162430506468809e-07,
+        "mean_l2_loss": 0.26874053478240967,
+        "mean_gaussianmmd_loss": 6.170948505401611,
+        "mean_linearmmd_loss": 0.028537096455693245,
+        "mean_dss_loss": 0.002337189158424735,
+        "mean_swd_loss": 3256.6277957956
+    },
+    "160896d": {
+        "individual_results": {
+            "160896d->2020jishuyanzheng_99602/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0030932037625461817
+            },
+            "160896d->2020jishuyanzheng_99602/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0028122132644057274
+            },
+            "160896d->2020jishuyanzheng_99602/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.142659664154053
+            },
+            "160896d->2020jishuyanzheng_99602/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.4070250391960144
+            },
+            "160896d->2020jishuyanzheng_99602/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.13243846595287323
+            }
+        },
+        "mean_gram_loss": 6.434721058212745e-07,
+        "mean_l2_loss": 0.2697317600250244,
+        "mean_gaussianmmd_loss": 6.142659664154053,
+        "mean_linearmmd_loss": 0.02171885408461094,
+        "mean_dss_loss": 0.0029527085134759545,
+        "mean_swd_loss": 3155.4107080101967
+    },
+    "161020h": {
+        "individual_results": {
+            "161020h->2020jishuyanzheng_99634/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0015629217959940434
+            },
+            "161020h->2020jishuyanzheng_99634/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0017870928859338164
+            },
+            "161020h->2020jishuyanzheng_99634/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.17433500289917
+            },
+            "161020h->2020jishuyanzheng_99634/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.36714112758636475
+            },
+            "161020h->2020jishuyanzheng_99634/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.12322229892015457
+            }
+        },
+        "mean_gram_loss": 5.315679914019711e-07,
+        "mean_l2_loss": 0.24518170952796936,
+        "mean_gaussianmmd_loss": 6.17433500289917,
+        "mean_linearmmd_loss": 0.01897289790213108,
+        "mean_dss_loss": 0.00167500734096393,
+        "mean_swd_loss": 2862.8656354149184
+    },
+    "161034d": {
+        "individual_results": {
+            "161034d->2020jishuyanzheng_99637/stage2_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.0027892766520380974
+            },
+            "161034d->2020jishuyanzheng_99637/stage4_C2f_features.npy": {
+                "loss_type": "dss",
+                "loss": 0.002914554439485073
+            },
+            "161034d->2020jishuyanzheng_99637/stage6_C2f_features.npy": {
+                "loss_type": "gmmd",
+                "loss": 6.114692687988281
+            },
+            "161034d->2020jishuyanzheng_99637/stage8_C2f_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.40006881952285767
+            },
+            "161034d->2020jishuyanzheng_99637/stage9_SPPF_features.npy": {
+                "loss_type": "L2",
+                "loss": 0.09533946216106415
+            }
+        },
+        "mean_gram_loss": 5.075527269582381e-07,
+        "mean_l2_loss": 0.2477041482925415,
+        "mean_gaussianmmd_loss": 6.114692687988281,
+        "mean_linearmmd_loss": 0.01686832122504711,
+        "mean_dss_loss": 0.0028519155457615852,
+        "mean_swd_loss": 3607.0496458013854
+    }
+}

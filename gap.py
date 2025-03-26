@@ -553,11 +553,11 @@ if __name__ == "__main__":
 
     ###  2.计算对应层级特征分布差异
     # city_to_foggy，sim10k_to_city 、voc_to_clipart1k、  privatepower_to_publicpower
-    source_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/privatepower_to_publicpower/source' 
-    target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/privatepower_to_publicpower/target'
+    source_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/privatepower_to_publicpower/target' 
+    target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/privatepower_to_publicpower/source'
     results = process_features(source_directory, target_directory)
     # 保存结果
-    output_path = "./gap/pr2pu_gap.json"
+    output_path = "./gap/pu2pr_gap.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
 
