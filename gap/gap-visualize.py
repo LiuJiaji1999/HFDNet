@@ -75,7 +75,8 @@ def visualize_losses(json_file, output_dir="vis", sample_size=20):
     print(f"已保存 loss 统计结果: {stats_file}")
     
     # 设置 Seaborn 主题
-    sns.set_theme(style="whitegrid")
+    # sns.set_theme(style="whitegrid")
+    sns.set_theme(style="white")
     
     # 动态设置图像宽度：每个实验占 0.8 英寸，最小宽度 8 英寸，最大不超过 20 英寸
     width_inches = min(max(8, len(subs) * 0.8), 20)
@@ -101,8 +102,8 @@ def visualize_losses(json_file, output_dir="vis", sample_size=20):
         print(f"已保存 {loss_type} 图: {out_path}")
 
 # 示例调用：
-# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/c2f_gap.json", output_dir="vis/city_to_foggy")
+visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/c2f_gap.json", output_dir="vis/city_to_foggy")
 # visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/s2c_gap.json", output_dir="vis/sim10k_to_city")
 # visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/v2c_gap.json", output_dir="vis/voc_to_clipart1k")
 # # visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/pr2pu_gap.json", output_dir="vis/privatepower_to_publicpower")
-visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/pu2pr_gap.json", output_dir="vis/publicpower_to_privatepower")
+# visualize_losses("/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/gap/pu2pr_gap.json", output_dir="vis/publicpower_to_privatepower")
