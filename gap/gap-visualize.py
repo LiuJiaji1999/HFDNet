@@ -85,8 +85,8 @@ def visualize_losses(json_file, output_dir="vis", sample_size=20):
         plt.figure(figsize=(width_inches, 6))
         # 绘制柱状图
         sns.barplot(x=subs, y=data[loss_type], hue=subs, palette="viridis", dodge=False, legend=False)
-        plt.title(f"{loss_type.replace('_', ' ').title()} Across Sub-folder", fontsize=14)
-        plt.xlabel("Sub-folder", fontsize=12)
+        plt.title(f"{loss_type.replace('_', ' ').title()} Across Sub-sample", fontsize=14)
+        plt.xlabel("Sub-sample", fontsize=12)
         plt.ylabel("Loss Value", fontsize=12)
         
         # 仅显示部分索引，防止过于密集
