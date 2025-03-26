@@ -86,9 +86,19 @@ def visualize_losses(json_file, output_dir="vis", sample_size=20):
         plt.figure(figsize=(width_inches, 6))
         # 绘制柱状图
         sns.barplot(x=subs, y=data[loss_type], hue=subs, palette="viridis", dodge=False, legend=False)
-        plt.title(f"{loss_type.replace('_', ' ').title()} Across Sub-sample", fontsize=14)
+        
+        # Simplified y-axis label mapping
+        loss_name_map = {
+            "mean_gram_loss": "Gram Gap",
+            "mean_l2_loss": "L2 Gap",
+            "mean_gaussianmmd_loss": "MMD Gap",
+            "mean_linearmmd_loss": "L-MMD Gap",
+            "mean_dss_loss": "DSS Gap",
+            "mean_swd_loss": "SWD Gap"
+        }
+        # plt.title(f"{loss_type.replace('_', ' ').title()} Across Sub-sample", fontsize=14)
         plt.xlabel("Sub-sample", fontsize=12)
-        plt.ylabel("Loss Value", fontsize=12)
+        plt.ylabel(loss_name_map[loss_type], fontsize=12)  # Use simplified name
         
         # 仅显示部分索引，防止过于密集
         step = max(1, len(subs) // 10)  # 每 10% 取一个刻度
