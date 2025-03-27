@@ -26,8 +26,8 @@ if __name__ == '__main__':
     # voc_to_clipart1k.yaml sourcevoc
     # clipart1k.yaml oracleclipart1k
 
-    # privatepower_to_publicpower.yaml sourceprivate
-    # publicpower.yaml oraclepublic
+    ## privatepower_to_publicpower.yaml sourceprivate
+    ## publicpower.yaml oraclepublic
 
     # publicpower_to_privatepower.yaml sourcepublic
     # privatepower.yaml oracleprivate

@@ -1288,59 +1288,59 @@ def output_to_rotated_target(output, max_det=300):
     return targets[:, 0], targets[:, 1], targets[:, 2:-1], targets[:, -1]
 
 
-# def feature_visualization(x, module_type, stage, n=32, save_dir=Path("runs/detect/exp")):
-#     """
-#     Visualize feature maps of a given model module during inference.
+def feature_visualization(x, module_type, stage, n=32, save_dir=Path("runs/detect/exp")):
+    """
+    Visualize feature maps of a given model module during inference.
 
-#     Args:
-#         x (torch.Tensor): Features to be visualized.
-#         module_type (str): Module type.
-#         stage (int): Module stage within the model.
-#         n (int, optional): Maximum number of feature maps to plot. Defaults to 32.
-#         save_dir (Path, optional): Directory to save results. Defaults to Path('runs/detect/exp').
-#     """
-#     for m in {"Detect", "Segment", "Pose", "Classify", "OBB", "RTDETRDecoder"}:  # all model heads
-#         if m in module_type:
-#             return
-#     if isinstance(x, torch.Tensor):
-#         _, channels, height, width = x.shape  # batch, channels, height, width
-#         print('通道数是：',channels)
-#         if height > 1 and width > 1:
-#             f = save_dir / f"stage{stage}_{module_type.split('.')[-1]}_features.png"  # filename
-#             blocks = torch.chunk(x[0].cpu(), channels, dim=0)  # select batch index 0, block by channels
-#             n = max(n, channels)  # number of plots #!!
-#             _, ax = plt.subplots(math.ceil(n / 4), 4, tight_layout=True)  # 8 rows x n/8 cols
-#             ax = ax.ravel()
-#             plt.subplots_adjust(wspace=0.05, hspace=0.05)
-#             for i in range(n):
-#                 ax[i].imshow(blocks[i].squeeze())  # cmap='gray'
-#                 ax[i].axis("off")
-#             LOGGER.info(f"Saving {f}... ({n}/{channels})")
-#             plt.savefig(f, dpi=300, bbox_inches="tight")
-#             plt.close()
-#             np.save(str(f.with_suffix(".npy")), x[0].cpu().numpy())  # npy save
-
-def feature_visualization(x, module_type, stage, save_dir=Path("runs/detect/exp")):
-    # feature_dict = {}
-    # 排除检测头、分割头等模块
-    for m in {"Detect", "Segment", "Pose", "Classify", "OBB", "RTDETRDecoder"}:
+    Args:
+        x (torch.Tensor): Features to be visualized.
+        module_type (str): Module type.
+        stage (int): Module stage within the model.
+        n (int, optional): Maximum number of feature maps to plot. Defaults to 32.
+        save_dir (Path, optional): Directory to save results. Defaults to Path('runs/detect/exp').
+    """
+    for m in {"Detect", "Segment", "Pose", "Classify", "OBB", "RTDETRDecoder"}:  # all model heads
         if m in module_type:
             return
-    if stage in [2,4,6,8,9]: #!!
-        if isinstance(x, torch.Tensor):
-            batch_size, channels, height, width = x.shape  # 获取完整的 batch 维度
-            print(f"当前层: {module_type}, 阶段: {stage}, 批次: {batch_size}, 通道数: {channels}, 大小:{height, width}")
-            if height > 1 and width > 1:
-                save_dir.mkdir(parents=True, exist_ok=True)  # 确保保存目录存在
-                file_path = save_dir / f"stage{stage}_{module_type.split('.')[-1]}_features.npy"
-                feature_npy = x.cpu().numpy() # 保存整个 batch 的特征数据
-                np.save(str(file_path), feature_npy)  
-                print(f"已保存特征数据到 {file_path}")
-    #             # 使用 stage 与 module_type 拼接生成 key
-    #             key = f"stage{stage}_{module_type.split('.')[-1]}"
-    #             feature_dict[key] = feature_npy
-    #             return feature_dict
-    # return feature_dict
+    if isinstance(x, torch.Tensor):
+        _, channels, height, width = x.shape  # batch, channels, height, width
+        print('通道数是：',channels)
+        if height > 1 and width > 1:
+            f = save_dir / f"stage{stage}_{module_type.split('.')[-1]}_features.png"  # filename
+            blocks = torch.chunk(x[0].cpu(), channels, dim=0)  # select batch index 0, block by channels
+            n = max(n, channels)  # number of plots #!!
+            _, ax = plt.subplots(math.ceil(n / 4), 4, tight_layout=True)  # 8 rows x n/8 cols
+            ax = ax.ravel()
+            plt.subplots_adjust(wspace=0.05, hspace=0.05)
+            for i in range(n):
+                ax[i].imshow(blocks[i].squeeze())  # cmap='gray'
+                ax[i].axis("off")
+            LOGGER.info(f"Saving {f}... ({n}/{channels})")
+            plt.savefig(f, dpi=300, bbox_inches="tight")
+            plt.close()
+            np.save(str(f.with_suffix(".npy")), x[0].cpu().numpy())  # npy save
+
+# def feature_visualization(x, module_type, stage, save_dir=Path("runs/detect/exp")):
+#     # feature_dict = {}
+#     # 排除检测头、分割头等模块
+#     for m in {"Detect", "Segment", "Pose", "Classify", "OBB", "RTDETRDecoder"}:
+#         if m in module_type:
+#             return
+#     if stage in [2,4,6,8,9]: #!!
+#         if isinstance(x, torch.Tensor):
+#             batch_size, channels, height, width = x.shape  # 获取完整的 batch 维度
+#             print(f"当前层: {module_type}, 阶段: {stage}, 批次: {batch_size}, 通道数: {channels}, 大小:{height, width}")
+#             if height > 1 and width > 1:
+#                 save_dir.mkdir(parents=True, exist_ok=True)  # 确保保存目录存在
+#                 file_path = save_dir / f"stage{stage}_{module_type.split('.')[-1]}_features.npy"
+#                 feature_npy = x.cpu().numpy() # 保存整个 batch 的特征数据
+#                 np.save(str(file_path), feature_npy)  
+#                 print(f"已保存特征数据到 {file_path}")
+#     #             # 使用 stage 与 module_type 拼接生成 key
+#     #             key = f"stage{stage}_{module_type.split('.')[-1]}"
+#     #             feature_dict[key] = feature_npy
+#     #             return feature_dict
+#     # return feature_dict
             
 
 
