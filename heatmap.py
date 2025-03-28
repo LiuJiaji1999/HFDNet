@@ -156,8 +156,10 @@ class yolov8_heatmap:
 
     def draw_detections(self, box, color, name, img):
         xmin, ymin, xmax, ymax = list(map(int, list(box)))
-        cv2.rectangle(img, (xmin, ymin), (xmax, ymax), tuple(int(x) for x in color), 2)
-        cv2.putText(img, str(name), (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, tuple(int(x) for x in color), 2, lineType=cv2.LINE_AA)
+        # 细线边框（线宽=1）
+        cv2.rectangle(img, (xmin, ymin), (xmax, ymax), tuple(int(x) for x in color), 1)
+        # 小字体（从0.8改为0.5），线宽也改为1
+        # cv2.putText(img, str(name), (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, tuple(int(x) for x in color), 1, lineType=cv2.LINE_AA)
         return img
 
     def renormalize_cam_in_bounding_boxes(self, boxes, image_float_np, grayscale_cam):
@@ -214,16 +216,17 @@ class yolov8_heatmap:
             for img_path_ in os.listdir(img_path):
                 self.process(f'{img_path}/{img_path_}', f'{save_path}/{img_path_}')
         else:
-            self.process(img_path, f'{save_path}/insulator_defect-b.png')
+            self.process(img_path, f'{save_path}/frankfurt_000000_001751.jpg')
         
 def get_params():
     params = {
         'weight': '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt', # 现在只需要指定权重即可,不需要指定cfg
+        # 'weight': '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity/weights/best.pt', # 现在只需要指定权重即可,不需要指定cfg
         'device': 'cuda:0',
-        'method': 'EigenGradCAM', # GradCAMPlusPlus, GradCAM, XGradCAM, EigenCAM, HiResCAM, LayerCAM, RandomCAM, EigenGradCAM
+        'method': 'EigenGradCAM', # GradCAMPlusPlus, GradCAM, XGradCAM, RandomCAM, EigenCAM, HiResCAM, LayerCAM, EigenGradCAM
         'layer': [2, 4, 6, 8, 9],
-        'backward_type': 'box', # class, box, all
-        'conf_threshold': 0.6, # 0.2
+        'backward_type': 'all', # class, box, all
+        'conf_threshold': 0.5, # 0.2
         'ratio': 0.02, # 0.02-0.1
         'show_box': True,
         'renormalize': True
@@ -233,8 +236,8 @@ def get_params():
 if __name__ == '__main__':
     model = yolov8_heatmap(**get_params())
     # model(r'/home/lenovo/data/liujiaji/Datasets/Einsulator/defect/img/2020jishuyanzheng_87134.jpg', '/home/lenovo/data/liujiaji/powerGit/yolov8/image/new-heatmap/')
-    # model(r'/home/lenovo/data/liujiaji/yolov8/powerdata/images/test/2020jishuyanzheng_91953.jpg', '/home/lenovo/data/liujiaji/powerGit/yolov8/image/heatmap/8.2')
-    model(r'/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val', '/home/lenovo/data/liujiaji/powerGit/dayolo/image/heatmap')
+    model(r'/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val/frankfurt_000000_001751.jpg', '/home/lenovo/data/liujiaji/powerGit/dayolo/image/heatmap')
+    # model(r'/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val', '/home/lenovo/data/liujiaji/powerGit/dayolo/image/heatmap')
 
 # source-only: baseline/sourcecity            /sourcesim10k              /sourcevoc               /sourcepublic 
 # ours:       improve/sourcecity-aptpse-dmm  /sourcesim10k-aptpse-dmm    /sourcevoc-aptpse-dmm    /sourcepublic-aptpse-dmm2
