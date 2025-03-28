@@ -55,8 +55,8 @@ transform = transforms.Compose([
 # c2f
 source_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format'
 target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format'
-# # weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
-# weight = 'runs/train/baseline/sourcecity/weights/best.pt'
+# weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
+weight = 'runs/train/baseline/sourcecity/weights/best.pt'
 
 # s2c
 # source_path = '/home/lenovo/data/liujiaji/DA-Datasets/Sim10k'
@@ -77,7 +77,7 @@ target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_for
 # weight = 'runs/train/baseline/sourcepublic/weights/best.pt'
 
 # v8 
-weight = 'yolov8m.pt'
+# weight = 'yolov8m.pt'
 model = attempt_load_weights(weight, device).eval()
 
 source_dataset = CustomDataset(source_path, transform=transform, label_prefix='S')
@@ -218,7 +218,7 @@ def plot_tsne(features, labels, domains, save_path='tsne_visualization.png'):
             plt.scatter(embeddings[mask, 0], embeddings[mask, 1],
                        c=domain_colors[domain],
                        marker=markers[domain],
-                       s=50,
+                       s=70,
                        alpha=0.6,
                        edgecolor='w',
                        linewidth=0.5,
@@ -234,7 +234,7 @@ def plot_tsne(features, labels, domains, save_path='tsne_visualization.png'):
     
     # 美化图形
     plt.grid(True, linestyle='--', alpha=0.4)
-    plt.gca().set_facecolor('#f5f5f5')
+    plt.gca().set_facecolor('white')
     
     # 保存图像
     plt.tight_layout()
@@ -249,4 +249,4 @@ if __name__ == "__main__":
     
     # 3. 可视化
     plot_tsne(features, labels, domains,
-             save_path='/home/lenovo/data/liujiaji/powerGit/dayolo/image/tsne/tsne-c2f-v8.png')
+             save_path='/home/lenovo/data/liujiaji/powerGit/dayolo/image/tsne/tsne-c2f-so.png')
