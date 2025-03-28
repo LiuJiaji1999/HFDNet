@@ -45,6 +45,25 @@ class CustomDataset(Dataset):
         label = f"{self.label_prefix}{label}"
         return image, label
 
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
+import seaborn as sns
+import os
+from tqdm import tqdm
+import warnings
+warnings.filterwarnings('ignore')
+import torch
+from torch.utils.data import DataLoader, Dataset
+import torchvision.transforms as transforms
+import cv2
+import torch.nn as nn
+from collections import defaultdict
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# 自定义数据集类保持不变...
+
 # 数据预处理
 transform = transforms.Compose([
     transforms.Resize((640, 640)),
@@ -52,33 +71,11 @@ transform = transforms.Compose([
 ])
 
 # 加载数据
-# c2f
 source_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format'
 target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format'
-# # weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
-# weight = 'runs/train/baseline/sourcecity/weights/best.pt'
 
-# s2c
 # source_path = '/home/lenovo/data/liujiaji/DA-Datasets/Sim10k'
 # target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format_car_class'
-# # weight = 'runs/train/improve/sourcesim10k-aptpse-dmm/weights/best.pt'
-# weight = 'runs/train/baseline/sourcesim10k/weights/best.pt'
-
-# # v2c
-# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/VOC/train/VOCdevkit/VOC2007/yolov5_format'
-# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format'
-# # weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
-# weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
-
-# pu2pr
-# source_path = '/home/lenovo/data/liujiaji/Datasets/publicpower'
-# target_path = '/home/lenovo/data/liujiaji/yolov8/privatepower'
-# weight = 'runs/train/improve/sourcepublic-aptpse-dmm2/weights/best.pt'
-# weight = 'runs/train/baseline/sourcepublic/weights/best.pt'
-
-# v8 
-weight = 'yolov8m.pt'
-model = attempt_load_weights(weight, device).eval()
 
 source_dataset = CustomDataset(source_path, transform=transform, label_prefix='S')
 target_dataset = CustomDataset(target_path, transform=transform, label_prefix='T')
@@ -87,6 +84,10 @@ target_dataset = CustomDataset(target_path, transform=transform, label_prefix='T
 combined_dataset = torch.utils.data.ConcatDataset([source_dataset, target_dataset])
 st_dataloader = DataLoader(combined_dataset, batch_size=8, shuffle=False, num_workers=4)
 
+# 加载模型
+weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
+# weight = 'runs/train/baseline/sourcecity/weights/best.pt'
+model = attempt_load_weights(weight, device).eval()
 
 def extract_yolov8_features(model, dataloader):
     """
@@ -123,7 +124,6 @@ def extract_yolov8_features(model, dataloader):
     print(f"Final features shape: {features.shape}")
     return features, np.array(labels), np.array(domains)
 
-'''
 
 def plot_tsne(features, labels, domains, save_path='tsne_visualization.png'):
     """
@@ -151,7 +151,7 @@ def plot_tsne(features, labels, domains, save_path='tsne_visualization.png'):
     markers = {'source': 'o', 'target': 's'}  # 源域圆形，目标域方形
     
     # 绘制数据点
-    for class_idx in range(1):
+    for class_idx in range(8):
         for domain in ['source', 'target']:
             prefix = 'S' if domain == 'source' else 'T'
             mask = (labels == f"{prefix}{class_idx}")
@@ -168,8 +168,8 @@ def plot_tsne(features, labels, domains, save_path='tsne_visualization.png'):
     
     # 添加图例和标题
     plt.title('Feature Distribution Visualization', fontsize=14, pad=12)
-    plt.xlabel('Dimension 1', fontsize=12)
-    plt.ylabel('Dimension 2', fontsize=12)
+    # plt.xlabel('Dimension 1', fontsize=12)
+    # plt.ylabel('Dimension 2', fontsize=12)
     
     # 简化图例
     handles, labels_legend = plt.gca().get_legend_handles_labels()
@@ -189,58 +189,8 @@ def plot_tsne(features, labels, domains, save_path='tsne_visualization.png'):
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     print(f"Visualization saved to {save_path}")
-'''
 
-def plot_tsne(features, labels, domains, save_path='tsne_visualization.png'):
-    """
-    简洁大气的t-SNE可视化（仅区分源域和目标域）
-    参数:
-        features: (N, C) 特征矩阵
-        labels: (N,) 类别标签 (可忽略)
-        domains: (N,) 域标签('source'/'target')
-    """
-    # t-SNE降维
-    tsne = TSNE(n_components=2, perplexity=30, random_state=42, n_iter=1000)
-    embeddings = tsne.fit_transform(features)
-    
-    # 设置样式
-    plt.figure(figsize=(10, 8))
-    sns.set_style("white")
-    
-    # 定义域颜色和样式
-    domain_colors = {'source': '#1f77b4', 'target': '#ff7f0e'}  # 蓝色-源域，橙色-目标域
-    markers = {'source': 'o', 'target': 's'}  # 源域圆形，目标域方形
-    
-    # 绘制数据点
-    for domain in ['source', 'target']:
-        mask = (domains == domain)
-        if np.sum(mask) > 0:
-            plt.scatter(embeddings[mask, 0], embeddings[mask, 1],
-                       c=domain_colors[domain],
-                       marker=markers[domain],
-                       s=50,
-                       alpha=0.6,
-                       edgecolor='w',
-                       linewidth=0.5,
-                       label=f'{domain.capitalize()} domain')
-    
-    # 添加图例和标题
-    plt.title('Feature Distribution: Source vs Target', fontsize=14)
-    # plt.xlabel('t-SNE Dimension 1', fontsize=12)
-    # plt.ylabel('t-SNE Dimension 2', fontsize=12)
-    
-    # 简化图例
-    plt.legend(frameon=True, fontsize=10, loc='upper right')
-    
-    # 美化图形
-    plt.grid(True, linestyle='--', alpha=0.4)
-    plt.gca().set_facecolor('#f5f5f5')
-    
-    # 保存图像
-    plt.tight_layout()
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Visualization saved to {save_path}")
+
 
 # 主流程
 if __name__ == "__main__":
@@ -249,4 +199,4 @@ if __name__ == "__main__":
     
     # 3. 可视化
     plot_tsne(features, labels, domains,
-             save_path='/home/lenovo/data/liujiaji/powerGit/dayolo/image/tsne/tsne-c2f-v8.png')
+             save_path='/home/lenovo/data/liujiaji/powerGit/dayolo/tsne-c2f.png')
