@@ -218,11 +218,11 @@ class yolov8_heatmap:
         
 def get_params():
     params = {
-        'weight': 'runs/train/exp2/weights/best.pt', # 现在只需要指定权重即可,不需要指定cfg
+        'weight': '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt', # 现在只需要指定权重即可,不需要指定cfg
         'device': 'cuda:0',
         'method': 'EigenGradCAM', # GradCAMPlusPlus, GradCAM, XGradCAM, EigenCAM, HiResCAM, LayerCAM, RandomCAM, EigenGradCAM
-        'layer': [10, 12, 14, 16, 18],
-        'backward_type': 'class', # class, box, all
+        'layer': [2, 4, 6, 8, 9],
+        'backward_type': 'box', # class, box, all
         'conf_threshold': 0.6, # 0.2
         'ratio': 0.02, # 0.02-0.1
         'show_box': True,
@@ -233,5 +233,14 @@ def get_params():
 if __name__ == '__main__':
     model = yolov8_heatmap(**get_params())
     # model(r'/home/lenovo/data/liujiaji/Datasets/Einsulator/defect/img/2020jishuyanzheng_87134.jpg', '/home/lenovo/data/liujiaji/powerGit/yolov8/image/new-heatmap/')
-    model(r'/home/lenovo/data/liujiaji/yolov8/powerdata/images/test/2020jishuyanzheng_91953.jpg', '/home/lenovo/data/liujiaji/powerGit/yolov8/image/heatmap/8.2')
-    # model(r'/home/lenovo/data/liujiaji/yolov8/powerdata/images/val/', '/home/lenovo/data/liujiaji/powerGit/yolov8/heatmap')
+    # model(r'/home/lenovo/data/liujiaji/yolov8/powerdata/images/test/2020jishuyanzheng_91953.jpg', '/home/lenovo/data/liujiaji/powerGit/yolov8/image/heatmap/8.2')
+    model(r'/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val', '/home/lenovo/data/liujiaji/powerGit/dayolo/image/heatmap')
+
+# source-only: baseline/sourcecity            /sourcesim10k              /sourcevoc               /sourcepublic 
+# ours:       improve/sourcecity-aptpse-dmm  /sourcesim10k-aptpse-dmm    /sourcevoc-aptpse-dmm    /sourcepublic-aptpse-dmm2
+# oracle:      baseline/oraclefoggy          /oraclecity                 /oracleclipart1k         /oracleprivate sourceprivate
+
+# /home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val
+# /home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format_car_class/images/val
+# /home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format/images/val
+# /home/lenovo/data/liujiaji/yolov8/privatepower/images/val

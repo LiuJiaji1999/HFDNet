@@ -10,7 +10,7 @@ from PIL import Image
 from ultralytics.nn.tasks import attempt_load_weights
 from timm.utils import AverageMeter
 import matplotlib.pyplot as plt
-plt.rcParams["font.family"] = "Times New Roman"
+plt.rcParams["font.family"] = "DejaVu Sans"
 import seaborn as sns
 
 def get_activation(feat, backbone_idx=-1):
@@ -142,7 +142,7 @@ class yolov8_erf:
         plt.rcParams.update(params)
         plt.style.use('seaborn-whitegrid')
         sns.set_style("white")
-        plt.rc('font', **{'family': 'Times New Roman'})
+        plt.rc('font', **{'family': 'DejaVu Sans'})
         plt.rcParams['axes.unicode_minus'] = False
         
         data = self.meter.avg
@@ -159,15 +159,24 @@ class yolov8_erf:
 
 def get_params():
     params = {
-        'weight': 'yolov8n.pt', # 只需要指定权重即可
+        'weight': '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt', # 只需要指定权重即可
         'device': 'cuda:0',
-        'layer': '10', # string
-        'dataset': '',
-        'num_images': 50,
-        'save_path': 'result.png'
+        'layer': '9', # string  如果换了主干，p3 0-2,p4 0-3,p5 0-4是一定有的
+        'dataset': '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val',# 训练集图片路径
+        'num_images': 50, # 多少张计算感受野
+        'save_path': '/home/lenovo/data/liujiaji/powerGit/dayolo/erf_c2f_9.png'
     }
     return params
 
 if __name__ == '__main__':
     cfg = get_params()
     yolov8_erf(**cfg).process()
+
+# source-only: baseline/sourcecity            /sourcesim10k              /sourcevoc               /sourcepublic 
+# ours:       improve/sourcecity-aptpse-dmm  /sourcesim10k-aptpse-dmm    /sourcevoc-aptpse-dmm    /sourcepublic-aptpse-dmm2
+# oracle:      baseline/oraclefoggy          /oraclecity                 /oracleclipart1k         /oracleprivate sourceprivate
+
+# /home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val
+# /home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format_car_class/images/val
+# /home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format/images/val
+# /home/lenovo/data/liujiaji/yolov8/privatepower/images/val
