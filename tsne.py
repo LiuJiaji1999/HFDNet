@@ -103,6 +103,7 @@ def extract_yolov8_features(model, dataloader):
     with torch.no_grad():
         for images, lbls in tqdm(dataloader, desc='Extracting features'):
             images = images.to(device)
+            features = model.model[:9 + 1](images)  # 取 SPPF 层的输出
             outputs = model(images)
             
             # 调试输出检查
