@@ -1,12 +1,14 @@
-# DGDA-YOLO
+# HFDet
 
 ## Introduction
 This is our PyTorch implementation of the paper "[``]()" submitted in ***   ***.
 
 <div align="center">
-    <img src="img/.png" width="1000" alt="UDA-YOLO">
+    <img src="hfdet.png" width="1000" alt="HFDet">
 </div>
 
+## Weight
+Since github can't upload large files, we uploaded the weights of the four benchmark tasks to the web drive
 
 ## <div align="left">Quick Start Examples</div>
 
