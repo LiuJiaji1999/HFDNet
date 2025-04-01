@@ -35,7 +35,7 @@ Since github can't upload large files, we uploaded the weights of the four bench
 ###### Install
 ```bash
 # clone the project and configure the environment.
-git clone https://github.com/LiuJiaji1999/dgda-yolo.git
+git clone https://github.com/LiuJiaji1999/HFDet.git
 the version of ultralytics is '8.2.50'           
 NVIDIA GeForce RTX 3090
 # python: 3.8.18
