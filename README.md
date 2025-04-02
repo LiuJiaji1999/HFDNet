@@ -88,6 +88,7 @@ plot_PR.py : plot pr results for multiple models
 plot_result.py : script to plot curve comparison plots
 track.py : script to track inference
 get_model_erf.py : Script to plot the effective feeling field of a model.
+    effective feeling 感受野表示？
 ```
 
 ### References
