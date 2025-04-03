@@ -159,12 +159,12 @@ class yolov8_erf:
 
 def get_params():
     params = {
-        'weight': '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt', # 只需要指定权重即可
+        'weight': '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity/weights/best.pt', # 只需要指定权重即可
         'device': 'cuda:0',
-        'layer': '9', # string  如果换了主干，p3 0-2,p4 0-3,p5 0-4是一定有的
+        'layer': '8', # string   一般只看 9 , 如果换了主干，p3 0-2,p4 0-3,p5 0-4是一定有的
         'dataset': '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val',# 训练集图片路径
         'num_images': 50, # 多少张计算感受野
-        'save_path': '/home/lenovo/data/liujiaji/powerGit/dayolo/erf_c2f_9.png'
+        'save_path': '/home/lenovo/data/liujiaji/powerGit/dayolo/image/erf/c2f-so.png'
     }
     return params
 
