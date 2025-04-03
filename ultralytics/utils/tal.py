@@ -162,6 +162,7 @@ class TaskAlignedAssigner(nn.Module):
         overlaps[mask_gt] = self.iou_calculation(gt_boxes, pd_boxes) # iou的计算
         if power:
             overlaps[mask_gt] = self.power_transform(overlaps[mask_gt].to(dtype=torch.float)).to(overlaps.dtype)
+        
         # 预测框与真实框的匹配程度： 预测类别分值 ** alpha * 预测框与真实框的iou值** beta 
         align_metric = bbox_scores.pow(self.alpha) * overlaps.pow(self.beta)
         return align_metric, overlaps
@@ -279,8 +280,16 @@ class TaskAlignedAssigner(nn.Module):
         """
         n_anchors = xy_centers.shape[0]
         bs, n_boxes, _ = gt_bboxes.shape
+        # # 计算gt_bboxes的左上角坐标(lt)和右下角坐标(rb)。将gt_bboxes重塑为(b*n_boxes, 1, 4), 然后使用chunk(2, 2)将其沿第2维(通道维度)分割成两部分。
         lt, rb = gt_bboxes.view(-1, 1, 4).chunk(2, 2)  # left-top, right-bottom
+        # 计算每个anchor中心相对于每个 gt 的偏移量。首先, 将xy_centers添加一个新的维度(维度大小为1)，得到形状为(1, h*w, 4)的张量。
+        # 然后, 分别计算anchor中心与每个 gt 左上角和右下角坐标的差值, 
+        # 并将这两个差值连接在一起，得到形状为(bs, n_boxes, n_anchors, 4)的张量bbox_deltas。
         bbox_deltas = torch.cat((xy_centers[None] - lt, rb - xy_centers[None]), dim=2).view(bs, n_boxes, n_anchors, -1)
+        # 对于每个anchor中心和每个ground truth bounding box，计算它们之间的最小距离(在x轴和y轴上)
+        # 这可以通过对bbox_deltas沿第3维(anchor中心维度)求最小值来实现, 结果是一个形状为(bs, n_boxes, h*w)的张量。
+        # 判断这些最小距离是否大于一个很小的阈值eps(默认为1e-9)。如果大于eps，则认为该anchor中心与对应的ground truth bounding box有重叠。
+        # 返回一个形状为(bs, n_boxes, h*w)的张量, 其中值为1表示对应的anchor中心与ground truth bounding box有重叠，值为0表示没有重叠。
         # return (bbox_deltas.min(3)[0] > eps).to(gt_bboxes.dtype)
         return bbox_deltas.amin(3).gt_(eps)
 
@@ -308,8 +317,12 @@ class TaskAlignedAssigner(nn.Module):
             # 一个预测框匹配真实框的位置
             mask_multi_gts = (fg_mask.unsqueeze(1) > 1).expand(-1, n_max_boxes, -1)  # (b, n_max_boxes, h*w)
             # 与预测框iou最高的 真实框的索引
+            #  # overlaps就是CIoU  选择gt与pd ciou最大的那个位置索引  这个索引的值的维度是1, 值也就是在0-n_max_boxes-1之间
             max_overlaps_idx = overlaps.argmax(1)  # (b, h*w)
             # one-hot编码
+             # is_max_overlaps: [b, n_max_boxes, h*w], 中将is_max_overlaps中对应的n_max_boxes的维度赋值为1
+            # 这个跟select_topk_candidates中的运用有异曲同工之妙
+            # 最终的目的就是筛选出gt与pd中CIoU最大的那一维, 将pd对应的多个gt中CIoU最大的那个赋值为1, 其余赋值为0
             is_max_overlaps = torch.zeros(mask_pos.shape, dtype=mask_pos.dtype, device=mask_pos.device)
             is_max_overlaps.scatter_(1, max_overlaps_idx.unsqueeze(1), 1)
 
@@ -357,6 +370,12 @@ class RotatedTaskAlignedAssigner(TaskAlignedAssigner):
 
 def make_anchors(feats, strides, grid_cell_offset=0.5):
     """Generate anchors from features."""
+    '''
+            各特征图每个像素点一个锚点即Anchors,即每个像素点只预测一个box
+            故共有 80x80 + 40x40 + 20x20 = 8400个anchors
+        '''
+    # anc_points : 8400 x 2 ，每个像素中心点坐标
+    # strides_tensor: 8400 x 1 ，每个像素的缩放倍数
     anchor_points, stride_tensor = [], []
     assert feats is not None
     dtype, device = feats[0].dtype, feats[0].device

@@ -409,6 +409,7 @@ class v8DetectionLoss:
             target_labels, target_bboxes, target_scores, fg_mask, _ = self.assigner(anchors, n_anchors_list, gt_labels, gt_bboxes, mask_gt, pred_bboxes.detach() * stride_tensor)
         # TAL
         else:
+            # 正负样本 筛选
             target_labels, target_bboxes, target_scores, fg_mask, _ = self.assigner(
                 pred_scores.detach().sigmoid(), (pred_bboxes.detach() * stride_tensor).type(gt_bboxes.dtype),
                 anchor_points * stride_tensor, gt_labels, gt_bboxes, mask_gt)
