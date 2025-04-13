@@ -100,7 +100,7 @@ if __name__ == '__main__':
 #     model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecplid/weights/best.pt') # loading pretrain weights
     # COCO pre-trained weight
     model.load('yolov5mu.pt')
-    result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
+    result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/pupower_to_prpower.yaml',
                 cache=False,
                 imgsz=640,
                 epochs=100,
@@ -117,6 +117,6 @@ if __name__ == '__main__':
                 cos_lr = True,
                 # project='runs/debug',
                 project='runs/train/v5',
-                name = 'sourcevoc',
+                name = 'sourcepu',
                 # mixup = 1.0,
                 )
