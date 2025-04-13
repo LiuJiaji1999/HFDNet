@@ -490,6 +490,9 @@ def process_features(source_dir, target_dir):
 
             # 根据 stage 信息选择损失计算方式
             if stage_str in ['2', '4']:
+                # 浅层特征相对量
+
+
                 loss = compute_dss_loss(source_feat, target_feat)
                 dss_losses.append(loss)
                 loss_type = 'dss'
