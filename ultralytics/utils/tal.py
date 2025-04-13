@@ -120,7 +120,7 @@ class TaskAlignedAssigner(nn.Module):
     def power_transform(self, array, power=2):
         return torch.where(array < 0.5, array ** power, array ** (1/power))
     
-    def get_box_metrics(self, pd_scores, pd_bboxes, gt_labels, gt_bboxes, mask_gt, power=True):
+    def get_box_metrics(self, pd_scores, pd_bboxes, gt_labels, gt_bboxes, mask_gt, power=False):
         """
         Args:
             pd_scores (Tensor): shape(bs, num_total_anchors, num_classes)
