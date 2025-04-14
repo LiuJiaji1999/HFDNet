@@ -60,28 +60,28 @@ def calculate_fid(mu1, sigma1, mu2, sigma2):
 
 # **数据加载**
 # c2f
-source_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format'
-target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format'
-daod_weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
-source_weight = 'runs/train/baseline/sourcecity/weights/best.pt'
+# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format'
+# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format'
+# daod_weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
+# source_weight = 'runs/train/baseline/sourcecity/weights/best.pt'
 
 # s2c
 # source_path = '/home/lenovo/data/liujiaji/DA-Datasets/Sim10k'
 # target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format_car_class'
-# # weight = 'runs/train/improve/sourcesim10k-aptpse-dmm/weights/best.pt'
-# weight = 'runs/train/baseline/sourcesim10k/weights/best.pt'
+# daod_weight = 'runs/train/improve/sourcesim10k-aptpse-dmm/weights/best.pt'
+# source_weight = 'runs/train/baseline/sourcesim10k/weights/best.pt'
 
-# # # v2c
-# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/VOC/train/VOCdevkit/VOC2007/yolov5_format'
-# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format'
-# weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
-# # weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
+# # v2c
+source_path = '/home/lenovo/data/liujiaji/DA-Datasets/VOC/train/VOCdevkit/VOC2007/yolov5_format'
+target_path = '/home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format'
+daod_weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
+source_weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
 
 # pu2pr
 # source_path = '/home/lenovo/data/liujiaji/Datasets/pupower'
 # target_path = '/home/lenovo/data/liujiaji/Datasets/prpower'
-# # weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
-# weight = 'runs/train/baseline/sourcepu/weights/best.pt'
+# daod_weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
+# source_weight = 'runs/train/baseline/sourcepu/weights/best.pt'
 
 # 数据集加载（保持不变）
 source_dataset = CustomDataset(source_path, transform=transform)
@@ -128,16 +128,20 @@ plt.legend()
 leg = plt.legend()
 for lh in leg.legend_handles:
     lh.set_alpha(1)
+print(f"FID\nBaseline: {fid_baseline:.2f}\nHFDet: {fid_adapted:.2f}")
 
-# 添加 FID 值到图中右上角
-plt.text(
-    x=plt.xlim()[1] * 0.6,   # 横坐标位置偏右
-    y=plt.ylim()[1] * 0.95,  # 纵坐标位置靠顶部
-    s=f"FID\nBaseline: {fid_baseline:.2f}\nHFDet: {fid_adapted:.2f}",
-    fontsize=12,
-    bbox=dict(boxstyle="round", facecolor="white", alpha=0.8)
-)
+# 获取数据范围
+x_max, y_max = feats_2d[:, 0].max(), feats_2d[:, 1].max()
+x_min, y_min = feats_2d[:, 0].min(), feats_2d[:, 1].min()
 
-plt.title("PCA Visualization of Domain Shift")
+# # 设置 FID 注释位置：右上角，稍微偏移一些，避免遮挡边界
+# plt.text(
+#     x=x_max - 0.05 * (x_max - x_min),
+#     y=y_max - 0.05 * (y_max - y_min),
+#     s=f"FID\nBaseline: {fid_baseline:.2f}\nHFDet: {fid_adapted:.2f}",
+#     fontsize=12,
+#     bbox=dict(boxstyle="round", facecolor="white", alpha=0.8)
+# )
+plt.title("PCA Visualization")
 plt.tight_layout()
-plt.savefig('./gap/pca/pca-c2f-compare.png', dpi=300)
+plt.savefig('./gap/pca/pca-v2c-compare.png', dpi=300)
