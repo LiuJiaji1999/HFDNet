@@ -121,6 +121,6 @@ if __name__ == '__main__':
                 cos_lr = True,
                 # project='runs/debug',
                 project='runs/train/improve',
-                name = 'spurcepu-aptpse-dmm',
+                name = 'sourcepu-aptpse-dmm',
                 mixup = 1.0,
                 )
