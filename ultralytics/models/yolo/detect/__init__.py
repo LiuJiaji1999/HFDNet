@@ -3,6 +3,7 @@
 from .predict import DetectionPredictor
 from .train import DetectionTrainer
 from .val import DetectionValidator
-from .uda_train import UDADetectionTrainer
+# from .uda_train import UDADetectionTrainer
 
-__all__ = "DetectionPredictor", "DetectionTrainer", "DetectionValidator" ,"UDADetectionTrainer"
+__all__ = "DetectionPredictor", "DetectionTrainer", "DetectionValidator" 
+# ,"UDADetectionTrainer"

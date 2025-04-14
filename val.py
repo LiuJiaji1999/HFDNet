@@ -7,7 +7,7 @@ from ultralytics import YOLO
 if __name__ == '__main__':
     model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt')
     model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/pupower_to_prpower.yaml',
-              split='val',
+              split='test',
               imgsz=640,
               batch=8,
               # iou=0.7,

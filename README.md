@@ -24,7 +24,9 @@ Pascal VOC → Clipart1k
 Public power data 
     CPLID: https://github.com/InsulatorData/InsulatorDataSet
     VPMBGI: https://github.com/phd-benel/VPMBGI
-    IDID: https://ieee-dataport.org/competitions/insulator-defect-detection
+    # IDID: https://ieee-dataport.org/competitions/insulator-defect-detection
+
+🔔 '.yaml' file is in https://drive.google.com/drive/folders/1aqQfeHzpxAiJBeITXhvD-Bw0PZnLeeP0
 ```
 
 ## Weight
@@ -36,12 +38,13 @@ Since github can't upload large files, we uploaded the weights of the four bench
 ```bash
 # clone the project and configure the environment.
 git clone https://github.com/LiuJiaji1999/HFDet.git
-the version of ultralytics is '8.2.50'           
-NVIDIA GeForce RTX 3090
-# python: 3.8.18
-# torch:  1.12.0+cu113
-# torchvision: 0.13.0+cu113 
-# numpy: 1.22.3   
+# the version of ultralytics is '8.2.50'           
+# GPU-NVIDIA GeForce RTX 3090 
+# CPU-12th Gen Intel(R) Core(TM) i9-12900
+python: 3.8.18
+torch:  1.12.0+cu113
+torchvision: 0.13.0+cu113 
+numpy: 1.22.3   
 ```
 
 ###### Train
