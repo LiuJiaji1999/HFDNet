@@ -15,9 +15,9 @@ from ultralytics import YOLO
 # /home/lenovo/data/liujiaji/yolov8/privatepower/images/val
 
 if __name__ == '__main__':
-    model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourceprivate/weights/best.pt') # select your model.pt path
+    model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/oraclepr/weights/best.pt') # select your model.pt path
     model.predict(
-                  source='/home/lenovo/data/liujiaji/yolov8/privatepower/images/val', 
+                  source='/home/lenovo/data/liujiaji/Datasets/prpower/images/val', 
                   # target='/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val',
 
                   imgsz=640,
