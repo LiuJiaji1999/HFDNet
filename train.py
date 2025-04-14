@@ -94,14 +94,16 @@ from ultralytics import YOLO
 # # 训练参数官方详解链接：https://docs.ultralytics.com/modes/train/#resuming-interrupted-trainings:~:text=a%20training%20run.-,Train%20Settings,-The%20training%20settings
 if __name__ == '__main__':
 #     model = YOLO('ultralytics/cfg/models/v8/yolov8m.yaml')
-    model = YOLO('ultralytics/cfg/models/v5/yolov5m.yaml')
-#     model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main/runs/train/exp2/weights/last.pt') # 断点续训
+    # model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main/runs/train/exp2/weights/last.pt') # 断点续训
     # 域适应会使用 源域 pre-trained weight
 #     model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcepu/weights/best.pt') # loading pretrain weights
-#     model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/v5/sourcepu/weights/best.pt') # loading pretrain weights
     # COCO pre-trained weight
-    model.load('yolov5mu.pt')
 #     model.load('yolov8m.pt')
+    
+    model = YOLO('ultralytics/cfg/models/v5/yolov5m.yaml')
+    model.load('yolov5mu.pt')
+#   model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/v5/sourcepu/weights/best.pt') # loading pretrain weights
+    
     result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
                 cache=False,
                 imgsz=640,
