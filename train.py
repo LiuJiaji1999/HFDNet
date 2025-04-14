@@ -107,7 +107,7 @@ if __name__ == '__main__':
     result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/pupower_to_prpower.yaml',
                 cache=False,
                 imgsz=640,
-                epochs=100,
+                epochs=50,
                 batch=8, # 32
                 close_mosaic=10, 
                 workers=8,# 4
