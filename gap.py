@@ -497,7 +497,7 @@ def process_features(source_dir, target_dir):
             source_norm = F.normalize(source_feat, p=2, dim=1)
             target_norm = F.normalize(target_feat, p=2, dim=1)
             # 计算归一化特征之间的 L2 距离（可换成余弦距离等）
-            norm_diff = F.mse_loss(source_norm, target_norm, reduction='mean').item()# 计算欧式差异（未归一化）
+            norm_diff = F.mse_loss(source_norm, target_norm, reduction='mean').item()# 
 
             # 分类统计层级归一化差异
             if stage_str in ['2', '4']:
