@@ -469,6 +469,11 @@ def process_features(source_dir, target_dir):
         dss_losses = []  # dss
         swd_losses = []
 
+        # 新增各层级归一化特征差异列表
+        normalized_diffs_shallow = []
+        normalized_diffs_middle = []
+        normalized_diffs_deep = []
+
         for file_name in common_files[:loop_count]:  # 仅处理 loop_count 个文件
             # 解析 stage 信息 ，文件名格式为 "stage{stage}_{module_type}_features.npy"
             try:
@@ -487,12 +492,24 @@ def process_features(source_dir, target_dir):
             if source_feat.shape != target_feat.shape:
                 # 调整 target_feat 的尺寸，使其匹配 source_feat
                 target_feat = F.interpolate(target_feat, size=source_feat.shape[2:], mode="bilinear", align_corners=False)
+            
+            # 特征归一化（按通道）
+            source_norm = F.normalize(source_feat, p=2, dim=1)
+            target_norm = F.normalize(target_feat, p=2, dim=1)
+            # 计算归一化特征之间的 L2 距离（可换成余弦距离等）
+            norm_diff = F.mse_loss(source_norm, target_norm, reduction='mean').item()# 计算欧式差异（未归一化）
 
+            # 分类统计层级归一化差异
+            if stage_str in ['2', '4']:
+                normalized_diffs_shallow.append(norm_diff)
+            elif stage_str in ['6']:
+                normalized_diffs_middle.append(norm_diff)
+            elif stage_str in ['8', '9']:
+                normalized_diffs_deep.append(norm_diff)
+            
+                
             # 根据 stage 信息选择损失计算方式
             if stage_str in ['2', '4']:
-                # 浅层特征相对量
-
-
                 loss = compute_dss_loss(source_feat, target_feat)
                 dss_losses.append(loss)
                 loss_type = 'dss'
@@ -524,8 +541,10 @@ def process_features(source_dir, target_dir):
                 loss_type = 'Unknown'
 
             key = f"{src_sub}->{tgt_sub}/{file_name}"
-            sub_results[key] = {'loss_type': loss_type, 'loss': loss.item() if isinstance(loss, torch.Tensor) else loss}
-            print(f"{key}: {loss_type} difference = {loss}")
+            sub_results[key] = {'loss_type': loss_type, 
+                                'loss': loss.item() if isinstance(loss, torch.Tensor) else loss}
+                                # 'norm_diff': norm_diff}
+            print(f"{key}: {loss_type} loss = {loss}")
 
         # 计算均值
         mean_gram_loss = sum(gram_losses) / len(gram_losses)
@@ -546,7 +565,29 @@ def process_features(source_dir, target_dir):
             "mean_swd_loss": mean_swd_loss.item() if isinstance(mean_swd_loss, torch.Tensor) else mean_swd_loss
         }
 
-    return results
+
+    return results, normalized_diffs_shallow,normalized_diffs_middle,normalized_diffs_deep
+    # return normalized_diffs_shallow,normalized_diffs_middle,normalized_diffs_deep
+
+import numpy as np
+import json
+
+# 统计函数并保存为字典
+def summary(name, values):
+    arr = np.array(values)
+    stats = {
+        "mean": float(arr.mean()),
+        "std_dev": float(arr.std()),
+        "min": float(arr.min()),
+        "max": float(arr.max())
+    }
+    # print(f"{name}:")
+    # print(f"  Mean      = {stats['mean']:.6f}")
+    # print(f"  Std Dev   = {stats['std_dev']:.6f}")
+    # print(f"  Min~Max   = [{stats['min']:.6f}, {stats['max']:.6f}]\n")
+    return stats
+
+
 
 # 示例调用
 if __name__ == "__main__":
@@ -555,14 +596,25 @@ if __name__ == "__main__":
     # target_feature()
 
     ###  2.计算对应层级特征分布差异
-    # city_to_foggy，sim10k_to_city 、voc_to_clipart1k、  privatepower_to_publicpower
-    source_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/privatepower_to_publicpower/target' 
-    target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/privatepower_to_publicpower/source'
-    results = process_features(source_directory, target_directory)
+    # city_to_foggy，sim10k_to_city 、voc_to_clipart1k、  pupower_to_prpower
+    source_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/pupower_to_prpower/source' 
+    target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/pupower_to_prpower/target'
+    results,_,_,_ = process_features(source_directory, target_directory)
     # 保存结果
-    output_path = "./gap/pu2pr_gap.json"
-    with open(output_path, "w", encoding="utf-8") as f:
+    gapoutput_path = "./gap/pu2pr_gap.json"
+    with open(gapoutput_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
+    print(f"特征差异值 已保存结果到 {gapoutput_path}")
 
-    print(f"已保存结果到 {output_path}")
+    _,normalized_diffs_shallow, normalized_diffs_middle, normalized_diffs_deep = process_features(source_directory, target_directory)
+    results = {
+        "shallow_stage2_4": summary("Shallow (stage2/4)", normalized_diffs_shallow),
+        "middle_stage6": summary("Middle  (stage6)", normalized_diffs_middle),
+        "deep_stage8_9": summary("Deep    (stage8/9)", normalized_diffs_deep)
+    }
+    # 保存为 JSON 文件
+    feoutput_path = "./gap/feature/pu2pr.json"
+    with open(feoutput_path, "w") as f:
+        json.dump(results, f, indent=4)
+    print(f"特征相对量 已保存结果到 {feoutput_path}")
 

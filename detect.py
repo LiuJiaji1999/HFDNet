@@ -12,23 +12,23 @@ from ultralytics import YOLO
 # /home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val
 # /home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format_car_class/images/val
 # /home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format/images/val
-# /home/lenovo/data/liujiaji/yolov8/privatepower/images/val
+# /home/lenovo/data/liujiaji/Datasets/prpower/images/val 
 
 if __name__ == '__main__':
-    model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/oraclepr/weights/best.pt') # select your model.pt path
+    model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcepu/weights/best.pt') # select your model.pt path
     model.predict(
                   source='/home/lenovo/data/liujiaji/Datasets/prpower/images/val', 
-                  # target='/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val',
+                  # target='/home/lenovo/data/liujiaji/Datasets/prpower/images/val',
 
                   imgsz=640,
-                  project='runs/detect/compare',
-                  name='or-pu2pr',
+                  project='runs/detect',
+                  name='pupower_to_prpower/target',
                   save=True, # result save
                   conf=0.6,
                   # stream=True,
                   # iou=0.7,
                   # agnostic_nms=True,
-                  # visualize=True, # visualize model features maps
+                  visualize=True, # visualize model features maps
                   # line_width=8, # line width of the bounding boxes
                   show_conf=False, # do not show prediction confidence
                   show_labels=False, # do not show prediction labels

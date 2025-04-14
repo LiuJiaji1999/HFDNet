@@ -1320,6 +1320,7 @@ def feature_visualization(x, module_type, stage, n=32, save_dir=Path("runs/detec
             plt.close()
             np.save(str(f.with_suffix(".npy")), x[0].cpu().numpy())  # npy save
 
+# 用于输出特定层特征，计算特征相对量和差异值
 # def feature_visualization(x, module_type, stage, save_dir=Path("runs/detect/exp")):
 #     # feature_dict = {}
 #     # 排除检测头、分割头等模块
