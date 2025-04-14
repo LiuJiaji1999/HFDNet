@@ -72,16 +72,16 @@ def calculate_fid(mu1, sigma1, mu2, sigma2):
 # source_weight = 'runs/train/baseline/sourcesim10k/weights/best.pt'
 
 # # v2c
-source_path = '/home/lenovo/data/liujiaji/DA-Datasets/VOC/train/VOCdevkit/VOC2007/yolov5_format'
-target_path = '/home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format'
-daod_weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
-source_weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
+# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/VOC/train/VOCdevkit/VOC2007/yolov5_format'
+# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format'
+# daod_weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
+# source_weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
 
 # pu2pr
-# source_path = '/home/lenovo/data/liujiaji/Datasets/pupower'
-# target_path = '/home/lenovo/data/liujiaji/Datasets/prpower'
-# daod_weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
-# source_weight = 'runs/train/baseline/sourcepu/weights/best.pt'
+source_path = '/home/lenovo/data/liujiaji/Datasets/pupower'
+target_path = '/home/lenovo/data/liujiaji/Datasets/prpower'
+daod_weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
+source_weight = 'runs/train/baseline/sourcepu/weights/best.pt'
 
 # 数据集加载（保持不变）
 source_dataset = CustomDataset(source_path, transform=transform)
@@ -144,4 +144,4 @@ x_min, y_min = feats_2d[:, 0].min(), feats_2d[:, 1].min()
 # )
 plt.title("PCA Visualization")
 plt.tight_layout()
-plt.savefig('./gap/pca/pca-v2c-compare.png', dpi=300)
+plt.savefig('./gap/pca/pca-pu2pr-compare.png', dpi=300)
