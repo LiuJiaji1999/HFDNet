@@ -38,27 +38,27 @@ transform = transforms.Compose([
 
 # **数据加载**
 # c2f
-source_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format'
-target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format'
-weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
+# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format'
+# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format'
+# # weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
 # weight = 'runs/train/baseline/sourcecity/weights/best.pt'
 
 # s2c
 # source_path = '/home/lenovo/data/liujiaji/DA-Datasets/Sim10k'
 # target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format_car_class'
-# # weight = 'runs/train/improve/sourcesim10k-aptpse-dmm/weights/best.pt'
-# weight = 'runs/train/baseline/sourcesim10k/weights/best.pt'
+# weight = 'runs/train/improve/sourcesim10k-aptpse-dmm/weights/best.pt'
+# # weight = 'runs/train/baseline/sourcesim10k/weights/best.pt'
 
 # # # v2c
 # source_path = '/home/lenovo/data/liujiaji/DA-Datasets/VOC/train/VOCdevkit/VOC2007/yolov5_format'
 # target_path = '/home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format'
-# weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
-# # weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
+# # weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
+# weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
 
 # pu2pr
-# source_path = '/home/lenovo/data/liujiaji/Datasets/pupower'
-# target_path = '/home/lenovo/data/liujiaji/Datasets/prpower'
-# # weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
+source_path = '/home/lenovo/data/liujiaji/Datasets/pupower'
+target_path = '/home/lenovo/data/liujiaji/Datasets/prpower'
+weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
 # weight = 'runs/train/baseline/sourcepu/weights/best.pt'
 
 source_dataset = CustomDataset(source_path, transform=transform)
@@ -124,6 +124,10 @@ leg = plt.legend()
 for lh in leg.legend_handles:
     lh.set_alpha(1)
 
+# 隐藏 x 和 y 轴刻度标签
+plt.xticks([])  # 隐藏 x 轴刻度
+plt.yticks([])  # 隐藏 y 轴刻度
+
 # 计算 Frechet Inception Distance (FID)
 def calculate_fid(mu1, sigma1, mu2, sigma2):
     """ 计算 Frechet Inception Distance (FID) """
@@ -142,4 +146,4 @@ print(f"Frechet Distance (FID) Score: {fid_score:.4f}")
 
 # plt.title(f"PCA Visualization (FID={fid_score:.2f})(Exp. Var. {pca.explained_variance_ratio_.sum():.2f})")
 plt.title(f"PCA Visualization (FID={fid_score:.2f})")
-plt.savefig('./gap/pca/pca-c2f.png', dpi=300, bbox_inches='tight')
+plt.savefig('./gap/pca/pca-pu2pr.png', dpi=300, bbox_inches='tight')
