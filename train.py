@@ -119,5 +119,5 @@ if __name__ == '__main__':
                 # project='runs/debug',
                 project='runs/train/v5',
                 name = 's2c',
-                # mixup = 1.0,
+                mixup = 1.0,
                 )
