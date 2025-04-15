@@ -474,6 +474,7 @@ def process_features(source_dir, target_dir):
         normalized_diffs_middle = []
         normalized_diffs_deep = []
 
+
         for file_name in common_files[:loop_count]:  # 仅处理 loop_count 个文件
             # 解析 stage 信息 ，文件名格式为 "stage{stage}_{module_type}_features.npy"
             try:
@@ -498,6 +499,7 @@ def process_features(source_dir, target_dir):
             target_norm = F.normalize(target_feat, p=2, dim=1)
             # 计算归一化特征之间的 L2 距离（可换成余弦距离等）
             norm_diff = F.mse_loss(source_norm, target_norm, reduction='mean').item()# 
+            
 
             # 分类统计层级归一化差异
             if stage_str in ['2', '4']:
@@ -507,7 +509,8 @@ def process_features(source_dir, target_dir):
             elif stage_str in ['8', '9']:
                 normalized_diffs_deep.append(norm_diff)
             
-                
+            
+               
             # 根据 stage 信息选择损失计算方式
             if stage_str in ['2', '4']:
                 loss = compute_dss_loss(source_feat, target_feat)
@@ -545,6 +548,7 @@ def process_features(source_dir, target_dir):
                                 'loss': loss.item() if isinstance(loss, torch.Tensor) else loss}
                                 # 'norm_diff': norm_diff}
             print(f"{key}: {loss_type} loss = {loss}")
+            
 
         # 计算均值
         mean_gram_loss = sum(gram_losses) / len(gram_losses)
@@ -565,12 +569,9 @@ def process_features(source_dir, target_dir):
             "mean_swd_loss": mean_swd_loss.item() if isinstance(mean_swd_loss, torch.Tensor) else mean_swd_loss
         }
 
-
-    return results, normalized_diffs_shallow,normalized_diffs_middle,normalized_diffs_deep
+    return results,normalized_diffs_shallow,normalized_diffs_middle,normalized_diffs_deep
     # return normalized_diffs_shallow,normalized_diffs_middle,normalized_diffs_deep
 
-import numpy as np
-import json
 
 # 统计函数并保存为字典
 def summary(name, values):
@@ -588,6 +589,168 @@ def summary(name, values):
     return stats
 
 
+def compute_features(source_dir, target_dir, output_json="feature_strength_results.json"):
+    """
+    计算源域和目标域不同子文件夹下的相同npy文件的特征强度，并保存JSON结果。
+    主要统计浅层(2,4)、中层(6)、深层(8,9)的特征强度。
+    """
+    source_subdirs = sorted([d for d in os.listdir(source_dir) if os.path.isdir(os.path.join(source_dir, d))])
+    target_subdirs = sorted([d for d in os.listdir(target_dir) if os.path.isdir(os.path.join(target_dir, d))])
+
+    all_results = {}  # 存储所有结果
+
+    for src_sub, tgt_sub in zip(source_subdirs, target_subdirs):
+        src_path = os.path.join(source_dir, src_sub)
+        tgt_path = os.path.join(target_dir, tgt_sub)
+
+        source_files = sorted(glob.glob(os.path.join(src_path, "*.npy")))
+        target_files = sorted(glob.glob(os.path.join(tgt_path, "*.npy")))
+
+        # 获取相同的文件名
+        source_names = set(os.path.basename(f) for f in source_files)
+        target_names = set(os.path.basename(f) for f in target_files)
+        common_files = sorted(source_names & target_names)
+
+        loop_count = min(len(source_files), len(target_files), len(common_files))
+        if loop_count == 0:
+            print(f"未找到 {src_sub} 和 {tgt_sub} 下的相同 npy 文件！")
+            continue
+
+        # 初始化各层级的特征强度统计
+        layer_stats = {
+            'shallow': {'norms': [], 'files': []},  # stage 2,4
+            'middle': {'norms': [], 'files': []},   # stage 6
+            'deep': {'norms': [], 'files': []}      # stage 8,9
+        }
+
+        for file_name in common_files[:loop_count]:
+            try:
+                stage_part = file_name.split("stage")[1]
+                stage_str = stage_part.split("_")[0]
+            except Exception as e:
+                print(f"解析 {file_name} 失败: {e}")
+                continue
+
+            src_file = os.path.join(src_path, file_name)
+            tgt_file = os.path.join(tgt_path, file_name)
+
+            # 加载特征并调整尺寸
+            source_feat = torch.from_numpy(np.load(src_file))
+            target_feat = torch.from_numpy(np.load(tgt_file))
+            if source_feat.shape != target_feat.shape:
+                target_feat = F.interpolate(target_feat, size=source_feat.shape[2:], mode="bilinear", align_corners=False)
+            
+            # 特征归一化并计算强度
+            source_norm = F.normalize(source_feat, p=2, dim=1)
+            layer_norm = source_norm.abs().mean().item()  # 使用绝对值均值作为特征强度
+
+            # 分类统计
+            if stage_str in ['2', '4']:
+                layer_stats['shallow']['norms'].append(layer_norm)
+                layer_stats['shallow']['files'].append(file_name)
+            elif stage_str == '6':
+                layer_stats['middle']['norms'].append(layer_norm)
+                layer_stats['middle']['files'].append(file_name)
+            elif stage_str in ['8', '9']:
+                layer_stats['deep']['norms'].append(layer_norm)
+                layer_stats['deep']['files'].append(file_name)
+
+        # 计算各层级的统计量
+        results = {
+            'source_subdir': src_sub,
+            'target_subdir': tgt_sub,
+            'layer_comparison': {}
+        }
+
+        for layer_type in ['shallow', 'middle', 'deep']:
+            if layer_stats[layer_type]['norms']:
+                norms = layer_stats[layer_type]['norms']
+                results['layer_comparison'][layer_type] = {
+                    'mean_strength': float(np.mean(norms)),
+                    'max_strength': float(np.max(norms)),
+                    'min_strength': float(np.min(norms)),
+                    'std': float(np.std(norms)),
+                    'file_count': len(norms),
+                    'sample_files': layer_stats[layer_type]['files'][:3]  # 记录前3个文件名示例
+                }
+
+        all_results[f"{src_sub}_vs_{tgt_sub}"] = results
+
+        # 打印当前子目录的结果
+        print(f"\n=== {src_sub} vs {tgt_sub} ===")
+        for layer, stats in results['layer_comparison'].items():
+            print(f"{layer}层: 均值={stats['mean_strength']:.4f}, 样本数={stats['file_count']}")
+
+    # 保存结果到JSON文件
+    with open(output_json, 'w') as f:
+        json.dump(all_results, f, indent=2)
+    
+    print(f"\n所有结果已保存到 {output_json}")
+    return all_results
+
+import os
+import glob
+import numpy as np
+import torch
+import torch.nn.functional as F
+
+def calculate_layer_strengths(source_dir, target_dir):
+    """
+    计算所有图像在浅层(2,4)、中层(6)、深层(8,9)的平均特征强度
+    返回: (shallow_mean, middle_mean, deep_mean)
+    """
+    source_subdirs = sorted([d for d in os.listdir(source_dir) if os.path.isdir(os.path.join(source_dir, d))])
+    target_subdirs = sorted([d for d in os.listdir(target_dir) if os.path.isdir(os.path.join(target_dir, d))])
+
+    # 初始化各层级特征强度累加器
+    shallow_total, middle_total, deep_total = 0.0, 0.0, 0.0
+    shallow_count, middle_count, deep_count = 0, 0, 0
+
+    for src_sub, tgt_sub in zip(source_subdirs, target_subdirs):
+        src_path = os.path.join(source_dir, src_sub)
+        tgt_path = os.path.join(target_dir, tgt_sub)
+
+        source_files = sorted(glob.glob(os.path.join(src_path, "*.npy")))
+        target_files = sorted(glob.glob(os.path.join(tgt_path, "*.npy")))
+
+        # 获取相同的文件名
+        common_files = set(os.path.basename(f) for f in source_files) & set(os.path.basename(f) for f in target_files)
+        
+        for file_name in common_files:
+            try:
+                stage_str = file_name.split("stage")[1].split("_")[0]
+            except:
+                continue
+
+            src_file = os.path.join(src_path, file_name)
+            source_feat = torch.from_numpy(np.load(src_file))
+            source_norm = F.normalize(source_feat, p=2, dim=1)
+            layer_norm = source_norm.abs().mean().item()
+
+            if stage_str in ['2', '4']:
+                shallow_total += layer_norm
+                shallow_count += 1
+            elif stage_str in  ['6']:
+                middle_total += layer_norm
+                middle_count += 1
+            elif stage_str in ['8', '9']:
+                deep_total += layer_norm
+                deep_count += 1
+
+    # 计算全局平均值
+    shallow_mean = shallow_total / shallow_count if shallow_count > 0 else 0.0
+    middle_mean = middle_total / middle_count if middle_count > 0 else 0.0
+    deep_mean = deep_total / deep_count if deep_count > 0 else 0.0
+
+    print("\n=== 全局特征强度统计 ===")
+    print(f"浅层(2,4)平均强度: {shallow_mean:.4f} (样本数: {shallow_count})")
+    print(f"中层(6)平均强度: {middle_mean:.4f} (样本数: {middle_count})")
+    print(f"深层(8,9)平均强度: {deep_mean:.4f} (样本数: {deep_count})")
+
+    return shallow_mean, middle_mean, deep_mean
+
+
+
 
 # 示例调用
 if __name__ == "__main__":
@@ -597,24 +760,49 @@ if __name__ == "__main__":
 
     ###  2.计算对应层级特征分布差异
     # city_to_foggy，sim10k_to_city 、voc_to_clipart1k、  pupower_to_prpower
-    source_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/pupower_to_prpower/source' 
-    target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/pupower_to_prpower/target'
-    results,_,_,_ = process_features(source_directory, target_directory)
-    # 保存结果
-    gapoutput_path = "./gap/pu2pr_gap.json"
-    with open(gapoutput_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=4, ensure_ascii=False)
-    print(f"特征差异值 已保存结果到 {gapoutput_path}")
+    source_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/sim10k_to_city/source' 
+    target_directory = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/detect/sim10k_to_city/target'
+    # results,_,_,_ = process_features(source_directory, target_directory)
+    # # 保存结果
+    # gapoutput_path = "./gap/pu2pr_gap.json"
+    # with open(gapoutput_path, "w", encoding="utf-8") as f:
+    #     json.dump(results, f, indent=4, ensure_ascii=False)
+    # print(f"特征差异值 已保存结果到 {gapoutput_path}")
 
-    _,normalized_diffs_shallow, normalized_diffs_middle, normalized_diffs_deep = process_features(source_directory, target_directory)
-    results = {
-        "shallow_stage2_4": summary("Shallow (stage2/4)", normalized_diffs_shallow),
-        "middle_stage6": summary("Middle  (stage6)", normalized_diffs_middle),
-        "deep_stage8_9": summary("Deep    (stage8/9)", normalized_diffs_deep)
-    }
-    # 保存为 JSON 文件
-    feoutput_path = "./gap/feature/pu2pr.json"
-    with open(feoutput_path, "w") as f:
-        json.dump(results, f, indent=4)
-    print(f"特征相对量 已保存结果到 {feoutput_path}")
+    # _,normalized_diffs_shallow, normalized_diffs_middle, normalized_diffs_deep = process_features(source_directory, target_directory)
+    # results = {
+    #     "shallow_stage2_4": summary("Shallow (stage2/4)", normalized_diffs_shallow),
+    #     "middle_stage6": summary("Middle  (stage6)", normalized_diffs_middle),
+    #     "deep_stage8_9": summary("Deep    (stage8/9)", normalized_diffs_deep)
+    # }
+    # # 保存为 JSON 文件
+    # feoutput_path = "./gap/feature/pu2pr.json"
+    # with open(feoutput_path, "w") as f:
+    #     json.dump(results, f, indent=4)
+    # print(f"特征差异相对量 已保存结果到 {feoutput_path}")
+
+    compute_features(source_directory, target_directory,output_json='./gap/feature/s2c.json')
+    # calculate_layer_strengths(source_directory, target_directory)
+
+'''
+浅层(2,4)平均强度: 0.0605 (样本数: 1000)
+中层(6)平均强度: 0.0369 (样本数: 500)
+深层(8,9)平均强度: 0.0301 (样本数: 1000)
+=== 全局特征强度统计 ===
+浅层(2,4)平均强度: 0.0619 (样本数: 1000)
+中层(6)平均强度: 0.0399 (样本数: 500)
+深层(8,9)平均强度: 0.0309 (样本数: 1000)
+
+浅层(2,4)平均强度: 0.0622 (样本数: 1000)
+中层(6)平均强度: 0.0382 (样本数: 500)
+深层(8,9)平均强度: 0.0300 (样本数: 1000)
+=== 全局特征强度统计 ===
+浅层(2,4)平均强度: 0.0618 (样本数: 204)
+中层(6)平均强度: 0.0388 (样本数: 102)
+深层(8,9)平均强度: 0.0308 (样本数: 204)
+
+
+
+'''
+
 
