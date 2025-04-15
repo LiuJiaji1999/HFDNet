@@ -1,7 +1,7 @@
 # HFDet
 
 ## Introduction
-This is our PyTorch implementation of the paper "[``]()" submitted in ***   ***.
+This is our PyTorch implementation of the paper "[`Hierarchical Feature Differentiation for domain adaptive object Detection`]()" submitted in *** Neural Networks ***.
 
 <div align="center">
     <img src="hfdet.png" width="1000" alt="HFDet">
@@ -11,20 +11,20 @@ This is our PyTorch implementation of the paper "[``]()" submitted in ***   ***.
 ```bash
 Cityscapes → Foggy Cityscapes
     Cityscapes: https://www.cityscapes-dataset.com/downloads/
-        `Images leftImg8bit_trainvaltest.zip (11GB) [md5]; 
+        `Images leftImg8bit_trainvaltest.zip (11GB) [md5].
         `Annotations gtFine_trainvaltest.zip (241MB) [md5].
     Foggy CityScapes: https://www.cityscapes-dataset.com/downloads/. 
-        `Images leftImg8bit_trainval_foggyDBF.zip (20GB) [md5]; 
+        `Images leftImg8bit_trainval_foggyDBF.zip (20GB) [md5]. 
         `Annotations are the same with `CityScapes`. 
 Sim10K → Cityscapes
     Sim10K : https://fcav.engin.umich.edu/projects/driving-in-the-matrix
 Pascal VOC → Clipart1k
     PascalVOC(2007+2012): follow the scripts in .dataset/VOC.yaml to build VOC datasets.
-    Clipart1k: https://github.com/naoto0804/cross-domain-detection
+    Clipart1k: https://github.com/naoto0804/cross-domain-detection.
 Public power data 
-    CPLID: https://github.com/InsulatorData/InsulatorDataSet
-    VPMBGI: https://github.com/phd-benel/VPMBGI
-    # IDID: https://ieee-dataport.org/competitions/insulator-defect-detection
+    CPLID: https://github.com/InsulatorData/InsulatorDataSet.
+    VPMBGI: https://github.com/phd-benel/VPMBGI.
+    # IDID: https://ieee-dataport.org/competitions/insulator-defect-detection.
 
 🔔 '.yaml' file is in https://drive.google.com/drive/folders/1aqQfeHzpxAiJBeITXhvD-Bw0PZnLeeP0
 ```
