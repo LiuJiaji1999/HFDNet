@@ -67,9 +67,10 @@ python detect.py
 /ultralytics/data/uda_build.py  # load dataset  def uda_build_dataloader
 /ultralytics/nn/uda_tasks.py  # update model structure
 /ultralytics/engine/uda_trainer.py # update trainer
-/ultralytics/engine/validator.py  #plotting
-default.yaml # add weight value
+/ultralytics/engine/validator.py  # loss
+/ultralytics/cfg/default.yaml # add weight value
 /ultralytics/nn/modules/head.py # head pseudo
+/ultralytics/utils/plotting.py # output_to_target
 ```
 
 
