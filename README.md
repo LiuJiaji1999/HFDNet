@@ -84,11 +84,9 @@ detect.py: inference script
 distill.py: distill script
 export.py: export onnx scripts
 gap.py: /gap 
-get_COCO_metrice.py: script to calculate COCO metrics
 get_FPS.py: script to calculate model storage size, model inference time-FPS
 heatmap.py: script to generate heat map
 main_profile.py : a script that outputs the model and the parameters and calculations for each layer of the model
-meanimage.py : Calculate the mean and standard deviation image, sf-yolo-like.
 track.py : script to track inference
 ```
 
