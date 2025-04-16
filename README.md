@@ -68,6 +68,7 @@ python detect.py
 /ultralytics/nn/uda_tasks.py  # update model structure
 /ultralytics/engine/uda_trainer.py # update trainer
 /ultralytics/engine/validator.py  #plotting
+default.yaml # add weight value
 ```
 
 
