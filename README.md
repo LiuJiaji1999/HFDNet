@@ -86,11 +86,7 @@ get_FPS.py: script to calculate model storage size, model inference time, FPS
 heatmap.py: script to generate heat map
 main_profile.py : a script that outputs the model and the parameters and calculations for each layer of the model
 meanimage.py : Calculate the mean and standard deviation image, sf-yolo-like.
-plot_after.py : sometimes turn off x, cause can't save validation result result.png
-plot_PR.py : plot pr results for multiple models
-plot_result.py : script to plot curve comparison plots
 track.py : script to track inference
-get_model_erf.py : Script to plot the effective feeling field of a model. [No visible effect]
 ```
 
 ### References
