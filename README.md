@@ -69,6 +69,7 @@ python detect.py
 /ultralytics/engine/uda_trainer.py # update trainer
 /ultralytics/engine/validator.py  #plotting
 default.yaml # add weight value
+/ultralytics/nn/modules/head.py # head pseudo
 ```
 
 
