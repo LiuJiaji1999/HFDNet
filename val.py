@@ -12,9 +12,9 @@ def get_weight_size(path):
     return f'{stats.st_size / 1024 / 1024:.1f}'
 
 if __name__ == '__main__':
-    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcepu-aptpse-dmm2/weights/best.pt'
+    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
     model = YOLO(model_path)
-    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/pupower_to_prpower.yaml',
+    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
               split='val',
               imgsz=640,
               batch=8,
