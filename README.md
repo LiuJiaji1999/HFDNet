@@ -1,7 +1,7 @@
 # HFDet
 
 ## Introduction
-This is our PyTorch implementation of the paper "[`Hierarchical Feature Differentiation for domain adaptive object Detection`]()" submitted in *** Neural Networks ***.
+This is our PyTorch implementation of the paper "[`HFDet: Hierarchical Feature Differentiation for domain adaptive object Detection`]()" submitted in ***Neural Networks***.
 
 <div align="center">
     <img src="hfdet.png" width="1000" alt="HFDet">
