@@ -1,7 +1,7 @@
 # HFDet
 
 ## Introduction
-This is our PyTorch implementation of the paper "[`HFDet: Hierarchical Feature Differentiation for domain adaptation object Detection`]()" submitted in ***Neural Networks***.
+This is our PyTorch implementation of the paper "[`HFDet: Hierarchical Feature Differentiation for domain adaptation object Detection`].
 
 <div align="center">
     <img src="hfdet.png" width="1000" alt="HFDet">
@@ -47,16 +47,16 @@ torchvision: 0.13.0+cu113
 numpy: 1.22.3   
 ```
 
-###### Train
-```bash
-python train.py
-# nohup python train.py > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/improve/c2f.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/improve/c2f.log
-```
-
 ###### Test & Detect
 ```bash
 python val.py
 python detect.py
+```
+
+###### Train
+```bash
+python train.py
+# nohup python train.py > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/improve/c2f.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/improve/c2f.log
 ```
 
 ###### Dual-input
