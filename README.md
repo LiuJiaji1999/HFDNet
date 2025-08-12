@@ -1,10 +1,10 @@
 # HFDet
 
 ## Introduction
-This is our PyTorch implementation of the paper "[`HFDet: Hierarchical Feature Differentiation for domain adaptation object Detection`].
+This is our PyTorch implementation of the paper "[`Hierarchical Feature Differentiation-guided Network for domain adaptation object Detection`].
 
 <div align="center">
-    <img src="hfdet.png" width="1000" alt="HFDet">
+    <img src="hfdnet.png" width="1000" alt="HFDet">
 </div>
 
 ## Dataset Preparing
@@ -37,7 +37,7 @@ Since github can't upload large files, we uploaded the weights of the four bench
 ###### Install
 ```bash
 # clone the project and configure the environment.
-git clone https://github.com/LiuJiaji1999/HFDet.git
+git clone https://github.com/LiuJiaji1999/HFDNet.git
 # the version of ultralytics is '8.2.50'           
 # GPU-NVIDIA GeForce RTX 3090 
 # CPU-12th Gen Intel(R) Core(TM) i9-12900
