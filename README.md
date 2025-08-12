@@ -1,4 +1,4 @@
-# HFDet
+# HFDNet
 
 ## Introduction
 This is our PyTorch implementation of the paper "[`Hierarchical Feature Differentiation-guided Network for domain adaptation object Detection`].
