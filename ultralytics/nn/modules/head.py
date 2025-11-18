@@ -71,15 +71,15 @@ class Detect(nn.Module):
                 print('**************** head/forward/pseudo')
                 self.printed_pseudo = True  # 记录已打印
             
-            # cls_conf = y[:,4].sigmoid().detach() # Class confidence (probability) y[:,1].shape[4,8400]
-            cls_conf = y[:,4].detach() # Class confidence (probability) y[:,1].shape[4,8400]
-            box_conf = torch.mean(cls_conf, dim=1, keepdim=True).detach()  # Bounding box confidence (average class confidence)
-            y[:, 4] = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
+            # actual
+            # cls_conf = y[:,4].detach() # Class confidence (probability) y[:,1].shape[4,8400]
+            # box_conf = torch.mean(cls_conf, dim=1, keepdim=True).detach()  # Bounding box confidence (average class confidence)
+            # y[:, 4] = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
 
-            # c_det = y[..., 4].detach()  # 检测的置信度
-            # c_bbx = (1 - torch.mean(y[..., -4:], axis=2)).detach()  # 边界框的置信度
-            # c_comb = c_det * c_bbx  # 综合置信度
-            # y[..., 4] = (1 - delta) * c_det + delta * c_comb  # 使用 delta 参数更新置信度
+            c_det = y[:, 4].detach()  # 检测的置信度
+            c_bbx = (1 - torch.mean(y[:, -4:], axis=2)).detach()  # 边界框的置信度
+            c_comb = c_det * c_bbx  # 综合置信度
+            y[..., 4] = (1 - delta) * c_det + delta * c_comb  # 使用 delta 参数更新置信度
 
         return y if self.export else (y, x)
     
@@ -114,17 +114,38 @@ class Detect(nn.Module):
         """Decode predicted bounding boxes and class probabilities based on multiple-level feature maps."""
         # Inference path
         shape = x[0].shape  # BCHW
-        x_cat = torch.cat([xi.view(shape[0], self.no, -1) for xi in x], 2)
+        # x 是一个列表，包含来自不同层级（不同尺度）的特征图。例如 x[0] 可能是大尺度特征图（检测小物体），x[2] 可能是小尺度特征图（检测大物体）。
+        # x[0].shape 是 (Batch, Channels, Height, Width)。
+        # self.no 是每个锚点输出的维度，计算公式为 4 * reg_max + nc（reg_max 是分布焦点的基数，nc 是类别数）。
+        #  xi.view(shape[0], self.no, -1) 将每个特征图从 (B, C, H, W) 重塑为 (B, self.no, H*W)，相当于将空间网格展平。
+        # torch.cat(..., 2) 将所有这些展平后的特征图在最后一个维度（即 H*W 的维度）上进行拼接。结果是 x_cat 的形状为 (B, self.no, N)，其中 N 是所有特征图上锚点位置的总和。这一步将所有尺度的预测汇总到了一个张量中。
+        x_cat = torch.cat([xi.view(shape[0], self.no, -1) for xi in x], 2) 
+
+        # 如果输入尺寸改变或设置为动态，则重新为每个特征图生成锚点（anchors）和对应的步幅（strides）。
+        # make_anchors 函数会根据特征图的尺寸和步幅，生成每个网格中心点的坐标（anchors）以及该层特征图相对于原图的步幅（strides）。步幅代表了该层特征图上一个像素点对应原图多少像素。
+        # self.anchors 的形状是 (N, 2)，表示 N 个锚点每个的中心点 (x, y)（注意，这里是网格坐标，不是图像像素坐标）。
+        # self.strides 的形状是 (N,)，表示每个锚点所在特征层的步幅。
         if self.dynamic or self.shape != shape:
             self.anchors, self.strides = (x.transpose(0, 1) for x in make_anchors(x, self.stride, 0.5))
             self.shape = shape
-
+        
+        #### 分离边界框和分类输出
+        # 将拼接后的预测输出 x_cat 拆分为边界框回归部分 (box) 和分类部分 (cls)。
+        # box 的形状为 (B, 4 * reg_max, N)。
+            # YOLOv8 使用 DFL（Distribution Focal Loss），它对边界框的每个位置（左、上、右、下）预测一个离散的分布，而不是直接回归一个值。reg_max 就是这个分布的区间数。
+        # cls 的形状为 (B, nc, N)，是每个锚点位置对于所有类别的原始分类分数。   
         if self.export and self.format in {"saved_model", "pb", "tflite", "edgetpu", "tfjs"}:  # avoid TF FlexSplitV ops
             box = x_cat[:, : self.reg_max * 4]
             cls = x_cat[:, self.reg_max * 4 :]
         else:
             box, cls = x_cat.split((self.reg_max * 4, self.nc), 1)
 
+        #### 边界框解码（核心步骤）
+        # self.dfl(box)：这是解码的关键。
+            # DFL 层 的作用是将 box 输出的离散分布通过加权求和，积分成一个连续的、具体的坐标偏移值。
+            # 执行后，(4 * reg_max, N) 会变成 (4, N)，即每个预测框的四个坐标偏移量 (left, top, right, bottom)。
+        # self.decode_bboxes：这个函数（通常是 dist2bbox）利用 DFL 输出的坐标偏移量和预先生成的锚点，计算出边界框的最终坐标。
+        #  * self.strides：由于之前的计算都是在特征图网格坐标系下进行的，乘以步幅是为了将坐标和宽高映射回原始输入图像的像素坐标系。
         if self.export and self.format in {"tflite", "edgetpu"}:
             # Precompute normalization factor to increase numerical stability
             # See https://github.com/ultralytics/ultralytics/issues/7371
@@ -136,7 +157,9 @@ class Detect(nn.Module):
         else:
             dbox = self.decode_bboxes(self.dfl(box), self.anchors.unsqueeze(0)) * self.strides
 
-        return torch.cat((dbox, cls.sigmoid()), 1)
+        #  cls.sigmoid()：将分类的原始分数通过 Sigmoid 函数激活，转换为0到1之间的概率值。请注意，YOLOv8 使用多标签分类，每个类别独立计算概率，而不是用 Softmax。
+        #  torch.cat((dbox, cls.sigmoid()), 1)：将解码后的边界框 (B, 4, N) 和类别概率 (B, nc, N) 在第二个维度上拼接。
+        return torch.cat((dbox, cls.sigmoid()), 1) # 最终返回的张量形状为 (B, 4 + nc, N)。
 
     def bias_init(self):
         """Initialize Detect() biases, WARNING: requires stride availability."""
