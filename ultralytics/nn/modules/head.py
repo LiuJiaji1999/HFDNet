@@ -64,6 +64,14 @@ class Detect(nn.Module):
             return x
 
         y = self._inference(x) # torch.Size([4, 12, 8400])
+        # 它的形状是 (B, 4 + nc, N)。 
+        # B：批次大小。
+        # 4 + nc：这是第二个维度，也是特征维度。它包含了：
+        # 前4个元素：边界框的坐标 (x_center, y_center, width, height)。
+        # 后 nc 个元素：nc 个类别的置信度分数。 cityspaces有8个类别
+        # N：这是第三个维度，代表所有特征图上锚点位置的总和，即预测框的数量。N=80*80+40*40+20*20=8400
+        #  y[b, :, n]  # 对于批次b中的第n个预测框，它包含了 (4个坐标 + nc个类别分数) 共 (4+nc) 个值。
+ 
         
         
         if pseudo:
@@ -76,8 +84,34 @@ class Detect(nn.Module):
             # box_conf = torch.mean(cls_conf, dim=1, keepdim=True).detach()  # Bounding box confidence (average class confidence)
             # y[:, 4] = (1 - delta) * cls_conf + delta * box_conf # update confidence with delta
 
-            c_det = y[:, 4].detach()  # 检测的置信度
-            c_bbx = (1 - torch.mean(y[:, -4:], axis=2)).detach()  # 边界框的置信度
+            '''
+            1. 获取边界框的四个坐标 (x, y, w, h)
+            代码： y[:, :4, :] ,形状： (B, 4, N)
+            解释：
+            : 代表所有批次。
+            :4 代表在特征维度上，取前4个元素，即 (x, y, w, h)。
+            : 代表所有预测框。
+            
+            2. 获取所有类别的置信度分数,形状： (B, nc, N)
+            代码： y[:, 4:, :]
+            解释：
+            : 代表所有批次。
+            4: 代表在特征维度上，从第5个元素开始直到最后，即所有的类别置信度。
+            : 代表所有预测框。
+
+            -4: 代表特征为度上的最后4个,
+            '''
+            c_det = y[:, 4:,:].detach()  # 检测的置信度
+               
+            # 计算每个框的坐标“不确定性”或“稳定性”，
+            ## 方法一
+            # Confmix本质是坐标的方差，但 代码的 mean 操作很令人费解，因为它将一个与位置相关的坐标值变成了一个全局统计量。
+            # c_bbx = (1 - torch.mean(y[:, :4,:], axis=2)).detach()  # 边界框的置信度
+            ## 方法二
+            # 计算每个框的宽高乘积的倒数（面积越大，不确定性可能越低）
+            areas = y[:, :4,:][:, 2, :] * y[:, :4,:][:, 3, :]  # w * h
+            c_bbx = 1 / (1 + areas)  # 一个示例性的转换
+
             c_comb = c_det * c_bbx  # 综合置信度
             y[..., 4] = (1 - delta) * c_det + delta * c_comb  # 使用 delta 参数更新置信度
 
