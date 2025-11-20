@@ -220,7 +220,12 @@ class yolov8_heatmap:
         
 def get_params():
     params = {
+        # ## ssda-yolo
+        # 'weight': '/home/lenovo/data/liujiaji/SSDA-YOLO/runs/train/cityscapes_csfoggy_ssda_960_yolov5l_R/weights/best_student.pt',
+        
+        ## hfdnet
         'weight': '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt', # 现在只需要指定权重即可,不需要指定cfg
+        
         # 'weight': '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity/weights/best.pt', # 现在只需要指定权重即可,不需要指定cfg
         'device': 'cuda:0',
         'method': 'EigenGradCAM', # GradCAMPlusPlus, GradCAM, XGradCAM, RandomCAM, EigenCAM, HiResCAM, LayerCAM, EigenGradCAM
@@ -236,7 +241,8 @@ def get_params():
 if __name__ == '__main__':
     model = yolov8_heatmap(**get_params())
     # model(r'/home/lenovo/data/liujiaji/Datasets/Einsulator/defect/img/2020jishuyanzheng_87134.jpg', '/home/lenovo/data/liujiaji/powerGit/yolov8/image/new-heatmap/')
-    model(r'/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val/frankfurt_000000_001751.jpg', '/home/lenovo/data/liujiaji/powerGit/dayolo/image/heatmap')
+    model(r'/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val/frankfurt_000000_001751.jpg',  #  1236,1751,1016,694
+          '/home/lenovo/data/liujiaji/powerGit/dayolo/image/heatmap')
     # model(r'/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val', '/home/lenovo/data/liujiaji/powerGit/dayolo/image/heatmap')
 
 # source-only: baseline/sourcecity            /sourcesim10k              /sourcevoc               /sourcepublic 
