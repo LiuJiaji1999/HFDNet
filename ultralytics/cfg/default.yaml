@@ -93,7 +93,7 @@ nms: False # (bool) CoreML: add NMS
 daca_weight : 1
 mix_weight: 0.01 #  cutmix参数，[0.01, 0.1, 1]
 # 以下三个参数 应该呈现 递增  [0.1,0.1,0.1] , [0.01,0.1,1] , 
-shallow_weight: 0.01 # 用于平衡 gram 
+shallow_weight: 0.01 # 用于平衡 dss
 middle_weight: 0.1 # 用于平衡 mmd 
 high_weight: 1 # 用于平衡 MSE损失
 
