@@ -41,10 +41,23 @@ git clone https://github.com/LiuJiaji1999/HFDNet.git
 # the version of ultralytics is '8.2.50'           
 # GPU-NVIDIA GeForce RTX 3090 
 # CPU-12th Gen Intel(R) Core(TM) i9-12900
-python: 3.8.18
-torch:  1.12.0+cu113
-torchvision: 0.13.0+cu113 
-numpy: 1.22.3   
+
+pip install -r DA-requirements.txt
+统计信息:
+  - Pip 包数量: 154
+  - Conda-only 包数量: 50
+  - 系统库数量: 2
+
+需要注意的特殊包:
+  - opencv-python==4.9.0.80
+  - opencv-python-headless==4.10.0.84
+  - torch==1.12.1+cu113
+  - torchvision==0.13.1+cu113
+
+# python: 3.8.18
+# torch:  1.12.0+cu113
+# torchvision: 0.13.0+cu113 
+# numpy: 1.22.3   
 ```
 
 ###### Test & Detect
