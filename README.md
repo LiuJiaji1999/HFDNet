@@ -163,6 +163,8 @@ sunnny-->rainy
 ## test
 python ssda_yolov5_test.py --data yamls_sda/pascalvoc0712_clipart1k_VOC.yaml --weights runs/train/voc2clipart_ssda_960_yolov5l6/weights/best_student.pt --name voc2clipart_ssda_960_yolov5l --img 960 --batch-size 6 --device 0
 python ssda_yolov5_test.py --data yamls_sda/cityscapes_csfoggy_VOC.yaml --weights runs/train/cityscapes_csfoggy_ssda_960_yolov5l_R/weights/best_student.pt --name cityscapes_csfoggy_ssda_960_yolov5l --img 960 --batch-size 6 --device 0
+
+💡ALL LOGS ARE IN https://github.com/LiuJiaji1999/power/tree/main/dayolo
 ```
 
 ###### Dual-input
