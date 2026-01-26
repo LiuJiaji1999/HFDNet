@@ -70,6 +70,99 @@ python detect.py
 ```bash
 python train.py
 # nohup python train.py > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/improve/c2f.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/improve/c2f.log
+------------------------
+SOTA Methods
+### DACA
+cd DACA
+conda activate DA [albumentations==1.4.2,numpy=1.22.3 最合适的版本匹配]
+nohup bash run.sh > run.log 2>&1 &
+1.(Pre-adaptation): 先用源域进行监督训练，带标签
+# 只有 car 类别
+# nohup python train.py --name sim10k --epochs 20 --data data/sim10k2cityscapes.yaml --weights yolov5s.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/daca-pre-sim10k2city.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/daca-pre-sim10k2city.log
+# nohup python train.py --name cityscapes --epochs 20 --data data/cityscapes2foggy.yaml --weights yolov5s.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/daca-pre-city2foggy.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/daca-pre-city2foggy.log
+# nohup python train.py --name domestic --epochs 20 --data /home/lenovo/data/liujiaji/powerGit/dayolo/domain/domestic_to_foreign.yaml --weights yolov5s.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-pre-d2f.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-pre-d2f.log
+nohup python train.py --name publicpower --epochs 20 --data /home/lenovo/data/liujiaji/powerGit/dayolo/domain/publicpower_to_privatepower.yaml --weights yolov5s.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-pre-pu2pr.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-pre-pu2pr.log
+
+2.Training (Oracles):
+# nohup python train.py --name oraclecityscapes --epochs 20 --data data/cityscapes.yaml --weights yolov5s.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/oracle-city.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/oracle-city.log
+# nohup python train.py --name oraclefoggy --epochs 20 --data data/foggycityscapes.yaml --weights yolov5s.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/oracle-foggy.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/oracle-foggy.log
+# nohup python train.py --name oraclepublic --epochs 20 --data /home/lenovo/data/liujiaji/powerGit/dayolo/domain/foreign.yaml --weights yolov5s.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-oraclefo.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-oraclefo.log
+nohup python train.py --name oraclepublic --epochs 20 --data /home/lenovo/data/liujiaji/powerGit/dayolo/domain/publicpower.yaml --weights yolov5s.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-oraclepu.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-oraclepu.log
+
+3.(DACA-based adaptation):
+albumentations/transformer.py 警告信息太多：
+# nohup python -W ignore uda_daca_train.py --name sim10k2cityscapes_daca --epochs 50 --data data/sim10k2cityscapes.yaml --weights runs/train/sim10k/weights/last.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/daca-sim10k2city.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/daca-sim10k2city.log
+# nohup python -W ignore uda_daca_train.py --name cityscapes2foggy_daca --epochs 50 --data data/cityscapes2foggy.yaml --weights runs/train/cityscapes/weights/best.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/daca-city2foggy.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/daca-city2foggy.log  
+# nohup python -W ignore uda_daca_train.py --name domestic2foreign_daca --epochs 50 --data /home/lenovo/data/liujiaji/powerGit/dayolo/domain/domestic_to_foreign.yaml --weights runs/train/domestic/weights/best.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-d2f.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-d2f.log
+nohup python -W ignore uda_daca_train.py --name public2private_daca --epochs 50 --data /home/lenovo/data/liujiaji/powerGit/dayolo/domain/publicpower_to_privatepower.yaml --weights runs/train/publicpower/weights/best.pt > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-pu2pr.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/daca-pu2pr.log
+
+4.Validation
+# source-only
+python val.py  --name exp  --data data/sim10k2cityscapes.yaml  --weights runs/train/sim10k/weights/best.pt 
+python val.py  --name exp  --data data/cityscapes2foggy.yaml  --weights runs/train/cityscapes/weights/best.pt 
+# oracle
+python val.py  --name exp  --data data/sim10k2cityscapes.yaml --weights /home/lenovo/data/liujiaji/DACA/runs/train/oraclecityscapes/weights/best.pt 
+python val.py  --name exp  --data data/cityscapes2foggy.yaml --weights /home/lenovo/data/liujiaji/DACA/runs/train/oraclefoggy/weights/best.pt 
+# daca
+python val.py  --name exp  --data data/sim10k2cityscapes.yaml  --weights runs/train/sim10k2cityscapes_daca/weights/best.pt 
+python val.py  --name exp  --data data/cityscapes2foggy.yaml  --weights runs/train/cityscapes2foggy_daca/weights/best.pt
+python val.py  --name exp  --data /home/lenovo/data/liujiaji/powerGit/dayolo/domain/publicpower_to_privatepower.yaml  --weights runs/train/public2private_daca/weights/best.pt 
+
+------------------------
+
+### SF-YOLO
+conda activate DA
+Sim10k: train set size:7000 val set size:1000 test set size:2000
+/home/lenovo/data/liujiaji/Datasets-DA/Sim10k/images
+
+## city2foggy
+# 1. Extract target training data :
+cd TargetAugment_train
+python extract_data.py --scenario_name city2foggy --images_folder /home/lenovo/data/liujiaji/Datasets-DA/CityScapesFoggy/yolov5_format/images --image_suffix jpg
+# 2. Then train the Target Augmentation Module :
+## style_image: 如果 源图像 和 目标图像 的背景相似，那就是 目标图像的均值；否则就是随机的目标图像
+nohup python train.py --scenario_name city2foggy --content_dir data/city2foggy --style_dir data/meanfoggy --vgg pre_trained/vgg16_ori.pth --save_dir models/city2foggy --n_threads=8 --device 0 > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/sf-yolo-targetdata-city2foggy.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/sf-yolo-targetdata-city2foggy.log
+# 3. SF-YOLO adaptation
+cd ..
+nohup python train_sf-yolo.py --epochs 20 --batch-size 16 --data data/foggy_cityscapes.yaml --weights source_weights/cityscapes/yolov5s_cityscapes.pt --decoder_path TargetAugment_train/models/city2foggy/decoder_iter_160000.pth --encoder_path TargetAugment_train/pre_trained/vgg16_ori.pth --fc1 TargetAugment_train/models/city2foggy/fc1_iter_160000.pth --fc2 TargetAugment_train/models/city2foggy/fc2_iter_160000.pth --style_add_alpha 0.4 --style_path ./TargetAugment_train/data/meanfoggy/meanfoggy.jpg --SSM_alpha 0.5 --device 0 > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/sf-yolo-city2foggy.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/sf-yolo-city2foggy.log
+# 4. val
+python val.py --data data/foggy_cityscapes.yaml --weights runs/train/exp/weights/best_teacher.pt
+
+## sim10k2city
+cd TargetAugment_train
+python extract_data.py --scenario_name sim10k2city --images_folder /home/lenovo/data/liujiaji/Datasets-DA/CityScapes/yolov5_format/images --image_suffix jpg
+nohup python train.py --scenario_name sim10k2city --content_dir data/sim10k2city --style_dir data/meancity --vgg pre_trained/vgg16_ori.pth --save_dir models/sim10k2city --n_threads=8 --device 0 > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/sf-yolo-targetdata-sim10k2city.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/sf-yolo-targetdata-sim10k2city.log
+cd ..
+nohup python train_sf-yolo.py --epochs 20 --batch-size 16 --data data/cityscapes.yaml --weights source_weights/sim10k/yolov5s_sim10k.pt --decoder_path TargetAugment_train/models/sim10k2city/decoder_iter_160000.pth --encoder_path TargetAugment_train/pre_trained/vgg16_ori.pth --fc1 TargetAugment_train/models/sim10k2city/fc1_iter_160000.pth --fc2 TargetAugment_train/models/sim10k2city/fc2_iter_160000.pth --style_add_alpha 0.4 --style_path ./TargetAugment_train/data/meancity/aachen_000000_000019.jpg --SSM_alpha 0.5 --device 0 > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/sf-yolo-sim10k2city-2.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/other/sf-yolo-sim10k2city-2.log
+# 4. val
+python val.py --data data/cityscapes.yaml --weights runs/train/exp5/weights/best_teacher.pt
+
+------------------------
+
+### SSDA-YOLO
+conda activate DA
+clear-->foggy 
+    train：Source -- labeled cityspace, Target -- unlabeled foggy cityspace
+    test、val：labeled foggy cityspace
+sunnny-->rainy
+    train：Source -- labeled sunnny images, Target -- unlabeled rainy images
+    test、val：extra labeled images from rainy 
+## train
+------- 多卡：python -m torch.distributed.launch --nproc_per_node 4 
+# voc2clipart_ssda_960_yolov5l6
+- python ssda_yolov5_train.py --weights weights/yolov5l.pt --data yamls_sda/pascalvoc0712_clipart1k_VOC.yaml --name voc2clipart_ssda_960_yolov5l --img 960 --device 0 --batch-size 6 --epochs 100 --lambda_weight 0.005 --consistency_loss --alpha_weight 2.0
+- python ssda_yolov5_train.py --weights weights/yolov5l.pt --data yamls_sda/cityscapes_csfoggy_VOC.yaml --name cityscapes_csfoggy_ssda_960_yolov5l --img 960 --device 0 --batch-size 6 --epochs 100 --lambda_weight 0.005 --consistency_loss --alpha_weight 2.0
+
+# If you want to resume a breakout training, following the script below.
+------- 多卡： python -m torch.distributed.launch --nproc_per_node 4 -master_port 12345 
+# voc2clipart_ssda_960_yolov5l_R
+- python ssda_yolov5_train.py --weights weights/yolov5l.pt --data yamls_sda/pascalvoc0712_clipart1k_VOC.yaml --name voc2clipart_ssda_960_yolov5l_R --student_weight runs/train/voc2clipart_ssda_960_yolov5l4/weights/best_student.pt --teacher_weight runs/train/voc2clipart_ssda_960_yolov5l4/weights/best_teacher.pt --img 960 --device 0 --batch-size 6 --epochs 200 --lambda_weight 0.005 --consistency_loss --alpha_weight 2.0
+# cityscapes_csfoggy_ssda_960_yolov5l_R
+- python ssda_yolov5_train.py --weights weights/yolov5l.pt --data yamls_sda/cityscapes_csfoggy_VOC.yaml --name cityscapes_csfoggy_ssda_960_yolov5l_R --student_weight runs/train/cityscapes_csfoggy_ssda_960_yolov5l/weights/best_student.pt --teacher_weight runs/train/cityscapes_csfoggy_ssda_960_yolov5l/weights/best_teacher.pt --img 960 --device 0 --batch-size 6 --epochs 100 --lambda_weight 0.005 --consistency_loss --alpha_weight 2.0
+
+## test
+python ssda_yolov5_test.py --data yamls_sda/pascalvoc0712_clipart1k_VOC.yaml --weights runs/train/voc2clipart_ssda_960_yolov5l6/weights/best_student.pt --name voc2clipart_ssda_960_yolov5l --img 960 --batch-size 6 --device 0
+python ssda_yolov5_test.py --data yamls_sda/cityscapes_csfoggy_VOC.yaml --weights runs/train/cityscapes_csfoggy_ssda_960_yolov5l_R/weights/best_student.pt --name cityscapes_csfoggy_ssda_960_yolov5l --img 960 --batch-size 6 --device 0
 ```
 
 ###### Dual-input
