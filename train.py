@@ -76,13 +76,13 @@ from ultralytics import YOLO
 # print(f"Best mAP50: {best_mAP}")
 # print(f"Best parameters (gamma, alpha, lambda): {best_params}")
 
-        # city_to_foggycity.yaml sourcecity
+        # city_to_foggycity.yaml sourcecity 6类
         # foggycityscapes.yaml oraclefoggy
         
-        # sim10k_to_cityscapes.yaml sourcesim10k
+        # sim10k_to_cityscapes.yaml sourcesim10k car 1类
         # cityscapes.yaml oraclecity
 
-        # voc_to_clipart1k.yaml sourcevoc
+        # voc_to_clipart1k.yaml sourcevoc 20类
         # clipart1k.yaml oracleclipart1k
         
         # pupower_to_prpower.yaml sourcepu
