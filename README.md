@@ -62,7 +62,9 @@ pip install -r DA-requirements.txt
 
 ###### Test & Detect
 ```bash
+# download .pt and datasets to inference,such as result/yolo26
 python val.py
+# visualize the result
 python detect.py
 ```
 
