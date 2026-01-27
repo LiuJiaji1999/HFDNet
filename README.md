@@ -170,6 +170,7 @@ python ssda_yolov5_test.py --data yamls_sda/cityscapes_csfoggy_VOC.yaml --weight
 
 ###### Dual-input
 ```bash
+main update as below:
 /ultralytics/models/yolo/model.py
 /ultralytics/models/yolo/detect/__init__.py 
 /ultralytics/models/yolo/detect/uda_train.py
@@ -181,7 +182,6 @@ python ssda_yolov5_test.py --data yamls_sda/cityscapes_csfoggy_VOC.yaml --weight
 /ultralytics/cfg/default.yaml # add weight value
 /ultralytics/nn/modules/head.py # head pseudo
 /ultralytics/utils/plotting.py # output_to_target
-
 ```
 
 
@@ -201,7 +201,7 @@ main_profile.py : a script that outputs the model and the parameters and calcula
 track.py : script to track inference
 ```
 
-### References
+### Reproduce
 Reference code links are all [HERE](https://github.com/stars/LiuJiaji1999/lists/reference-da), thanks to the spirit of open source.
 
 
