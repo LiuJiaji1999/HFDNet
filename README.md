@@ -71,7 +71,7 @@ python detect.py
 python train.py
 # nohup python train.py > /home/lenovo/data/liujiaji/powerGit/dayolo/logs/improve/c2f.log 2>&1 & tail -f /home/lenovo/data/liujiaji/powerGit/dayolo/logs/improve/c2f.log
 ------------------------
-SOTA Methods
+Thank you for the open-source code. [https://github.com/stars/LiuJiaji1999/lists/reference-da]
 ### DACA
 cd DACA
 conda activate DA [albumentations==1.4.2,numpy=1.22.3 最合适的版本匹配]
@@ -106,7 +106,6 @@ python val.py  --name exp  --data data/cityscapes2foggy.yaml --weights /home/len
 # daca
 python val.py  --name exp  --data data/sim10k2cityscapes.yaml  --weights runs/train/sim10k2cityscapes_daca/weights/best.pt 
 python val.py  --name exp  --data data/cityscapes2foggy.yaml  --weights runs/train/cityscapes2foggy_daca/weights/best.pt
-python val.py  --name exp  --data /home/lenovo/data/liujiaji/powerGit/dayolo/domain/publicpower_to_privatepower.yaml  --weights runs/train/public2private_daca/weights/best.pt 
 
 ------------------------
 
