@@ -62,7 +62,7 @@ pip install -r DA-requirements.txt
 
 ###### Test & Detect
 ```bash
-# download .pt and datasets to inference,such as result/yolo26
+# download .pt and datasets to inference
 python val.py
 # visualize the result
 python detect.py
@@ -170,7 +170,7 @@ python ssda_yolov5_test.py --data yamls_sda/cityscapes_csfoggy_VOC.yaml --weight
 
 ###### Dual-input
 ```bash
-main update as below:
+main update as below: # v5,v8,11,26 are similarly, only some differences
 /ultralytics/models/yolo/model.py
 /ultralytics/models/yolo/detect/__init__.py 
 /ultralytics/models/yolo/detect/uda_train.py
