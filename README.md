@@ -31,7 +31,6 @@ Public power data
 
 ## Weight
 Due to GitHub's inability to upload large files promptly, we have uploaded the weights of our proposed model and the state-of-the-art model for the four benchmark tasks to [Google Drive](https://drive.google.com/drive/my-drive).
-
 ![Alt text](googledrive.png)
 
 ## Quick Start Examples
