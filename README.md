@@ -1,7 +1,7 @@
 # HFDNet
 
 ## Introduction
-This is our PyTorch implementation of the paper "[`Hierarchical Feature Differentiation-guided Network for domain adaptation object detection`].
+This is our PyTorch implementation of the paper "[`Hierarchical Feature Difference-guided Network for domain adaptation object detection`].
 
 <div align="center">
     <img src="hfdnet.png" width="1000" alt="HFDet">
@@ -30,7 +30,7 @@ Public power data
 ```
 
 ## Weight
-Since github can't upload large files, we uploaded the weights of the four benchmark tasks to the [Google Drive](https://drive.google.com/drive/my-drive)
+Due to GitHub's inability to upload large files promptly, we have uploaded the weights of our proposed model and the state-of-the-art model for the four benchmark tasks to [Google Drive](https://drive.google.com/drive/my-drive).
 
 ## Quick Start Examples
 
@@ -62,9 +62,9 @@ pip install -r DA-requirements.txt
 
 ###### Test & Detect
 ```bash
-# download .pt and datasets to inference
+# download .pt and datasets to inference, such as in '/result' in Google Drive.
 python val.py
-# visualize the result
+# visualize the result, such as 'Detection Results' of the paper.
 python detect.py
 ```
 
