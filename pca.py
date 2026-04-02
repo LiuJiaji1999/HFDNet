@@ -9,7 +9,7 @@ import torchvision.transforms as transforms
 import os
 import cv2
 from scipy.linalg import sqrtm  # 用于计算矩阵平方根
-
+'''
 class CustomDataset(Dataset):
     def __init__(self, root_dir, transform=None):
         self.root_dir = root_dir
@@ -60,28 +60,28 @@ def calculate_fid(mu1, sigma1, mu2, sigma2):
 
 # **数据加载**
 # c2f
-# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format'
-# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format'
-# daod_weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
-# source_weight = 'runs/train/baseline/sourcecity/weights/best.pt'
+source_path = '/home/lenovo/data/liujiaji/Datasets-DA/CityScapes/yolov5_format'
+target_path = '/home/lenovo/data/liujiaji/Datasets-DA/CityScapesFoggy/yolov5_format'
+daod_weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
+source_weight = 'runs/train/baseline/sourcecity/weights/best.pt'
 
 # s2c
-# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/Sim10k'
-# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format_car_class'
+# source_path = '/home/lenovo/data/liujiaji/Datasets-DA/Sim10k'
+# target_path = '/home/lenovo/data/liujiaji/Datasets-DA/CityScapes/yolov5_format_car_class'
 # daod_weight = 'runs/train/improve/sourcesim10k-aptpse-dmm/weights/best.pt'
 # source_weight = 'runs/train/baseline/sourcesim10k/weights/best.pt'
 
 # # v2c
-# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/VOC/train/VOCdevkit/VOC2007/yolov5_format'
-# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format'
+# source_path = '/home/lenovo/data/liujiaji/Datasets-DA/VOC/train/VOCdevkit/VOC2007/yolov5_format'
+# target_path = '/home/lenovo/data/liujiaji/Datasets-DA/clipart/yolov5_format'
 # daod_weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
 # source_weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
 
 # pu2pr
-source_path = '/home/lenovo/data/liujiaji/Datasets/pupower'
-target_path = '/home/lenovo/data/liujiaji/Datasets/prpower'
-daod_weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
-source_weight = 'runs/train/baseline/sourcepu/weights/best.pt'
+# source_path = '/home/lenovo/data/liujiaji/Datasets/pupower'
+# target_path = '/home/lenovo/data/liujiaji/Datasets/prpower'
+# daod_weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
+# source_weight = 'runs/train/baseline/sourcepu/weights/best.pt'
 
 # 数据集加载（保持不变）
 source_dataset = CustomDataset(source_path, transform=transform)
@@ -144,7 +144,7 @@ x_min, y_min = feats_2d[:, 0].min(), feats_2d[:, 1].min()
 # )
 plt.title("PCA Visualization")
 plt.tight_layout()
-plt.savefig('./gap/pca/pca-pu2pr-compare.png', dpi=300)
+plt.savefig('./gap/pca/pca-c2f-0402.png', dpi=300)
 
 
 '''
@@ -188,27 +188,27 @@ transform = transforms.Compose([
 
 # **数据加载**
 # c2f
-# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format'
-# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format'
-# # weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
-# weight = 'runs/train/baseline/sourcecity/weights/best.pt'
+# source_path = '/home/lenovo/data/liujiaji/Datasets-DA/CityScapes/yolov5_format'
+# target_path = '/home/lenovo/data/liujiaji/Datasets-DA/CityScapesFoggy/yolov5_format'
+# weight = 'runs/train/improve/sourcecity-aptpse-dmm/weights/best.pt'
+# # weight = 'runs/train/baseline/sourcecity/weights/best.pt'
 
 # s2c
-# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/Sim10k'
-# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format_car_class'
+source_path = '/home/lenovo/data/liujiaji/Datasets-DA/Sim10k'
+target_path = '/home/lenovo/data/liujiaji/Datasets-DA/CityScapes/yolov5_format_car_class'
 # weight = 'runs/train/improve/sourcesim10k-aptpse-dmm/weights/best.pt'
-# # weight = 'runs/train/baseline/sourcesim10k/weights/best.pt'
+weight = 'runs/train/baseline/sourcesim10k/weights/best.pt'
 
 # # # v2c
-# source_path = '/home/lenovo/data/liujiaji/DA-Datasets/VOC/train/VOCdevkit/VOC2007/yolov5_format'
-# target_path = '/home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format'
-# # weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
-# weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
+# source_path = '/home/lenovo/data/liujiaji/Datasets-DA/VOC/train/VOCdevkit/VOC2007/yolov5_format'
+# target_path = '/home/lenovo/data/liujiaji/Datasets-DA/clipart/yolov5_format'
+# weight = 'runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
+# # weight = 'runs/train/baseline/sourcevoc/weights/best.pt'
 
-# pu2pr
-source_path = '/home/lenovo/data/liujiaji/Datasets/pupower'
-target_path = '/home/lenovo/data/liujiaji/Datasets/prpower'
-weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
+# # pu2pr
+# source_path = '/home/lenovo/data/liujiaji/Datasets-Power/pupower'
+# target_path = '/home/lenovo/data/liujiaji/Datasets-Power/prpower'
+# # weight = 'runs/train/improve/sourcepu-aptpse-dmm/weights/best.pt'
 # weight = 'runs/train/baseline/sourcepu/weights/best.pt'
 
 source_dataset = CustomDataset(source_path, transform=transform)
@@ -295,7 +295,7 @@ fid_score = calculate_fid(mu_s, sigma_s, mu_t, sigma_t)
 print(f"Frechet Distance (FID) Score: {fid_score:.4f}")
 
 # plt.title(f"PCA Visualization (FID={fid_score:.2f})(Exp. Var. {pca.explained_variance_ratio_.sum():.2f})")
-plt.title(f"PCA Visualization (FID={fid_score:.2f})")
-plt.savefig('./gap/pca/pca-pu2pr.png', dpi=300, bbox_inches='tight')
+# plt.title(f"PCA Visualization (FID={fid_score:.2f})")
+plt.title(f"PCA Visualization (FID={fid_score:.2f})", fontsize=16)
+plt.savefig('./gap/pca/update/pca-pu2pr-so.png', dpi=300, bbox_inches='tight')
 
-'''
