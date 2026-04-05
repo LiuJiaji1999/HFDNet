@@ -117,7 +117,7 @@ if __name__ == '__main__':
                 # fraction=0.2,
                 cos_lr = True,
                 # project='runs/debug',
-                project='runs/train/aqpf',
+                project='runs/train/aqpf/noiou',
                 name = 'c2f',
-                # mixup = 1.0,
+                mixup = 1.0,
                 )
