@@ -72,8 +72,6 @@ class Detect(nn.Module):
         # N：这是第三个维度，代表所有特征图上锚点位置的总和，即预测框的数量。N=80*80+40*40+20*20=8400
         #  y[b, :, n]  # 对于批次b中的第n个预测框，它包含了 (4个坐标 + nc个类别分数) 共 (4+nc) 个值。
  
-        
-        
         if pseudo:
             if not hasattr(self, "printed_pseudo"): # self中没有该变量，就执行；有就不执行
                 print('**************** head/forward/pseudo')
@@ -120,9 +118,11 @@ class Detect(nn.Module):
             c_comb = c_det * c_bbx  # 综合置信度  ([4, 8, 8400])
             y[:, 4:,:] = (1 - delta) * c_det + delta * c_comb  # 使用 delta 参数更新置信度
 
+            # 仅检测置信度 c_det
+            # y[:, 4:,:] = c_det
+
         return y if self.export else (y, x)
     
-
 
     def forward_end2end(self, x):
         """
