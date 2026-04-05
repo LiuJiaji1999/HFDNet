@@ -99,9 +99,16 @@ if __name__ == '__main__':
     
     model = YOLO('ultralytics/cfg/models/v8/yolov8m.yaml')
     # model.load('yolov5mu.pt')
-    model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity2/weights/best.pt') # loading pretrain weights
+#     model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity2/weights/best.pt') # loading pretrain weights
+    model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcesim10k/weights/best.pt') # loading pretrain weights
+#     model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity2/weights/best.pt') # loading pretrain weights
+#     model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcevoc/weights/best.pt') # loading pretrain weights
     
-    result = model.train(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
+    result = model.train(
+                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
+                data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/sim10k_to_cityscapes.yaml',
+                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
+                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/pupower_to_prpower.yaml',
                 cache=False,
                 imgsz=640,
                 epochs=50,
@@ -117,7 +124,7 @@ if __name__ == '__main__':
                 # fraction=0.2,
                 cos_lr = True,
                 # project='runs/debug',
-                project='runs/train/aqpf/noiou',
+                project='runs/train/aqpf/noiou', # nodelta 
                 name = 'c2f',
                 mixup = 1.0,
                 )
