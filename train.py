@@ -125,6 +125,6 @@ if __name__ == '__main__':
                 cos_lr = True,
                 # project='runs/debug',
                 project='runs/train/aqpf/noiou', # nodelta 
-                name = 'c2f',
+                name = 's2c',
                 mixup = 1.0,
                 )
