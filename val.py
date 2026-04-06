@@ -13,11 +13,11 @@ def get_weight_size(path):
 
 if __name__ == '__main__':
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
-    # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/noiou/pu2pr/weights/best.pt'
-    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/nodelta/s2c/weights/best.pt'
+    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/noiou/v2c/weights/best.pt'
+    # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/nodelta/s2c/weights/best.pt'
    
     model = YOLO(model_path)
-    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/sim10k_to_cityscapes.yaml',
+    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
               split='val',
               imgsz=640,
               batch=8,
@@ -25,7 +25,7 @@ if __name__ == '__main__':
               # rect=False,
               save_json=True, # if you need to cal coco metrice
               project='runs/val/apqf',
-              name='s2c-nodelta', # nodelta noiou
+              name='v2c-noiou', # nodelta noiou
               )
     
     # city_to_foggycity.yaml sourcecity
