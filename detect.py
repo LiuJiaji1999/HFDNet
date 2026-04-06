@@ -9,10 +9,10 @@ from ultralytics import YOLO
 # ours:       improve/sourcecity-aptpse-dmm  /sourcesim10k-aptpse-dmm    /sourcevoc-aptpse-dmm    /sourcepublic-aptpse-dmm2
 # oracle:      baseline/oraclefoggy          /oraclecity                 /oracleclipart1k         /oracleprivate sourceprivate
 
-# /home/lenovo/data/liujiaji/DA-Datasets/CityScapesFoggy/yolov5_format/images/val
-# /home/lenovo/data/liujiaji/DA-Datasets/CityScapes/yolov5_format_car_class/images/val
-# /home/lenovo/data/liujiaji/DA-Datasets/clipart/yolov5_format/images/val
-# /home/lenovo/data/liujiaji/Datasets/prpower/images/val 
+# /home/lenovo/data/liujiaji/Datasets-DA/CityScapesFoggy/yolov5_format/images/val
+# /home/lenovo/data/liujiaji/Datasets-DA/CityScapes/yolov5_format_car_class/images/val
+# /home/lenovo/data/liujiaji/Datasets-DA/clipart/yolov5_format/images/val
+# /home/lenovo/data/liujiaji/Datasets-Power/prpower/images/val 
 
 if __name__ == '__main__':
     model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcepu/weights/best.pt') # select your model.pt path
