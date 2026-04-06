@@ -31,6 +31,8 @@ Public power data
 
 ## Weight
 Due to GitHub's inability to upload large files promptly, we have uploaded the weights of our proposed model and the state-of-the-art model for the four benchmark tasks to [Google Drive](https://drive.google.com/drive/my-drive).
+Ablation of AQPF [c_det, c without δ , c with δ, c with δ + IoU] , their weight is in [Baidu Cloud](https://pan.baidu.com/s/1YM6Y0sE3-vt8PBLZv6mDcQ?pwd=2qph).
+
 ![Alt text](googledrive.png)
 
 ## Quick Start Examples
