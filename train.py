@@ -124,7 +124,7 @@ if __name__ == '__main__':
                 # fraction=0.2,
                 cos_lr = True,
                 # project='runs/debug',
-                project='runs/train/aqpf/nodelta', # nodelta  noiou
+                project='runs/train/aqpf/cdet', # nodelta  noiou
                 name = 'v2c',
                 mixup = 1.0,
                 )
