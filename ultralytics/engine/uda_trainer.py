@@ -757,9 +757,9 @@ class UDABaseTrainer:
                         batch_s['img'] = batch_s['img'][:min_batch_size]
                         batch_t['img'] = batch_t['img'][:min_batch_size]
 
-                    r = ni / max_iterations
-                    delta = 2 / (1 + math.exp(-5. * r)) - 1
-                    # delta = 0.5
+                    # r = ni / max_iterations
+                    # delta = 2 / (1 + math.exp(-5. * r)) - 1
+                    delta = 0.5
                     
                     pred_s = self.model(batch_s['img'], pseudo=True, delta=delta)  # forward          
                     pseudo_s, pred_s = pred_s # 源域 的 检测结果，特征图
