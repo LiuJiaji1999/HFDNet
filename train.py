@@ -101,8 +101,8 @@ if __name__ == '__main__':
     # model.load('yolov5mu.pt')
     # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity2/weights/best.pt') # loading pretrain weights
     # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcesim10k/weights/best.pt') # loading pretrain weights
-    model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity2/weights/best.pt') # loading pretrain weights
-    # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcevoc/weights/best.pt') # loading pretrain weights
+    model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcevoc/weights/best.pt') # loading pretrain weights
+    # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcepu2/weights/best.pt') # loading pretrain weights
     
     result = model.train(
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
@@ -124,7 +124,7 @@ if __name__ == '__main__':
                 # fraction=0.2,
                 cos_lr = True,
                 # project='runs/debug',
-                project='runs/train/aqpf/nodelta', # nodelta  noiou
+                project='runs/train/aqpf/noiou', # nodelta  noiou
                 name = 'v2c',
                 mixup = 1.0,
                 )
