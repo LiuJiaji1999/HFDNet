@@ -103,23 +103,23 @@ class Detect(nn.Module):
             # print(y.shape) # ([4, 12, 8400])
             # print(c_det.shape)# ([4, 8, 8400])
                
-            # # 计算每个框的坐标“不确定性”或“稳定性”，
-            # ## 方法一
-            # # Confmix本质是坐标的方差，但 代码的 mean 操作很令人费解，因为它将一个与位置相关的坐标值变成了一个全局统计量。
+            # 计算每个框的坐标“不确定性”或“稳定性”，
+            ## 方法一
+            # Confmix本质是坐标的方差，但 代码的 mean 操作很令人费解，因为它将一个与位置相关的坐标值变成了一个全局统计量。
             # c_bbx = (1 - torch.mean(y[:, :4,:], axis=1)).detach()  # 边界框的置信度
-            # # print(c_bbx.shape) #  ([4, 8400])
-            # ## 方法二
-            # # 计算每个框的宽高乘积的倒数（面积越大，不确定性可能越低）
-            # # areas = y[:, :4,:][:, 2, :] * y[:, :4,:][:, 3, :]  # w * h
-            # # c_bbx = 1 / (1 + areas)  # 一个示例性的转换
-            # c_bbx = c_bbx.unsqueeze(1).expand_as(c_det)
-            # # print(c_bbx.shape) #  ([4, 8, 8400])
+            # print(c_bbx.shape) #  ([4, 8400])
+            ## 方法二
+            # 计算每个框的宽高乘积的倒数（面积越大，不确定性可能越低）
+            areas = y[:, :4,:][:, 2, :] * y[:, :4,:][:, 3, :]  # w * h
+            c_bbx = 1 / (1 + areas)  # 一个示例性的转换
+            c_bbx = c_bbx.unsqueeze(1).expand_as(c_det)
+            # print(c_bbx.shape) #  ([4, 8, 8400])
             
-            # c_comb = c_det * c_bbx  # 综合置信度  ([4, 8, 8400])
-            # y[:, 4:,:] = (1 - delta) * c_det + delta * c_comb  # 使用 delta 参数更新置信度
+            c_comb = c_det * c_bbx  # 综合置信度  ([4, 8, 8400])
+            y[:, 4:,:] = (1 - delta) * c_det + delta * c_comb  # 使用 delta 参数更新置信度
 
-            # 仅检测置信度 c_det
-            y[:, 4:,:] = c_det
+            # # 仅检测置信度 c_det
+            # y[:, 4:,:] = c_det
 
         return y if self.export else (y, x)
     
