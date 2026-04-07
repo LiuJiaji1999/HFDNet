@@ -15,10 +15,10 @@ if __name__ == '__main__':
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/noiou/pu2pr/weights/best.pt'
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/nodelta/v2c/weights/best.pt'
-    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/cdet/c2f/weights/last.pt'
+    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/cdet/s2c/weights/best.pt'
    
     model = YOLO(model_path)
-    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
+    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/sim10k_to_cityscapes.yaml',
               split='val',
               imgsz=640,
               batch=8,
@@ -26,7 +26,7 @@ if __name__ == '__main__':
               # rect=False,
               save_json=True, # if you need to cal coco metrice
               project='runs/val/apqf',
-              name='c2f-cdet', # nodelta noiou cdet
+              name='s2c-cdet', # nodelta noiou cdet
               )
     
     # city_to_foggycity.yaml sourcecity
