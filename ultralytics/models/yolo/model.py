@@ -35,8 +35,8 @@ class YOLO(Model):
             },
             "detect": {
                 "model": DetectionModel,
-                # "trainer": yolo.detect.DetectionTrainer,
-                "trainer": yolo.detect.UDADetectionTrainer,
+                "trainer": yolo.detect.DetectionTrainer,
+                # "trainer": yolo.detect.UDADetectionTrainer,
                 "validator": yolo.detect.DetectionValidator,
                 "predictor": yolo.detect.DetectionPredictor,
             },

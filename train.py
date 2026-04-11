@@ -98,20 +98,25 @@ if __name__ == '__main__':
     # model.load('yolov8m.pt')
     
     model = YOLO('ultralytics/cfg/models/v8/yolov8m.yaml')
-    # model.load('yolov5mu.pt')
-#     model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity2/weights/best.pt') # loading pretrain weights
-    model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcesim10k/weights/best.pt') # loading pretrain weights
+    model.load('yolov8m.pt')
+    # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcecity2/weights/best.pt') # loading pretrain weights
+    # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcesim10k/weights/best.pt') # loading pretrain weights
     # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcevoc/weights/best.pt') # loading pretrain weights
     # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcepu2/weights/best.pt') # loading pretrain weights
     
     result = model.train(
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
-                data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/sim10k_to_cityscapes.yaml',
+                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/sim10k_to_cityscapes.yaml',
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/pupower_to_prpower.yaml',
+            ### 2024.4.11
+                data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower-pin-source.yaml',
+                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower-pin-target.yaml',
+                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower_to_prpower_pin.yaml',
+
                 cache=False,
                 imgsz=640,
-                epochs=50,
+                epochs=100,
                 batch=8, # 32
                 close_mosaic=10, 
                 workers=8,# 4
@@ -124,7 +129,7 @@ if __name__ == '__main__':
                 # fraction=0.2,
                 cos_lr = True,
                 # project='runs/debug',
-                project='runs/train/aqpf/cdet', # nodelta  noiou
-                name = 's2c',
-                mixup = 1.0,
+                project='runs/train/improve', # nodelta  noiou
+                name = 'sourceprpin', # oracleprpin spin2tpin
+                # mixup = 1.0,
                 )
