@@ -104,6 +104,8 @@ if __name__ == '__main__':
     # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcevoc/weights/best.pt') # loading pretrain weights
     # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourcepu2/weights/best.pt') # loading pretrain weights
     
+    # model.load('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourceprpin/weights/best.pt') # loading pretrain weights
+    
     result = model.train(
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/city_to_foggycity.yaml',
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/sim10k_to_cityscapes.yaml',
@@ -129,7 +131,7 @@ if __name__ == '__main__':
                 # fraction=0.2,
                 cos_lr = True,
                 # project='runs/debug',
-                project='runs/train/improve', # nodelta  noiou
+                project='runs/train/baseline', # nodelta  noiou
                 name = 'sourceprpin', # oracleprpin spin2tpin
                 # mixup = 1.0,
                 )

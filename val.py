@@ -15,18 +15,19 @@ if __name__ == '__main__':
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/improve/sourcevoc-aptpse-dmm/weights/best.pt'
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/noiou/pu2pr/weights/best.pt'
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/nodelta/v2c/weights/best.pt'
-    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/cdet/s2c/weights/best.pt'
+    # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/cdet/s2c/weights/best.pt'
+    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/souceprpin/weights/best.pt'
    
     model = YOLO(model_path)
-    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/sim10k_to_cityscapes.yaml',
+    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower_to_prpower_pin.yaml',
               split='val',
               imgsz=640,
               batch=8,
               # iou=0.7,
               # rect=False,
               save_json=True, # if you need to cal coco metrice
-              project='runs/val/apqf',
-              name='s2c-cdet', # nodelta noiou cdet
+              project='runs/val/baseline',
+              name='sourceprpin', # nodelta noiou cdet
               )
     
     # city_to_foggycity.yaml sourcecity
@@ -40,6 +41,9 @@ if __name__ == '__main__':
 
     # pupower_to_prpower.yaml sourcepu
     # prpower.yaml oraclepr
+
+    # prpower_to_prpower_pin.yaml sourceprpin
+    # prpower-pin-target.yaml oracleprpin
 
     # publicpower_to_privatepower.yaml sourcepublic
     # privatepower.yaml oracleprivate
