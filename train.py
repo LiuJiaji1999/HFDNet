@@ -114,7 +114,7 @@ if __name__ == '__main__':
             ### 2024.4.11
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower-pin-source.yaml',
                 data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower-pin-target.yaml',
-                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower_to_prpower_pin.yaml',
+                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower_to_prpower-pin.yaml',
 
                 cache=False,
                 imgsz=640,
