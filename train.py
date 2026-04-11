@@ -112,8 +112,8 @@ if __name__ == '__main__':
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/voc_to_clipart1k.yaml',
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/pupower_to_prpower.yaml',
             ### 2024.4.11
-                data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower-pin-source.yaml',
-                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower-pin-target.yaml',
+                # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower-pin-source.yaml',
+                data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower-pin-target.yaml',
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower_to_prpower_pin.yaml',
 
                 cache=False,
@@ -132,6 +132,6 @@ if __name__ == '__main__':
                 cos_lr = True,
                 # project='runs/debug',
                 project='runs/train/baseline', # nodelta  noiou
-                name = 'sourceprpin', # oracleprpin spin2tpin
+                name = 'oracleprpin', # oracleprpin spin2tpin
                 # mixup = 1.0,
                 )
