@@ -117,7 +117,7 @@ if __name__ == '__main__':
                 # data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower_to_prpower-pin.yaml',
 
                 cache=False,
-                imgsz=640,
+                imgsz=800,
                 epochs=100,
                 batch=8, # 32
                 close_mosaic=10, 

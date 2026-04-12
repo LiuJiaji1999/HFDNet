@@ -16,10 +16,10 @@ if __name__ == '__main__':
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/noiou/pu2pr/weights/best.pt'
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/nodelta/v2c/weights/best.pt'
     # model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/aqpf/cdet/s2c/weights/best.pt'
-    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourceprpin/weights/best.pt'
+    model_path = '/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/oracleprpin2/weights/best.pt'
    
     model = YOLO(model_path)
-    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower_to_prpower-pin.yaml',
+    result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower-pin-target.yaml',
               split='val',
               imgsz=640,
               batch=8,
@@ -27,7 +27,7 @@ if __name__ == '__main__':
               # rect=False,
               save_json=True, # if you need to cal coco metrice
               project='runs/val/baseline',
-              name='sourceprpin', # nodelta noiou cdet
+              name='oracleprpin', # nodelta noiou cdet
               plots=False
               )
     
