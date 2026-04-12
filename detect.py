@@ -1,7 +1,7 @@
 import warnings
 warnings.filterwarnings('ignore')
 from ultralytics import YOLO
-
+from pathlib import Path
 # 推理参数官方详解链接：https://docs.ultralytics.com/modes/predict/#inference-sources:~:text=of%20Results%20objects-,Inference%20Arguments,-model.predict()
        
 # city_to_foggycity.yaml  sim10k_to_cityscapes.yaml voc_to_clipart1k.yaml publicpower_to_privatepower
@@ -15,14 +15,29 @@ from ultralytics import YOLO
 # /home/lenovo/data/liujiaji/Datasets-Power/prpower/images/val 
 
 if __name__ == '__main__':
-    model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/oracleprpin2/weights/best.pt') # select your model.pt path
+    model = YOLO('/home/lenovo/data/liujiaji/yolov8/ultralytics-main-8.2.50/runs/train/baseline/sourceprpin/weights/best.pt') # select your model.pt path
+    # 图片目录
+#     source_dir = Path('/home/lenovo/data/liujiaji/Datasets-Power/privatepower-s-t/source/images/test')
+#     # 支持的图片格式
+#     exts = ['*.jpg', '*.jpeg', '*.png', '*.bmp', '*.JPG', '*.PNG']
+#     # 收集所有图片
+#     img_paths = []
+#     for ext in exts:
+#         img_paths.extend(source_dir.glob(ext))
+#     # 排序（保证顺序一致）
+#     img_paths = sorted(img_paths)
+#     # 只取前200张
+#     img_paths = img_paths[:200]
+#     print(f"Total selected images: {len(img_paths)}")
+    # 转成字符串列表（YOLO需要）
+#     img_paths = [str(p) for p in img_paths]
     model.predict(
-                  source='/home/lenovo/data/liujiaji/Datasets-Power/privatepower-s-t/target/images/val', 
+                  # source= img_paths,
+                  source='/home/lenovo/data/liujiaji/Datasets-Power/privatepower-s-t/source/images/test', 
                   # target='/home/lenovo/data/liujiaji/Datasets/prpower/images/val',
-
-                  imgsz=640,
+                  imgsz=960,
                   project='runs/detect',
-                  name='prpower_to_prpower-pin/target',
+                  name='prpower_to_prpower-pin/oracle',
                   save=True, # result save
                   conf=0.6,
                   # stream=True,
