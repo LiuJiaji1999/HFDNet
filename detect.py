@@ -35,7 +35,7 @@ if __name__ == '__main__':
                   # source= img_paths,
                   source='/home/lenovo/data/liujiaji/Datasets-Power/privatepower-s-t/source/images/test', 
                   # target='/home/lenovo/data/liujiaji/Datasets/prpower/images/val',
-                  imgsz=960,
+                  imgsz=640,
                   project='runs/detect',
                   name='prpower_to_prpower-pin/oracle',
                   save=True, # result save

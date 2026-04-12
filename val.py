@@ -21,7 +21,7 @@ if __name__ == '__main__':
     model = YOLO(model_path)
     result = model.val(data='/home/lenovo/data/liujiaji/powerGit/dayolo/domain/prpower_to_prpower-pin.yaml',
               split='test',
-              imgsz=960,
+              imgsz=640,
               batch=8,
               # iou=0.7,
               # rect=False,
